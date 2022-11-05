@@ -1,0 +1,272 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Posts on dhruv.Sha256</title>
+        <link>https://dhruvsha256.github.io/posts/</link>
+        <description>Recent content in Posts on dhruv.Sha256</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sun, 14 Aug 2022 11:13:47 +0530</lastBuildDate>
+        <atom:link href="https://dhruvsha256.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Map, Filter, Reduce in python</title>
+            <link>https://dhruvsha256.github.io/posts/2022/07/map-filter-reduce-in-python/</link>
+            <pubDate>Mon, 18 Jul 2022 00:00:00 +0000</pubDate>
+            
+            <guid>https://dhruvsha256.github.io/posts/2022/07/map-filter-reduce-in-python/</guid>
+            <description>li = [x for x in range(100)] map: li = list(map(lambda x : x/2,li)) map(function,iteritable) return a map object after applying given function to all elements of, which can be then converted to a list iteritable equivalent to for x in li: x = x/2 filter: even = list(filter(lambda x : x%2 == 0 ,li)) filter(function,iteritable) return a filter object after applying given function to all elements of iteritable equivalent to even = [] for x in li: if x%2 == 0 : even.</description>
+            <content type="html"><![CDATA[<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>     li <span style="color:#f92672">=</span> [x <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">100</span>)]
+</span></span></code></pre></div><h2 id="map">map:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>  li <span style="color:#f92672">=</span> list(map(<span style="color:#66d9ef">lambda</span> x : x<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>,li))
+</span></span></code></pre></div><ul>
+<li>map(function,iteritable)</li>
+<li>return a map object after applying given function to all elements of, which can be
+then converted to a list
+iteritable</li>
+<li>equivalent to</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> li:
+</span></span><span style="display:flex;"><span>      x <span style="color:#f92672">=</span> x<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>
+</span></span></code></pre></div><h2 id="filter">filter:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>  even <span style="color:#f92672">=</span> list(filter(<span style="color:#66d9ef">lambda</span> x : x<span style="color:#f92672">%</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> ,li))
+</span></span></code></pre></div><ul>
+<li>filter(function,iteritable)</li>
+<li>return a filter object after applying given function to all elements
+of iteritable</li>
+<li>equivalent to</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>  even <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> li:
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> x<span style="color:#f92672">%</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> :
+</span></span><span style="display:flex;"><span>          even<span style="color:#f92672">.</span>append(x)
+</span></span></code></pre></div><h2 id="reduce">reduce:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>  <span style="color:#f92672">from</span> functools <span style="color:#f92672">import</span> reduce
+</span></span><span style="display:flex;"><span>  maxx <span style="color:#f92672">=</span> reduce( <span style="color:#66d9ef">lambda</span> x,y : x <span style="color:#66d9ef">if</span> x <span style="color:#f92672">&gt;</span> y <span style="color:#66d9ef">else</span> y, li)
+</span></span><span style="display:flex;"><span>  print(maxx)
+</span></span></code></pre></div><ul>
+<li>reduce(function,iteritable)</li>
+<li>have to import it from functools module</li>
+<li>return a map object after applying given function to all elements of
+iteritable</li>
+<li>equivalent to</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>  y <span style="color:#f92672">=</span> li[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>  maxx <span style="color:#f92672">=</span> y
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> li:
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> x <span style="color:#f92672">&gt;</span> y :
+</span></span><span style="display:flex;"><span>          maxx <span style="color:#f92672">=</span> x
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">else</span> :
+</span></span><span style="display:flex;"><span>          maxx <span style="color:#f92672">=</span> y
+</span></span><span style="display:flex;"><span>  print(maxx)
+</span></span></code></pre></div>]]></content>
+        </item>
+        
+        <item>
+            <title>hello world</title>
+            <link>https://dhruvsha256.github.io/posts/2022/07/hello-world/</link>
+            <pubDate>Sun, 17 Jul 2022 00:00:00 +0000</pubDate>
+            
+            <guid>https://dhruvsha256.github.io/posts/2022/07/hello-world/</guid>
+            <description>Code snippet #include&amp;lt;iostream&amp;gt; using namespace std; ing main(){ cout &amp;lt;&amp;lt; &amp;#34;hello world&amp;#34;; return 0; } Latex The following $$\int_{a}^{b} x^2 dx$$ Is an integral</description>
+            <content type="html"><![CDATA[<h2 id="code-snippet">Code snippet</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span><span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> std;
+</span></span><span style="display:flex;"><span>ing <span style="color:#a6e22e">main</span>(){
+</span></span><span style="display:flex;"><span>    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;hello world&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="latex">Latex</h2>
+<p>The following
+$$\int_{a}^{b} x^2 dx$$
+Is an integral</p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Happiness</title>
+            <link>https://dhruvsha256.github.io/posts/2022/08/happiness/</link>
+            <pubDate>Sun, 14 Aug 2022 11:13:47 +0530</pubDate>
+            
+            <guid>https://dhruvsha256.github.io/posts/2022/08/happiness/</guid>
+            <description>What is Happiness Is it a state when you are not sad you are not sad when people do something which is beneficial for their survival and reproduction you have this feeling of happiness, when your brain rewards you with some chemicals do we have to be happy all the time ?? Is it immoral to not be happy ?? Is happiness a social construct ?? Why do feel sad for people who are not happy How can you be happy have a sense of belonging have a sense of agency have a sense of purpose Find your purpose in a tribe Find a tribe can be your friends, your family, someone you love, a group of people sharing common interests etc.</description>
+            <content type="html"><![CDATA[<h1 id="what-is-happiness">What is Happiness</h1>
+<ul>
+<li>Is it a state when you are not sad</li>
+<li>you are not sad when people do something which is beneficial for their survival and reproduction</li>
+<li>you have this feeling of happiness, when your brain rewards you with some chemicals</li>
+<li>do we have to be happy all the time ??</li>
+<li>Is it immoral to not be happy ??</li>
+<li>Is happiness a social construct ??</li>
+<li>Why do feel sad for people who are not happy</li>
+</ul>
+<h1 id="how-can-you-be-happy">How can you be happy</h1>
+<ul>
+<li>have a sense of belonging</li>
+<li>have a sense of agency</li>
+<li>have a sense of purpose</li>
+</ul>
+<h2 id="find-your-purpose-in-a-tribe">Find your purpose in a tribe</h2>
+<h3 id="find-a-tribe">Find a tribe</h3>
+<ul>
+<li>can be your friends, your family, someone you love, a group of people sharing common interests etc. etc.</li>
+</ul>
+<h3 id="get-accepted-by-the-tribe">Get accepted by the tribe</h3>
+<ul>
+<li>have a sense of belonging</li>
+</ul>
+<h3 id="help-the-tribe">Help the tribe</h3>
+<ul>
+<li>make efforts and have a sense that your efforts matter</li>
+</ul>
+<h3 id="get-appreciated-by-the-tribe-for-your-efforts">Get appreciated by the tribe for your efforts</h3>
+<ul>
+<li>acknowledged by the tribe for your efforts</li>
+</ul>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Car Radio - Twenty One Pilots</title>
+            <link>https://dhruvsha256.github.io/posts/2022/08/car-radio-twenty-one-pilots/</link>
+            <pubDate>Mon, 08 Aug 2022 01:28:08 +0530</pubDate>
+            
+            <guid>https://dhruvsha256.github.io/posts/2022/08/car-radio-twenty-one-pilots/</guid>
+            <description>distracting yourself by listening to car radio I ponder of something great My lungs will fill and then deflate They fill with fire Exhale desire I know it&amp;#39;s dire My time today I have these thoughts So often I ought To replace that slot With what I once bought &amp;#39;Cause somebody stole My car radio And now I just sit in silence he distracted himself by listening to his car radio, but someone stole it we distract ourselves from our meaningless by clinging to some idea, some person, some materialistic thing some became nihilist, some became hedonist, some became slave, some accept religion dealing with existential crisis Sometimes quiet is violent I find it hard to hide it My pride is no longer inside It&amp;#39;s on my sleeve My skin will scream Reminding me of Who I killed inside my dream I hate this car that I&amp;#39;m driving There&amp;#39;s no hiding for me I&amp;#39;m forced to deal with what I feel There is no distraction to mask what is real I could pull the steering wheel he got to know that his pride is not inside him but in how he is perceived by others he now know that he had killed himself in his dreams, just to fit in and now their is no car radio to distract him from this guilt he is fed up to the point that he even thought of killing himself (pulling the steering wheel) it is a frightening thought I ponder of something terrifying &amp;#39;Cause this time there&amp;#39;s no sound to hide behind I find over the course of our human existence One thing consists of consistence And it&amp;#39;s that we&amp;#39;re all battling fear Oh dear, I don&amp;#39;t know if we know why we&amp;#39;re here Oh my, Too deep Please stop thinking I liked it better when my car had sound this feeling, this thought is so frightening for him and he can&amp;rsquo;t suppress these only thing that is consistent in everybody&amp;rsquo;s life is that they are constantly battling with their suffering and fear He wants to stop thinking about this, and just be normal but ironically, normal is defined by others, and if you dont fit in their template of normal then you are not accepted as normal He wants to be normal and live in a delusional reality, or does he !</description>
+            <content type="html"><![CDATA[<h2 id="distracting-yourself-by-listening-to-car-radio">distracting yourself by listening to car radio</h2>
+<pre tabindex="0"><code class="language-_" data-lang="_">I ponder of something great
+My lungs will fill and then deflate
+They fill with fire
+Exhale desire
+I know it&#39;s dire
+My time today
+I have these thoughts
+So often I ought
+To replace that slot
+With what I once bought
+&#39;Cause somebody stole
+My car radio
+And now I just sit in silence
+</code></pre><ul>
+<li>he distracted himself by listening to his car radio, but someone
+stole it</li>
+<li>we distract ourselves from our meaningless by clinging to some idea,
+some person, some materialistic thing</li>
+<li>some became nihilist, some became hedonist, some became slave, some accept religion</li>
+</ul>
+<h2 id="dealing-with-existential-crisis">dealing with existential crisis</h2>
+<pre tabindex="0"><code class="language-_" data-lang="_">Sometimes quiet is violent
+I find it hard to hide it
+My pride is no longer inside
+It&#39;s on my sleeve
+My skin will scream
+Reminding me of
+Who I killed inside my dream
+I hate this car that I&#39;m driving
+There&#39;s no hiding for me
+I&#39;m forced to deal with what I feel
+There is no distraction to mask what is real
+I could pull the steering wheel
+</code></pre><ul>
+<li>he got to know that his pride is not inside him but in how he is
+perceived by others</li>
+<li>he now know that he had killed himself in his dreams, just to fit in
+and now their is no car radio to distract him from this guilt</li>
+<li>he is fed up to the point that he even thought of killing himself (pulling the
+steering wheel)</li>
+</ul>
+<h2 id="it-is-a-frightening-thought">it is a frightening thought</h2>
+<pre tabindex="0"><code class="language-_" data-lang="_">I ponder of something terrifying
+&#39;Cause this time there&#39;s no sound to hide behind
+I find over the course of our human existence
+One thing consists of consistence
+And it&#39;s that we&#39;re all battling fear
+Oh dear, I don&#39;t know if we know why we&#39;re here
+Oh my,
+Too deep
+Please stop thinking
+I liked it better when my car had sound
+</code></pre><ul>
+<li>this feeling, this thought is so frightening for him and he can&rsquo;t
+suppress these</li>
+<li>only thing that is consistent in everybody&rsquo;s life is that they are
+constantly battling with their suffering and fear</li>
+<li>He wants to stop thinking about this, and just be <em>normal</em></li>
+<li>but ironically, normal is defined by others, and if you dont fit in
+their template of normal then you are not accepted as normal</li>
+<li>He wants to be <em>normal</em> and live in a delusional reality, or does he !</li>
+</ul>
+<h2 id="dealing-with-it">dealing with it</h2>
+<pre tabindex="0"><code class="language-_" data-lang="_">There are things we can do
+But from the things that work there are only two
+And from the two that we choose to do
+Peace will win
+And fear will lose
+There&#39;s faith and there&#39;s sleep
+We need to pick one please because
+Faith is to be awake
+And to be awake is for us to think
+And for us to think is to be alive
+And I will try with every rhyme
+To come across like I am dying
+To let you know you need to try to think
+</code></pre><ul>
+<li>now that you know that life has no meaning, you just accept it</li>
+<li>enjoy it or you become delusional just like the majority of people</li>
+<li>to have faith is to be awake and think (<code>I think therefore I am</code> -
+<em>Rene Descartes</em>, a cliche quote ik)</li>
+<li>the only thing that separates alive and dead is their conciousness,
+their ability to think</li>
+<li>he is dying to let others know about what he just discovered, and
+force them to think, as it liberated him</li>
+</ul>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Absurdism Extentialism Nihilism</title>
+            <link>https://dhruvsha256.github.io/posts/2022/07/absurdism-extentialism-nihilism/</link>
+            <pubDate>Sun, 17 Jul 2022 23:03:04 +0530</pubDate>
+            
+            <guid>https://dhruvsha256.github.io/posts/2022/07/absurdism-extentialism-nihilism/</guid>
+            <description>Nihilism I know that there is no objective meaning outside the illusions we (humans) as a society created. Existentialism As humans, we have freedom to create our own meaning to live. Essence make something what it is a defined purpose a meaning to life an essence, necessary for anything to exist Absurdism Constant tension between the hunger for meaning and impossibility of satisfying this drive in a meaningless world. Stare in this meaninglessness and show middle finger.</description>
+            <content type="html"><![CDATA[<h1 id="nihilism">Nihilism</h1>
+<ul>
+<li>I know that there is no objective meaning outside the illusions we (humans) as a society created.</li>
+</ul>
+<h1 id="existentialism">Existentialism</h1>
+<ul>
+<li>As humans, we have freedom to create our own meaning to live.</li>
+</ul>
+<h2 id="essence">Essence</h2>
+<ul>
+<li>make something what it is</li>
+<li>a defined purpose</li>
+<li>a meaning to life</li>
+<li>an essence, necessary for anything to exist</li>
+</ul>
+<h1 id="absurdism">Absurdism</h1>
+<ul>
+<li>Constant tension between the hunger for meaning and impossibility of satisfying this drive
+in a meaningless world.</li>
+<li>Stare in this meaninglessness and show middle finger.</li>
+<li>A fuck you to nihilism.</li>
+<li>Camus says we have three options to face the absurd:
+<ul>
+<li>Suicide: kill yourself ffs</li>
+<li>Philosophical suicide: believe in some meaning
+(like religion, Marxism) without killing yourself,
+swallow a pill of bullshit basically</li>
+<li>Acceptance: rebel, reject hope, embrace nothingness,
+don&rsquo;t make happiness a distant goal,
+spend time with yourself, be flexible, live with passion,
+you are giving away your freedom while you think of suicide,
+and choose love &hellip;.</li>
+</ul>
+</li>
+</ul>
+]]></content>
+        </item>
+        
+    </channel>
+</rss>
