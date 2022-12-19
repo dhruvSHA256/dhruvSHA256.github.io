@@ -5,7 +5,7 @@
         <description>Recent content in Posts on dhruv.Sha256</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Sun, 14 Aug 2022 11:13:47 +0530</lastBuildDate>
+        <lastBuildDate>Mon, 19 Dec 2022 11:34:05 +0530</lastBuildDate>
         <atom:link href="https://dhruvsha256.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
         
         <item>
@@ -80,6 +80,119 @@ iteritable</li>
 <p>The following
 $$\int_{a}^{b} x^2 dx$$
 Is an integral</p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Postgresql Indexes</title>
+            <link>https://dhruvsha256.github.io/posts/2022/12/postgresql-indexes/</link>
+            <pubDate>Mon, 19 Dec 2022 11:34:05 +0530</pubDate>
+            
+            <guid>https://dhruvsha256.github.io/posts/2022/12/postgresql-indexes/</guid>
+            <description>Indexes What a data structure, can make some queries fast Why cause, without index every query will be a sequential scan from disk whole point of index is to make query faster than O(n) so why not create an index for each type of query, cause indexes makes updating slow as we have to update indexes it also increases disk usage, slows down backup and restore Single Column Index index made on a single attribute Multi Column Index index made on a group of attribute Partial Index index made on a subset of table ex: index on all the incomplete appointments in appointments table B+ Tree Index uses B+ Tree for creating indexes default in postgresql stores pointer to heap file and not actual data better to store actual data for primary index as reading from heap file is another disk i/o used for query with operations like &amp;lt;, &amp;lt;= , = ,&amp;gt;=,&amp;gt; can be used for range queries, first go to the start of range in O(log(n)) and then traverse to next node can be used for patterns like ^foo or foo% (constant prefix) but not with %foo as BTree are sorted based on first char not suitable for large values of key as btree copies the key value in nodes -&amp;gt; less keys per node -&amp;gt; tree with more depth Hash Index uses hash table instead of btree PostgreSQL&amp;rsquo;s hash function maps any database value to a 32-bit integer, the hash code (about 4 billion possible hash codes) hashfunction(index attribute) -&amp;gt; bucket which contains pointer to the rows -&amp;gt; actual data in table can be smaller in size than btree Hash index select and insert performance can be better than a B-Tree index suitable for update heavy queries which uses equality operator should be used with equality operator and not with comparative operators, example select * from table where key = &#39;hello&#39; suitable for large values as their too are converted to 32 bit int values BRIN Index Block range index A block range is a group of pages that are physically adjacent in the table; for each block range, some summary info is stored by the index ex: a table storing a ZIP code column might have all codes for a city grouped together naturally.</description>
+            <content type="html"><![CDATA[<h2 id="indexes">Indexes</h2>
+<h3 id="what">What</h3>
+<ul>
+<li>a data structure, can make some queries fast</li>
+</ul>
+<h3 id="why">Why</h3>
+<ul>
+<li>cause, without index every query will be a sequential scan from disk</li>
+<li>whole point of index is to make query faster than O(n)</li>
+<li>so why not create an index for each type of query, cause indexes makes updating slow as we have to update indexes</li>
+<li>it also increases disk usage, slows down backup and restore</li>
+</ul>
+<h2 id="single-column-index">Single Column Index</h2>
+<ul>
+<li>index made on a single attribute</li>
+</ul>
+<h2 id="multi-column-index">Multi Column Index</h2>
+<ul>
+<li>index made on a group of attribute</li>
+</ul>
+<h2 id="partial-index">Partial Index</h2>
+<ul>
+<li>index made on a subset of table</li>
+<li>ex: index on all the incomplete appointments in appointments table</li>
+</ul>
+<h2 id="b-tree-index">B+ Tree Index</h2>
+<ul>
+<li>uses B+ Tree for creating indexes</li>
+<li>default in postgresql</li>
+<li>stores pointer to heap file and not actual data</li>
+<li>better to store actual data for primary index as reading from heap file is another disk i/o</li>
+<li>used for query with operations like &lt;, &lt;= , = ,&gt;=,&gt;</li>
+<li>can be used for range queries, first go to the start of range in O(log(n)) and then traverse to next node</li>
+<li>can be used for patterns like ^foo or foo% (constant prefix) but not with %foo as BTree are sorted based on first char</li>
+<li>not suitable for large values of key as btree copies the key value in nodes -&gt; less keys per node -&gt; tree with more depth</li>
+</ul>
+<h2 id="hash-index">Hash Index</h2>
+<ul>
+<li>uses hash table instead of btree</li>
+<li>PostgreSQL&rsquo;s hash function maps any database value to a 32-bit integer, the hash code (about 4 billion possible hash codes)</li>
+<li>hashfunction(index attribute) -&gt; bucket which contains pointer to the rows -&gt; actual data in table</li>
+<li>can be smaller in size than btree</li>
+<li>Hash index select and insert performance can be better than a B-Tree index</li>
+<li>suitable for update heavy queries which uses equality operator</li>
+<li>should be used with equality operator and not with comparative operators, example <code>select * from table where key = 'hello'</code></li>
+<li>suitable for large values as their too are converted to 32 bit int values</li>
+</ul>
+<h2 id="brin-index">BRIN Index</h2>
+<ul>
+<li>Block range index</li>
+<li>A block range is a group of pages that are physically adjacent in the table; for each block range, some summary info is stored by the index</li>
+<li>ex: a table storing a ZIP code column might have all codes for a city grouped together naturally.</li>
+<li>When you set up a BRIN index, PostgreSQL reads your selected column&rsquo;s maximum and minimum values for each 8k page of stored data. PostgreSQL then stores just 3 pieces of information into the BRIN index, the page number, the minimum value and the maximum value for your chosen column.</li>
+<li>more suitable for read heavy data, which is not updated frequently as updating can mess up ranges</li>
+<li>used for very large datasets where the data we are searching is in blocks, like timestamps and date ranges.</li>
+<li>size of index is very small</li>
+</ul>
+<h2 id="gin-index">GIN Index</h2>
+<ul>
+<li>Generalized inverted index</li>
+<li>used where we need to index composite value</li>
+<li>used for jsonb and array and tsvector (full text search)</li>
+<li>organizes keys (like normalized words) into btree</li>
+<li>node of btree contains lexmins and these lexmins points to the tuple id they exist in</li>
+<li>supports query with operators:
+<ul>
+<li>@&gt; (contains)</li>
+<li>&lt;@ (contained)</li>
+<li>&amp;&amp; (overlap)</li>
+<li>|| (concat)</li>
+</ul>
+</li>
+</ul>
+<h2 id="gist-index">GiST Index</h2>
+<ul>
+<li>generalized search tree</li>
+<li>a framework, not a single index</li>
+<li>used for spatial data and geometrical data</li>
+<li>postgresql includes GiST operator classes for several 2D geometric data types</li>
+<li>capable of optimizing nearest neighbour searches</li>
+<li>supports query with operators:
+<ul>
+<li>&lt;&lt; (left side)</li>
+<li>&amp;&lt; (not exceed to right)</li>
+<li>&amp;&gt; (not exceed to left)</li>
+<li>&gt;&gt; (right side)</li>
+<li>&lt;&lt;| (below)</li>
+<li>&amp;&lt;| (not exceed above)</li>
+<li>|&amp;&gt; (not exceed below)</li>
+<li>|&gt;&gt; (above)</li>
+<li>@&gt; (contains)</li>
+<li>&lt;@ (contained)</li>
+<li>~= (same)</li>
+<li>&amp;&amp;  (overlap)</li>
+</ul>
+</li>
+</ul>
+<h2 id="bloom-index">Bloom Index</h2>
+<ul>
+<li>sort of like hash but different</li>
+<li>uses Bloom Filters</li>
+<li>used for multicolumn indexing</li>
+</ul>
 ]]></content>
         </item>
         

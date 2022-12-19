@@ -6,7 +6,7 @@
     <description>Recent content on dhruv.Sha256</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 14 Aug 2022 11:13:47 +0530</lastBuildDate><atom:link href="https://dhruvsha256.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 19 Dec 2022 11:34:05 +0530</lastBuildDate><atom:link href="https://dhruvsha256.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Map, Filter, Reduce in python</title>
       <link>https://dhruvsha256.github.io/posts/2022/07/map-filter-reduce-in-python/</link>
@@ -23,6 +23,15 @@
       
       <guid>https://dhruvsha256.github.io/posts/2022/07/hello-world/</guid>
       <description>Code snippet #include&amp;lt;iostream&amp;gt; using namespace std; ing main(){ cout &amp;lt;&amp;lt; &amp;#34;hello world&amp;#34;; return 0; } Latex The following $$\int_{a}^{b} x^2 dx$$ Is an integral</description>
+    </item>
+    
+    <item>
+      <title>Postgresql Indexes</title>
+      <link>https://dhruvsha256.github.io/posts/2022/12/postgresql-indexes/</link>
+      <pubDate>Mon, 19 Dec 2022 11:34:05 +0530</pubDate>
+      
+      <guid>https://dhruvsha256.github.io/posts/2022/12/postgresql-indexes/</guid>
+      <description>Indexes What a data structure, can make some queries fast Why cause, without index every query will be a sequential scan from disk whole point of index is to make query faster than O(n) so why not create an index for each type of query, cause indexes makes updating slow as we have to update indexes it also increases disk usage, slows down backup and restore Single Column Index index made on a single attribute Multi Column Index index made on a group of attribute Partial Index index made on a subset of table ex: index on all the incomplete appointments in appointments table B+ Tree Index uses B+ Tree for creating indexes default in postgresql stores pointer to heap file and not actual data better to store actual data for primary index as reading from heap file is another disk i/o used for query with operations like &amp;lt;, &amp;lt;= , = ,&amp;gt;=,&amp;gt; can be used for range queries, first go to the start of range in O(log(n)) and then traverse to next node can be used for patterns like ^foo or foo% (constant prefix) but not with %foo as BTree are sorted based on first char not suitable for large values of key as btree copies the key value in nodes -&amp;gt; less keys per node -&amp;gt; tree with more depth Hash Index uses hash table instead of btree PostgreSQL&amp;rsquo;s hash function maps any database value to a 32-bit integer, the hash code (about 4 billion possible hash codes) hashfunction(index attribute) -&amp;gt; bucket which contains pointer to the rows -&amp;gt; actual data in table can be smaller in size than btree Hash index select and insert performance can be better than a B-Tree index suitable for update heavy queries which uses equality operator should be used with equality operator and not with comparative operators, example select * from table where key = &#39;hello&#39; suitable for large values as their too are converted to 32 bit int values BRIN Index Block range index A block range is a group of pages that are physically adjacent in the table; for each block range, some summary info is stored by the index ex: a table storing a ZIP code column might have all codes for a city grouped together naturally.</description>
     </item>
     
     <item>
