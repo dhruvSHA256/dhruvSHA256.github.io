@@ -6,7 +6,7 @@
     <description>Recent content on dhruv.Sha256</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 19 Dec 2022 11:34:05 +0530</lastBuildDate><atom:link href="https://dhruvsha256.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 18 Jan 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://dhruvsha256.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Map, Filter, Reduce in python</title>
       <link>https://dhruvsha256.github.io/posts/2022/07/map-filter-reduce-in-python/</link>
@@ -23,6 +23,24 @@
       
       <guid>https://dhruvsha256.github.io/posts/2022/07/hello-world/</guid>
       <description>Code snippet #include&amp;lt;iostream&amp;gt; using namespace std; ing main(){ cout &amp;lt;&amp;lt; &amp;#34;hello world&amp;#34;; return 0; } Latex The following $$\int_{a}^{b} x^2 dx$$ Is an integral</description>
+    </item>
+    
+    <item>
+      <title>Podcasts</title>
+      <link>https://dhruvsha256.github.io/podcasts/</link>
+      <pubDate>Wed, 18 Jan 2023 12:37:01 +0530</pubDate>
+      
+      <guid>https://dhruvsha256.github.io/podcasts/</guid>
+      <description>Philosophy Philosophize This! Pursuit of Wonder Then &amp;amp; Now Protesilaos Stavrou The Living Philosophy Science and Tech Lex Fridman Farnam Street PowerfulJRE Scaler Pod The Geek Narrator Andrew Huberman </description>
+    </item>
+    
+    <item>
+      <title>Books</title>
+      <link>https://dhruvsha256.github.io/books/</link>
+      <pubDate>Wed, 18 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://dhruvsha256.github.io/books/</guid>
+      <description>Ongoing Men Without Women TBR Pride and Prejudice Animal Farm 1984 Completed Old Man And The Sea Man&amp;rsquo;s Search For Meaning The Stranger Heart of Darkness A Room of Ones Own The Death of Ivan Ilych Srimad Bhagwadgita Yatharup </description>
     </item>
     
     <item>
@@ -68,7 +86,9 @@
       
       <guid>https://dhruvsha256.github.io/about/</guid>
       <description>I am Dhruv Sharma, I go by dhruv.sha256 on internet, this is my blog,
-I write about tech and philosophy</description>
+I like tech and philosophy,
+Here are some projects I have made,
+Books I have read and Podcasts I listen to.</description>
     </item>
     
     <item>
