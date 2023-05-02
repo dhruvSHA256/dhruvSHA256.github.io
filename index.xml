@@ -6,7 +6,7 @@
     <description>Recent content on dhruv.Sha256</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 18 Jan 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://dhruvsha256.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 02 May 2023 14:45:14 +0530</lastBuildDate><atom:link href="https://dhruvsha256.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Map, Filter, Reduce in python</title>
       <link>https://dhruvsha256.github.io/posts/2022/07/map-filter-reduce-in-python/</link>
@@ -23,6 +23,16 @@
       
       <guid>https://dhruvsha256.github.io/posts/2022/07/hello-world/</guid>
       <description>Code snippet #include&amp;lt;iostream&amp;gt; using namespace std; ing main(){ cout &amp;lt;&amp;lt; &amp;#34;hello world&amp;#34;; return 0; } Latex The following $$\int_{a}^{b} x^2 dx$$ Is an integral</description>
+    </item>
+    
+    <item>
+      <title>Solid Principles</title>
+      <link>https://dhruvsha256.github.io/posts/2023/05/solid-principles/</link>
+      <pubDate>Tue, 02 May 2023 14:45:14 +0530</pubDate>
+      
+      <guid>https://dhruvsha256.github.io/posts/2023/05/solid-principles/</guid>
+      <description>S - Single Responsibility Principle O - Open/Closed Principle L - Liskov Substitution Principle I - Interface Segmented Principle D - Dependency Inversion Principle Single Responsiblity: any module should be changed by only one actor dont put multiple functionalities in single module
+class PasswordHasher: def hashAndSavePassword(self, password: str): self.hashPassword(password) self.savePassword(password) def hashPassword(self, password: str): print(f&amp;#34;haashing {password}&amp;#34;) def savePassword(self, password: str): print(f&amp;#34;saving {password}&amp;#34;) for example in above code snippet the class PasswordHasher is doing two independent operations, and the actor that can change its implementation can be security team which can change hashing implementation or data team which may change how passwords are stored, this doesnt follow single responsiblity principle Both functionalities should be seperated</description>
     </item>
     
     <item>

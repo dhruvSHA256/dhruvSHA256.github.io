@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="Dhruv Sharma ">
+<meta name="description" content="S - Single Responsibility Principle O - Open/Closed Principle L - Liskov Substitution Principle I - Interface Segmented Principle D - Dependency Inversion Principle Single Responsiblity: any module should be changed by only one actor dont put multiple functionalities in single module
+class PasswordHasher: def hashAndSavePassword(self, password: str): self.hashPassword(password) self.savePassword(password) def hashPassword(self, password: str): print(f&amp;#34;haashing {password}&amp;#34;) def savePassword(self, password: str): print(f&amp;#34;saving {password}&amp;#34;) for example in above code snippet the class PasswordHasher is doing two independent operations, and the actor that can change its implementation can be security team which can change hashing implementation or data team which may change how passwords are stored, this doesnt follow single responsiblity principle Both functionalities should be seperated" />
+<meta name="keywords" content="blog, hello, python, clean coding, solid principle" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://dhruvsha256.github.io/posts/2023/05/solid_principles/" />
+
+
+    <title>
+        
+            Solid_principles :: dhruv.Sha256  — Dhruv Sha256
+        
+    </title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="https://dhruvsha256.github.io/main.4d467576ff1271e7fba333671de4e2256cdb6827159b0ba09f683c67644bf64a.css">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://dhruvsha256.github.io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://dhruvsha256.github.io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://dhruvsha256.github.io/favicon-16x16.png">
+    <link rel="manifest" href="https://dhruvsha256.github.io/site.webmanifest">
+    <link rel="mask-icon" href="https://dhruvsha256.github.io/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="https://dhruvsha256.github.io/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Solid_principles">
+<meta itemprop="description" content="S - Single Responsibility Principle O - Open/Closed Principle L - Liskov Substitution Principle I - Interface Segmented Principle D - Dependency Inversion Principle Single Responsiblity: any module should be changed by only one actor dont put multiple functionalities in single module
+class PasswordHasher: def hashAndSavePassword(self, password: str): self.hashPassword(password) self.savePassword(password) def hashPassword(self, password: str): print(f&#34;haashing {password}&#34;) def savePassword(self, password: str): print(f&#34;saving {password}&#34;) for example in above code snippet the class PasswordHasher is doing two independent operations, and the actor that can change its implementation can be security team which can change hashing implementation or data team which may change how passwords are stored, this doesnt follow single responsiblity principle Both functionalities should be seperated"><meta itemprop="datePublished" content="2023-05-02T14:45:14+05:30" />
+<meta itemprop="dateModified" content="2023-05-02T14:45:14+05:30" />
+<meta itemprop="wordCount" content="669"><meta itemprop="image" content="https://dhruvsha256.github.io/"/>
+<meta itemprop="keywords" content="hello,python,clean coding,solid principle," />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://dhruvsha256.github.io/"/>
+
+<meta name="twitter:title" content="Solid_principles"/>
+<meta name="twitter:description" content="S - Single Responsibility Principle O - Open/Closed Principle L - Liskov Substitution Principle I - Interface Segmented Principle D - Dependency Inversion Principle Single Responsiblity: any module should be changed by only one actor dont put multiple functionalities in single module
+class PasswordHasher: def hashAndSavePassword(self, password: str): self.hashPassword(password) self.savePassword(password) def hashPassword(self, password: str): print(f&#34;haashing {password}&#34;) def savePassword(self, password: str): print(f&#34;saving {password}&#34;) for example in above code snippet the class PasswordHasher is doing two independent operations, and the actor that can change its implementation can be security team which can change hashing implementation or data team which may change how passwords are stored, this doesnt follow single responsiblity principle Both functionalities should be seperated"/>
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2023-05-02 14:45:14 &#43;0530 IST" />
+
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://dhruvsha256.github.io/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">hello</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner">
+        
+        
+        
+        
+        
+        
+        
+        
+        <nav class="menu">
+            <ul class="menu__inner">
+                <li><a href="https://dhruvsha256.github.io/about">about</a></li>
+                <li><a href="https://dhruvsha256.github.io/posts">posts</a></li>
+                <li><a href="https://dhruvsha256.github.io/resume" target="_blank">resume</a></li>
+                <li><a href="https://dhruvsha256.github.io/projects">projects</a></li>
+                
+
+            </ul>
+        </nav>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+                <span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+   3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+   13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+ </svg></span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        4 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://dhruvsha256.github.io/posts/2023/05/solid_principles/">Solid_principles</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <p>S - Single Responsibility Principle
+<br>
+O - Open/Closed Principle
+<br>
+L - Liskov Substitution Principle
+<br>
+I - Interface Segmented Principle
+<br>
+D - Dependency Inversion Principle
+<br></p>
+<h3 id="single-responsiblity">Single Responsiblity:</h3>
+<p>any module should be changed by only one actor
+dont put multiple functionalities in single module</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PasswordHasher</span>:
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hashAndSavePassword</span>(self, password: str):
+</span></span><span style="display:flex;"><span>         self<span style="color:#f92672">.</span>hashPassword(password)
+</span></span><span style="display:flex;"><span>         self<span style="color:#f92672">.</span>savePassword(password)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hashPassword</span>(self, password: str):
+</span></span><span style="display:flex;"><span>         print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;haashing </span><span style="color:#e6db74">{</span>password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">savePassword</span>(self, password: str):
+</span></span><span style="display:flex;"><span>         print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;saving </span><span style="color:#e6db74">{</span>password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p>for example in above code snippet the class <code>PasswordHasher</code> is doing two independent
+operations, and the actor that can change its implementation can be security team
+which can change hashing implementation or data team which may change how passwords
+are stored, this doesnt follow single responsiblity principle
+Both functionalities should be seperated</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PasswordHasher</span>:
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hashPassword</span>(self, password: str):
+</span></span><span style="display:flex;"><span>         print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;hashing </span><span style="color:#e6db74">{</span>password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PasswordStorage</span>:
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">savePassword</span>(self, passwordHash: str):
+</span></span><span style="display:flex;"><span>         print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;saving </span><span style="color:#e6db74">{</span>passwordHash<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h3 id="open-close">Open Close:</h3>
+<p>open for extension but closed for modification</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HashingType</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PasswordHasher</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> __init__(self, password: str, hashingType: HashingType):
+</span></span><span style="display:flex;"><span>          self<span style="color:#f92672">.</span>password <span style="color:#f92672">=</span> password
+</span></span><span style="display:flex;"><span>          self<span style="color:#f92672">.</span>hashingType <span style="color:#f92672">=</span> hashingType
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hashPassword</span>(self):
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>hashingType <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;base64&#34;</span>:
+</span></span><span style="display:flex;"><span>              <span style="color:#75715e"># hash password with bas64</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">elif</span> self<span style="color:#f92672">.</span>hashingType <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;sha256&#34;</span>:
+</span></span><span style="display:flex;"><span>              <span style="color:#75715e"># hash password with sha256</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">elif</span> self<span style="color:#f92672">.</span>hashingType <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;md5&#34;</span>:
+</span></span><span style="display:flex;"><span>              <span style="color:#75715e"># hash password with md5</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">pass</span>
+</span></span></code></pre></div><p>in above code snippet, if we need to add one more hashing type, we need to modify the
+<code>PasswordHasher</code> class which voilates the Open Close principle.
+We should make the <code>HashingType</code> class more extensible</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IHashingType</span>(metaclass<span style="color:#f92672">=</span>ABCMeta):
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">@abstractmethod</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hashPassword</span>(self, password: str):
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Base64Hashing</span>(IHashingType):
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hashPassword</span>(self, password: str):
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># hash password with bas64</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Md5Hashing</span>(IHashingType):
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hashPassword</span>(self, password: str):
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># hash password with md5</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SHA256Hashing</span>(IHashingType):
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hashPassword</span>(self, password: str):
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># hash password with sha256</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PasswordHasher</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> __init__(self, password: str, hashingType: IHashingType):
+</span></span><span style="display:flex;"><span>          self<span style="color:#f92672">.</span>password <span style="color:#f92672">=</span> password
+</span></span><span style="display:flex;"><span>          self<span style="color:#f92672">.</span>hashingType <span style="color:#f92672">=</span> hashingType
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hashPassword</span>(self):
+</span></span><span style="display:flex;"><span>          self<span style="color:#f92672">.</span>hashingType<span style="color:#f92672">.</span>hashPassword(self<span style="color:#f92672">.</span>password)
+</span></span></code></pre></div><p>This way we just need to add another class for different hashing type</p>
+<h3 id="liskov-substution">Liskov Substution:</h3>
+<p>if their is f(x) for some object x of class A
+then their should be f(y) for some object y of class B if B inherits A
+if class CitrusFruit inherit class Fruit
+then eat(fruit) should support both, orange of CitrusFruit and banana of Fruit
+function should take argument of both base class and derived class and should not break</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Fruit</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> __init__(self, name: str):
+</span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>name <span style="color:#f92672">=</span> name
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CitrusFruit</span>(Fruit):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">eat</span>(fruit):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> isinstance(fruit, CitrusFruit):
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Eating citrus fruit: </span><span style="color:#e6db74">{</span>fruit<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">elif</span> isinstance(fruit, Fruit):
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Eating fruit: </span><span style="color:#e6db74">{</span>fruit<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    banana <span style="color:#f92672">=</span> Fruit(<span style="color:#e6db74">&#34;banana&#34;</span>)
+</span></span><span style="display:flex;"><span>    orange <span style="color:#f92672">=</span> CitrusFruit(<span style="color:#e6db74">&#34;orange&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    eat(banana)
+</span></span><span style="display:flex;"><span>    eat(orange)
+</span></span></code></pre></div><p>here the behaviour of <code>eat()</code> changes with the type of object it is passed which doest
+follow liskov substitution principle</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Fruit</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> __init__(self, name: str):
+</span></span><span style="display:flex;"><span>          self<span style="color:#f92672">.</span>name <span style="color:#f92672">=</span> name
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">eat</span>(self):
+</span></span><span style="display:flex;"><span>          print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Eating fruit: </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CitrusFruit</span>(Fruit):
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">eat</span>(self):
+</span></span><span style="display:flex;"><span>          print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Eating citrus fruit: </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">eat</span>(fruit: Fruit):
+</span></span><span style="display:flex;"><span>      fruit<span style="color:#f92672">.</span>eat()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  banana <span style="color:#f92672">=</span> Fruit(<span style="color:#e6db74">&#34;banana&#34;</span>)
+</span></span><span style="display:flex;"><span>  orange <span style="color:#f92672">=</span> CitrusFruit(<span style="color:#e6db74">&#34;orange&#34;</span>)
+</span></span><span style="display:flex;"><span>  eat(banana)
+</span></span><span style="display:flex;"><span>  eat(orange)
+</span></span></code></pre></div><p>Now <code>eat()</code> behaves same for <code>Fruit</code> or its subclass <code>CitrusFruit</code></p>
+<h3 id="interface-segregation">Interface Segregation:</h3>
+<p>design multiple smaller interfaces</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>  <span style="color:#f92672">from</span> abc <span style="color:#f92672">import</span> ABCMeta, abstractmethod
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IShape</span>(metaclass<span style="color:#f92672">=</span>ABCMeta):
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">@abstractmethod</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">NotImplementedError</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Circle</span>(IShape):
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Square</span>(IShape):
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Rectangle</span>(IShape):
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>(self):
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">pass</span>
+</span></span></code></pre></div><h3 id="dependency-inversion">Dependency Inversion:</h3>
+<p>high level module should not depend on low level module
+both should depend on abstraction
+abstraction should not depend on implementation
+implementation shouldnt depend on abstraction
+ex: store class has a fn makePayment which makes payment
+instead of initializing a class StripePayment in it
+make a interface HandlePayment, StripePayment and Paypalpayment both extends it
+not pass any object of HandlePayment interface in makePayment fn</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StripePayment</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">makePayment</span>(self):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Store</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">makeStripePayment</span>(self):
+</span></span><span style="display:flex;"><span>            stripePayment <span style="color:#f92672">=</span> StripePayment()
+</span></span><span style="display:flex;"><span>            stripePayment<span style="color:#f92672">.</span>makePayment()
+</span></span></code></pre></div><p>the fn <code>makeStripePayment()</code> initializes the object of <code>StripePayment</code> in its implementation
+suppose we need to test it using Mock payment api, then we it would be hard for us as we need to change the implementation of fn just to test.
+so instead of initializing payment object and depending on its concreat
+implementation we should depend on an interface instead (which will be implemented by
+StripePayment class) and take that as an argument</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IPayment</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">makePayment</span>(self):
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StripePayment</span>(IPayment):
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">makePayment</span>(self):
+</span></span><span style="display:flex;"><span>          print(<span style="color:#e6db74">&#34;making payment using stripe&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Store</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">makePayment</span>(self, paymentObj: IPayment):
+</span></span><span style="display:flex;"><span>          paymentObj<span style="color:#f92672">.</span>makePayment()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  store <span style="color:#f92672">=</span> Store()
+</span></span><span style="display:flex;"><span>  stripePayment <span style="color:#f92672">=</span> StripePayment()
+</span></span><span style="display:flex;"><span>  store<span style="color:#f92672">.</span>makePayment(stripePayment)
+</span></span></code></pre></div>
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="https://dhruvsha256.github.io/tags/hello/">hello</a></span>
+        <span class="tag"><a href="https://dhruvsha256.github.io/tags/python/">python</a></span>
+        <span class="tag"><a href="https://dhruvsha256.github.io/tags/clean-coding/">clean coding</a></span>
+        <span class="tag"><a href="https://dhruvsha256.github.io/tags/solid-principle/">solid principle</a></span>
+        
+    </p>
+
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        669 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2023-05-02 14:45
+        
+
+         
+          
+        
+      </p>
+    </div>
+
+    
+    <div class="pagination">
+        
+
+        <div class="pagination__buttons">
+            
+            <span class="button previous">
+                <a href="https://dhruvsha256.github.io/posts/2022/07/hello-world/">
+                    <span class="button__icon">←</span>
+                    <span class="button__text">hello world</span>
+                </a>
+            </span>
+            
+
+            
+            <span class="button next">
+                <a href="https://dhruvsha256.github.io/posts/2022/12/postgresql-indexes/">
+                    <span class="button__text">Postgresql Indexes</span>
+                    <span class="button__icon">→</span>
+                </a>
+            </span>
+            
+        </div>
+    </div>
+
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    <div class="footer__inner">
+        <div class="footer__content">
+            
+            
+            
+            <span><a href="https://dhruvsha256.github.io/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
+            
+        </div>
+    </div>
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="https://dhruvsha256.github.io/bundle.min.bb2c6bc3ed452ca4759660e4020811f248bc2320081559e8a32d8b0092773852941133639d35e8370d03d3ddaa750b1edd6b343c5bd22a55d5bdeae8f648f49b.js" integrity="sha512-uyxrw&#43;1FLKR1lmDkAggR8ki8IyAIFVnooy2LAJJ3OFKUETNjnTXoNw0D092qdQse3Ws0PFvSKlXVvero9kj0mw=="></script>
+
+
+
+    </body>
+</html>
