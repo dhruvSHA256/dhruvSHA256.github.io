@@ -1,6 +1,5 @@
 (function(window) {
     "use strict";
-
     const elementCode = ".mermaid";
     const loadMermaid = function(theme) {
         window.mermaid.initialize({ theme });
