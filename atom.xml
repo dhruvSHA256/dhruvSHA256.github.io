@@ -121,7 +121,7 @@ We must perform this operation without blocking our primary server, so we’ll c
 &lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span&gt;threads
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;We are almost done just need to test our load balancer.
-&lt;img src=&quot;&#x2F;media&#x2F;load-balancer-test.svg&quot; alt=&quot;xyx&quot; &#x2F;&gt; &lt;&#x2F;p&gt;
+&lt;img src=&quot;&#x2F;media&#x2F;load-balancer-test.gif&quot; alt=&quot;xyx&quot; &#x2F;&gt; &lt;&#x2F;p&gt;
 &lt;p&gt;Full code can be found on my &lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;dhruvSHA256&#x2F;load-balancer&quot;&gt;github&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
 </content>
         
