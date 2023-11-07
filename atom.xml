@@ -4,22 +4,8 @@
     <link href="https://dhruvsha256.github.io/atom.xml" rel="self" type="application/atom+xml"/>
     <link href="https://dhruvsha256.github.io/"/>
     <generator uri="https://www.getzola.org/">Zola</generator>
-    <updated>2023-11-07T00:00:00+00:00</updated>
+    <updated>2023-11-05T00:00:00+00:00</updated>
     <id>https://dhruvsha256.github.io/atom.xml</id>
-    <entry xml:lang="en">
-        <title>new test post</title>
-        <published>2023-11-07T00:00:00+00:00</published>
-        <updated>2023-11-07T00:00:00+00:00</updated>
-        <author>
-          <name>Unknown</name>
-        </author>
-        <link rel="alternate" href="https://dhruvsha256.github.io/posts/new-test-post/" type="text/html"/>
-        <id>https://dhruvsha256.github.io/posts/new-test-post/</id>
-        
-        <content type="html">&lt;p&gt;this is test post to check if build succeds&lt;&#x2F;p&gt;
-</content>
-        
-    </entry>
     <entry xml:lang="en">
         <title>Network Load balancer from scratch in Python</title>
         <published>2023-11-05T00:00:00+00:00</published>
