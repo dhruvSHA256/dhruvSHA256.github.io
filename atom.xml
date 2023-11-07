@@ -7,6 +7,34 @@
     <updated>2023-11-07T00:00:00+00:00</updated>
     <id>https://dhruvsha256.github.io/atom.xml</id>
     <entry xml:lang="en">
+        <title>hello their</title>
+        <published>2023-11-07T00:00:00+00:00</published>
+        <updated>2023-11-07T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/hello-their/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/hello-their/</id>
+        
+        <content type="html">&lt;p&gt;hello their bro&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>my name is dhruv</title>
+        <published>2023-11-07T00:00:00+00:00</published>
+        <updated>2023-11-07T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/my-name-is-dhruv/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/my-name-is-dhruv/</id>
+        
+        <content type="html">&lt;p&gt;hello dhruv here&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
         <title>new test post</title>
         <published>2023-11-07T00:00:00+00:00</published>
         <updated>2023-11-07T00:00:00+00:00</updated>
