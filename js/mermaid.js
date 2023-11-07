@@ -45,6 +45,7 @@
 
     const init = () => {
         saveOriginalData().catch(console.error);
+        loadMermaid(localStorage.getItem("theme") == "dark" ? "dark" : "default");
         document.body.addEventListener("dark-theme-set", () => {
             resetProcessed().then(loadMermaid("dark")).catch(console.error);
         });
