@@ -4,21 +4,35 @@
     <link href="https://dhruvsha256.github.io/atom.xml" rel="self" type="application/atom+xml"/>
     <link href="https://dhruvsha256.github.io/"/>
     <generator uri="https://www.getzola.org/">Zola</generator>
-    <updated>2023-11-05T00:00:00+00:00</updated>
+    <updated>2023-11-07T00:00:00+00:00</updated>
     <id>https://dhruvsha256.github.io/atom.xml</id>
     <entry xml:lang="en">
-        <title>Layer 4 Load balancer from scratch in Python</title>
+        <title>new test post</title>
+        <published>2023-11-07T00:00:00+00:00</published>
+        <updated>2023-11-07T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/new-test-post/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/new-test-post/</id>
+        
+        <content type="html">&lt;p&gt;this is test post to check if build succeds&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Network Load balancer from scratch in Python</title>
         <published>2023-11-05T00:00:00+00:00</published>
         <updated>2023-11-05T00:00:00+00:00</updated>
         <author>
           <name>Unknown</name>
         </author>
-        <link rel="alternate" href="https://dhruvsha256.github.io/blog/load-balancer-python/" type="text/html"/>
-        <id>https://dhruvsha256.github.io/blog/load-balancer-python/</id>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/load-balancer-python/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/load-balancer-python/</id>
         
         <content type="html">&lt;p&gt;Have you ever wondered how web applications handle increasing traffic? As a software engineer, you might have heard of load balancers,&lt;br &#x2F;&gt;
 which play a crucial role in managing the distribution of requests to multiple servers.&lt;&#x2F;p&gt;
-&lt;p&gt;This weekend, I decided to dive deep into socket programming and create a simple yet functional Layer 4 load balancer from scratch in Python. 
+&lt;p&gt;This weekend, I decided to dive deep into socket programming and create a simple yet functional a load balancer from scratch in Python. 
 In this blog post, I’ll walk you through the process.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;what-is-a-load-balancer-anyway&quot;&gt;What is a Load Balancer anyway ?&lt;&#x2F;h3&gt;
 &lt;p&gt;What is a load balancer anyway you may ask.
@@ -44,10 +58,10 @@ sequenceDiagram
     participant Client
     participant LoadBalancer
     participant Server
-    Client-&amp;gt;&amp;gt;LoadBalancer: Request R1
-    LoadBalancer-&amp;gt;&amp;gt;Server: Request R2
-    Server-&amp;gt;&amp;gt;LoadBalancer: Response R1
-    LoadBalancer-&amp;gt;&amp;gt;Client: Response R2
+    Client-&gt;&gt;LoadBalancer: Request R1
+    LoadBalancer-&gt;&gt;Server: Request R2
+    Server-&gt;&gt;LoadBalancer: Response R1
+    LoadBalancer-&gt;&gt;Client: Response R2
 &lt;&#x2F;pre&gt;
 &lt;ul&gt;
 &lt;li&gt;A layer 4 load balancer on the other hand works on (you guess), which is Transport Layer of OSI model.
@@ -120,8 +134,8 @@ We must perform this operation without blocking our primary server, so we’ll c
 &lt;&#x2F;span&gt;&lt;span&gt;            t.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;start&lt;&#x2F;span&gt;&lt;span&gt;()
 &lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span&gt;threads
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;We are almost done just need to test our load balancer.&lt;&#x2F;p&gt;
-&lt;script data-theme=&quot;asciinema&quot; src=&quot;https:&#x2F;&#x2F;asciinema.org&#x2F;a&#x2F;618289.js&quot; id=&quot;asciicast-618289&quot; async&gt;&lt;&#x2F;script&gt;
+&lt;p&gt;We are almost done just need to test our load balancer.
+&lt;img src=&quot;&#x2F;media&#x2F;load-balancer-test.svg&quot; alt=&quot;xyx&quot; &#x2F;&gt; &lt;&#x2F;p&gt;
 &lt;p&gt;Full code can be found on my &lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;dhruvSHA256&#x2F;load-balancer&quot;&gt;github&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
 </content>
         
@@ -133,8 +147,8 @@ We must perform this operation without blocking our primary server, so we’ll c
         <author>
           <name>Unknown</name>
         </author>
-        <link rel="alternate" href="https://dhruvsha256.github.io/blog/solid-principles/" type="text/html"/>
-        <id>https://dhruvsha256.github.io/blog/solid-principles/</id>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/solid-principles/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/solid-principles/</id>
         
         <content type="html">&lt;p&gt;S - Single Responsibility Principle
 &lt;br&gt;
@@ -362,8 +376,8 @@ StripePayment class) and take that as an argument&lt;&#x2F;p&gt;
         <author>
           <name>Unknown</name>
         </author>
-        <link rel="alternate" href="https://dhruvsha256.github.io/blog/postgresql-indexes/" type="text/html"/>
-        <id>https://dhruvsha256.github.io/blog/postgresql-indexes/</id>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/postgresql-indexes/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/postgresql-indexes/</id>
         
         <content type="html">&lt;h2 id=&quot;indexes&quot;&gt;Indexes&lt;&#x2F;h2&gt;
 &lt;h3 id=&quot;what&quot;&gt;What&lt;&#x2F;h3&gt;
@@ -478,8 +492,8 @@ StripePayment class) and take that as an argument&lt;&#x2F;p&gt;
         <author>
           <name>Unknown</name>
         </author>
-        <link rel="alternate" href="https://dhruvsha256.github.io/blog/happiness/" type="text/html"/>
-        <id>https://dhruvsha256.github.io/blog/happiness/</id>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/happiness/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/happiness/</id>
         
         <content type="html">&lt;h2 id=&quot;what-is-happiness&quot;&gt;What is Happiness&lt;&#x2F;h2&gt;
 &lt;ul&gt;
@@ -524,8 +538,8 @@ StripePayment class) and take that as an argument&lt;&#x2F;p&gt;
         <author>
           <name>Unknown</name>
         </author>
-        <link rel="alternate" href="https://dhruvsha256.github.io/blog/car-radio-by-top/" type="text/html"/>
-        <id>https://dhruvsha256.github.io/blog/car-radio-by-top/</id>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/car-radio-by-top/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/car-radio-by-top/</id>
         
         <content type="html">&lt;h2 id=&quot;distracting-yourself-by-listening-to-car-radio&quot;&gt;distracting yourself by listening to car radio&lt;&#x2F;h2&gt;
 &lt;pre data-lang=&quot;_&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-_ &quot;&gt;&lt;code class=&quot;language-_&quot; data-lang=&quot;_&quot;&gt;&lt;span&gt;I ponder of something great
@@ -628,8 +642,8 @@ force them to think, as it liberated him&lt;&#x2F;li&gt;
         <author>
           <name>Unknown</name>
         </author>
-        <link rel="alternate" href="https://dhruvsha256.github.io/blog/map-filter-reduce-in-python/" type="text/html"/>
-        <id>https://dhruvsha256.github.io/blog/map-filter-reduce-in-python/</id>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/map-filter-reduce-in-python/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/map-filter-reduce-in-python/</id>
         
         <content type="html">&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span&gt;     li = [x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;range&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;100&lt;&#x2F;span&gt;&lt;span&gt;)]
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
@@ -691,8 +705,8 @@ iteritable&lt;&#x2F;li&gt;
         <author>
           <name>Unknown</name>
         </author>
-        <link rel="alternate" href="https://dhruvsha256.github.io/blog/absurdism-extentialism-nihilism/" type="text/html"/>
-        <id>https://dhruvsha256.github.io/blog/absurdism-extentialism-nihilism/</id>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/absurdism-extentialism-nihilism/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/absurdism-extentialism-nihilism/</id>
         
         <content type="html">&lt;h2 id=&quot;nihilism&quot;&gt;Nihilism&lt;&#x2F;h2&gt;
 &lt;ul&gt;
