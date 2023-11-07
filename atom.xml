@@ -35,6 +35,20 @@
         
     </entry>
     <entry xml:lang="en">
+        <title>my name is yash</title>
+        <published>2023-11-07T00:00:00+00:00</published>
+        <updated>2023-11-07T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://dhruvsha256.github.io/posts/my-name-is-yash/" type="text/html"/>
+        <id>https://dhruvsha256.github.io/posts/my-name-is-yash/</id>
+        
+        <content type="html">&lt;p&gt;yash here&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
         <title>new test post</title>
         <published>2023-11-07T00:00:00+00:00</published>
         <updated>2023-11-07T00:00:00+00:00</updated>
