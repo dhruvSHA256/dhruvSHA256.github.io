@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 Allow: /
-Sitemap: https://dhruvsha256.github.io/sitemap.xml
+Sitemap: https://dhruv.fyi/sitemap.xml
