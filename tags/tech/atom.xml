@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title> - tech</title>
+    <link href="https://dhruv.fyi/tags/tech/atom.xml" rel="self" type="application/atom+xml"/>
+    <link href="https://dhruv.fyi"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2022-12-19T00:00:00+00:00</updated>
+    <id>https://dhruv.fyi/tags/tech/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Postgresql Indexes</title>
+        <published>2022-12-19T00:00:00+00:00</published>
+        <updated>2022-12-19T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://dhruv.fyi/blog/postgresql-indexes/" type="text/html"/>
+        <id>https://dhruv.fyi/blog/postgresql-indexes/</id>
+        
+        <content type="html">&lt;h2 id=&quot;indexes&quot;&gt;Indexes&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;what&quot;&gt;What&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;a data structure, can make some queries fast&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;why&quot;&gt;Why&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;cause, without index every query will be a sequential scan from disk&lt;&#x2F;li&gt;
+&lt;li&gt;whole point of index is to make query faster than O(n)&lt;&#x2F;li&gt;
+&lt;li&gt;so why not create an index for each type of query, cause indexes makes updating slow as we have to update indexes&lt;&#x2F;li&gt;
+&lt;li&gt;it also increases disk usage, slows down backup and restore&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;single-column-index&quot;&gt;Single Column Index&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;index made on a single attribute&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;multi-column-index&quot;&gt;Multi Column Index&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;index made on a group of attribute&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;partial-index&quot;&gt;Partial Index&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;index made on a subset of table&lt;&#x2F;li&gt;
+&lt;li&gt;ex: index on all the incomplete appointments in appointments table&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;b-tree-index&quot;&gt;B+ Tree Index&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;uses B+ Tree for creating indexes&lt;&#x2F;li&gt;
+&lt;li&gt;default in postgresql&lt;&#x2F;li&gt;
+&lt;li&gt;stores pointer to heap file and not actual data&lt;&#x2F;li&gt;
+&lt;li&gt;better to store actual data for primary index as reading from heap file is another disk i&#x2F;o&lt;&#x2F;li&gt;
+&lt;li&gt;used for query with operations like &amp;lt;, &amp;lt;= , = ,&amp;gt;=,&amp;gt;&lt;&#x2F;li&gt;
+&lt;li&gt;can be used for range queries, first go to the start of range in O(log(n)) and then traverse to next node&lt;&#x2F;li&gt;
+&lt;li&gt;can be used for patterns like ^foo or foo% (constant prefix) but not with %foo as BTree are sorted based on first char&lt;&#x2F;li&gt;
+&lt;li&gt;not suitable for large values of key as btree copies the key value in nodes -&amp;gt; less keys per node -&amp;gt; tree with more depth&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;hash-index&quot;&gt;Hash Index&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;uses hash table instead of btree&lt;&#x2F;li&gt;
+&lt;li&gt;PostgreSQL’s hash function maps any database value to a 32-bit integer, the hash code (about 4 billion possible hash codes)&lt;&#x2F;li&gt;
+&lt;li&gt;hashfunction(index attribute) -&amp;gt; bucket which contains pointer to the rows -&amp;gt; actual data in table&lt;&#x2F;li&gt;
+&lt;li&gt;can be smaller in size than btree&lt;&#x2F;li&gt;
+&lt;li&gt;Hash index select and insert performance can be better than a B-Tree index&lt;&#x2F;li&gt;
+&lt;li&gt;suitable for update heavy queries which uses equality operator&lt;&#x2F;li&gt;
+&lt;li&gt;should be used with equality operator and not with comparative operators, example &lt;code&gt;select * from table where key = &#x27;hello&#x27;&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;suitable for large values as their too are converted to 32 bit int values&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;brin-index&quot;&gt;BRIN Index&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Block range index&lt;&#x2F;li&gt;
+&lt;li&gt;A block range is a group of pages that are physically adjacent in the table; for each block range, some summary info is stored by the index&lt;&#x2F;li&gt;
+&lt;li&gt;ex: a table storing a ZIP code column might have all codes for a city grouped together naturally.&lt;&#x2F;li&gt;
+&lt;li&gt;When you set up a BRIN index, PostgreSQL reads your selected column’s maximum and minimum values for each 8k page of stored data. PostgreSQL then stores just 3 pieces of information into the BRIN index, the page number, the minimum value and the maximum value for your chosen column.&lt;&#x2F;li&gt;
+&lt;li&gt;more suitable for read heavy data, which is not updated frequently as updating can mess up ranges&lt;&#x2F;li&gt;
+&lt;li&gt;used for very large datasets where the data we are searching is in blocks, like timestamps and date ranges.&lt;&#x2F;li&gt;
+&lt;li&gt;size of index is very small&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;gin-index&quot;&gt;GIN Index&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Generalized inverted index&lt;&#x2F;li&gt;
+&lt;li&gt;used where we need to index composite value&lt;&#x2F;li&gt;
+&lt;li&gt;used for jsonb and array and tsvector (full text search)&lt;&#x2F;li&gt;
+&lt;li&gt;organizes keys (like normalized words) into btree&lt;&#x2F;li&gt;
+&lt;li&gt;node of btree contains lexmins and these lexmins points to the tuple id they exist in&lt;&#x2F;li&gt;
+&lt;li&gt;supports query with operators:
+&lt;ul&gt;
+&lt;li&gt;@&amp;gt; (contains)&lt;&#x2F;li&gt;
+&lt;li&gt;&amp;lt;@ (contained)&lt;&#x2F;li&gt;
+&lt;li&gt;&amp;amp;&amp;amp; (overlap)&lt;&#x2F;li&gt;
+&lt;li&gt;|| (concat)&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;gist-index&quot;&gt;GiST Index&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;generalized search tree&lt;&#x2F;li&gt;
+&lt;li&gt;a framework, not a single index&lt;&#x2F;li&gt;
+&lt;li&gt;used for spatial data and geometrical data&lt;&#x2F;li&gt;
+&lt;li&gt;postgresql includes GiST operator classes for several 2D geometric data types&lt;&#x2F;li&gt;
+&lt;li&gt;capable of optimizing nearest neighbour searches&lt;&#x2F;li&gt;
+&lt;li&gt;supports query with operators:
+&lt;ul&gt;
+&lt;li&gt;&amp;lt;&amp;lt; (left side)&lt;&#x2F;li&gt;
+&lt;li&gt;&amp;amp;&amp;lt; (not exceed to right)&lt;&#x2F;li&gt;
+&lt;li&gt;&amp;amp;&amp;gt; (not exceed to left)&lt;&#x2F;li&gt;
+&lt;li&gt;&amp;gt;&amp;gt; (right side)&lt;&#x2F;li&gt;
+&lt;li&gt;&amp;lt;&amp;lt;| (below)&lt;&#x2F;li&gt;
+&lt;li&gt;&amp;amp;&amp;lt;| (not exceed above)&lt;&#x2F;li&gt;
+&lt;li&gt;|&amp;amp;&amp;gt; (not exceed below)&lt;&#x2F;li&gt;
+&lt;li&gt;|&amp;gt;&amp;gt; (above)&lt;&#x2F;li&gt;
+&lt;li&gt;@&amp;gt; (contains)&lt;&#x2F;li&gt;
+&lt;li&gt;&amp;lt;@ (contained)&lt;&#x2F;li&gt;
+&lt;li&gt;~= (same)&lt;&#x2F;li&gt;
+&lt;li&gt;&amp;amp;&amp;amp;  (overlap)&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;bloom-index&quot;&gt;Bloom Index&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;sort of like hash but different&lt;&#x2F;li&gt;
+&lt;li&gt;uses Bloom Filters&lt;&#x2F;li&gt;
+&lt;li&gt;used for multicolumn indexing&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+</content>
+        
+    </entry>
+</feed>

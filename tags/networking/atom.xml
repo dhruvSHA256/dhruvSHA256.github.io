@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title> - networking</title>
+    <link href="https://dhruv.fyi/tags/networking/atom.xml" rel="self" type="application/atom+xml"/>
+    <link href="https://dhruv.fyi"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2023-11-07T00:00:00+00:00</updated>
+    <id>https://dhruv.fyi/tags/networking/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Network Load balancer from scratch in Python</title>
+        <published>2023-11-07T00:00:00+00:00</published>
+        <updated>2023-11-07T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://dhruv.fyi/blog/load-balancer-python/" type="text/html"/>
+        <id>https://dhruv.fyi/blog/load-balancer-python/</id>
+        
+        <content type="html">&lt;p&gt;Have you ever wondered how web applications handle increasing traffic? As a software engineer, you might have heard of load balancers,&lt;br &#x2F;&gt;
+which play a crucial role in managing the distribution of requests to multiple servers.&lt;&#x2F;p&gt;
+&lt;p&gt;This weekend, I decided to dive deep into socket programming and create a simple yet functional a load balancer from scratch in Python. 
+In this blog post, I’ll walk you through the process.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;what-is-a-load-balancer-anyway&quot;&gt;What is a Load Balancer anyway ?&lt;&#x2F;h3&gt;
+&lt;p&gt;What is a load balancer anyway you may ask.
+Imagine you’ve built your own onlyfans clone, and it’s gaining traction.&lt;&#x2F;p&gt;
+&lt;p&gt;To handle the increased traffic, you can’t infinitely scale your single server vertically. 
+Instead, you buy multiple servers and host your site across them.&lt;&#x2F;p&gt;
+&lt;p&gt;However, a new problem arises: how do you effectively utilize the resources of all these servers? The answer is a load balancer. 
+It distributes incoming requests to different servers based on a selection criteria, like a simple round-robin algorithm.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;layer-4-vs-layer-7-load-balancers&quot;&gt;Layer 4 vs. Layer 7 Load Balancers&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;A layer 7 load balancer works on you guessed it right, layer 7 of OSI model which is the
+application layer, so for every incoming request, it do multiple things like eliminating
+TLS, based on the data received redirect it to a specific server.&lt;&#x2F;p&gt;
+&lt;p&gt;The whole flow goes like this: client -&amp;gt; load balancer (decodes request) -&amp;gt; server
+Loadbalancer essentially creates a new request to server.
+All the data in request body is accessible to it. So we can say it can do things a
+little smartly.&lt;&#x2F;p&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;pre class=&quot;mermaid&quot;&gt;
+sequenceDiagram
+    participant Client
+    participant LoadBalancer
+    participant Server
+    Client-&gt;&gt;LoadBalancer: Request R1
+    LoadBalancer-&gt;&gt;Server: Request R2
+    Server-&gt;&gt;LoadBalancer: Response R1
+    LoadBalancer-&gt;&gt;Client: Response R2
+&lt;&#x2F;pre&gt;
+&lt;ul&gt;
+&lt;li&gt;A layer 4 load balancer on the other hand works on (you guess), which is Transport Layer of OSI model.
+It instead of decoding the request, directly sends the packet to server. 
+It basically act as a relay between client and server, which is faster but … dumb.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;the-code&quot;&gt;The code&lt;&#x2F;h3&gt;
+&lt;p&gt;Let’s dive into the code to build our Layer 4 load balancer. 
+The first step is to listen to an address and receive data from clients. 
+We will be using Python’s socket library for this.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;py&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-py &quot;&gt;&lt;code class=&quot;language-py&quot; data-lang=&quot;py&quot;&gt;&lt;span&gt;    sock = socket.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;socket&lt;&#x2F;span&gt;&lt;span&gt;(socket.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;AF_INET&lt;&#x2F;span&gt;&lt;span&gt;, socket.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;SOCK_STREAM&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;try&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;        sock.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;bind&lt;&#x2F;span&gt;&lt;span&gt;((&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;HOST&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;PORT&lt;&#x2F;span&gt;&lt;span&gt;))
+&lt;&#x2F;span&gt;&lt;span&gt;        sock.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;listen&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;print&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;f&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;Listening on port: &lt;&#x2F;span&gt;&lt;span&gt;{&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;PORT&lt;&#x2F;span&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;while &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;True&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            client_conn, client_addr = sock.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;accept&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;with &lt;&#x2F;span&gt;&lt;span&gt;client_conn:
+&lt;&#x2F;span&gt;&lt;span&gt;                &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;print&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;f&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;Connected by &lt;&#x2F;span&gt;&lt;span&gt;{client_addr}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;                data = client_conn.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;recv&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;1024&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;                &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;print&lt;&#x2F;span&gt;&lt;span&gt;(data.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;decode&lt;&#x2F;span&gt;&lt;span&gt;())
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;finally&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;        sock.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;close&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now that we are receiving connections from clients, 
+we need to somehow relay requests and responses between them.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;py&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-py &quot;&gt;&lt;code class=&quot;language-py&quot; data-lang=&quot;py&quot;&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;forward_request&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;source&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;destination&lt;&#x2F;span&gt;&lt;span&gt;):
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;print&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;f&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;Sending data from &lt;&#x2F;span&gt;&lt;span&gt;{source.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getsockname&lt;&#x2F;span&gt;&lt;span&gt;()}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt; to &lt;&#x2F;span&gt;&lt;span&gt;{destination.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getsockname&lt;&#x2F;span&gt;&lt;span&gt;()}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;try&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;while &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;True&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;                data = source.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;recv&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;1024&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;                &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;len&lt;&#x2F;span&gt;&lt;span&gt;(data) == &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;                    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;break
+&lt;&#x2F;span&gt;&lt;span&gt;                destination.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;send&lt;&#x2F;span&gt;&lt;span&gt;(data)
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;finally&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            source.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;close&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;            destination.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;close&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We will be needing two separate threads for this (one for receiving client request and
+sending it to server, and one receiving server response and sending it to client)&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;py&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-py &quot;&gt;&lt;code class=&quot;language-py&quot; data-lang=&quot;py&quot;&gt;&lt;span&gt;    c2b_thread = threading.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;Thread&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;target&lt;&#x2F;span&gt;&lt;span&gt;=forward_request, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;args&lt;&#x2F;span&gt;&lt;span&gt;=(client_conn, backend_conn))
+&lt;&#x2F;span&gt;&lt;span&gt;    b2c_thread = threading.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;Thread&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;target&lt;&#x2F;span&gt;&lt;span&gt;=forward_request, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;args&lt;&#x2F;span&gt;&lt;span&gt;=(backend_conn, client_conn))
+&lt;&#x2F;span&gt;&lt;span&gt;    c2b_thread.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;start&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;    b2c_thread.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;start&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;    c2b_thread.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;join&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;    b2c_thread.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;join&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now comes the tricky part: what if one server dies? It would be foolish to relay requests to a dead server.&lt;br &#x2F;&gt;
+We need a heartbeat mechanism to periodically check if the server is up and running. 
+If it isn’t, we should exclude it from our pool of servers. 
+We must perform this operation without blocking our primary server, so we’ll create a separate thread for it.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;py&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-py &quot;&gt;&lt;code class=&quot;language-py&quot; data-lang=&quot;py&quot;&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;get_server_heart_beat&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;server&lt;&#x2F;span&gt;&lt;span&gt;):
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;try&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            resp = requests.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;get&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;f&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;http:&#x2F;&#x2F;&lt;&#x2F;span&gt;&lt;span&gt;{server.host}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span&gt;{server.port}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&#x2F;health&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span&gt;resp.text == &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;up&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;except&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;False
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;update_heartbeat&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;server&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;delay&lt;&#x2F;span&gt;&lt;span&gt;):
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;while &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;True&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            server_heart_beat = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;get_server_heart_beat&lt;&#x2F;span&gt;&lt;span&gt;(server)
+&lt;&#x2F;span&gt;&lt;span&gt;            server.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;update_health_status&lt;&#x2F;span&gt;&lt;span&gt;(server_heart_beat)
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;sleep&lt;&#x2F;span&gt;&lt;span&gt;(delay)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;check_health&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;servers&lt;&#x2F;span&gt;&lt;span&gt;):
+&lt;&#x2F;span&gt;&lt;span&gt;        threads = []
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;s &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span&gt;servers:
+&lt;&#x2F;span&gt;&lt;span&gt;            t = threading.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;Thread&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;target&lt;&#x2F;span&gt;&lt;span&gt;=update_heartbeat, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;args&lt;&#x2F;span&gt;&lt;span&gt;=(s, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;2&lt;&#x2F;span&gt;&lt;span&gt;))
+&lt;&#x2F;span&gt;&lt;span&gt;            threads.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;append&lt;&#x2F;span&gt;&lt;span&gt;(t)
+&lt;&#x2F;span&gt;&lt;span&gt;            t.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;start&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span&gt;threads
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We are almost done just need to test our load balancer.
+&lt;img src=&quot;&#x2F;media&#x2F;load-balancer-test.gif&quot; alt=&quot;xyx&quot; &#x2F;&gt; &lt;&#x2F;p&gt;
+&lt;p&gt;Full code can be found on my &lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;dhruvSHA256&#x2F;load-balancer&quot;&gt;github&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

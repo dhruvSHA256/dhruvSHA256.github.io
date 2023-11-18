@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title> - happiness</title>
+    <link href="https://dhruv.fyi/tags/happiness/atom.xml" rel="self" type="application/atom+xml"/>
+    <link href="https://dhruv.fyi"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2022-08-14T00:00:00+00:00</updated>
+    <id>https://dhruv.fyi/tags/happiness/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Happiness</title>
+        <published>2022-08-14T00:00:00+00:00</published>
+        <updated>2022-08-14T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://dhruv.fyi/blog/happiness/" type="text/html"/>
+        <id>https://dhruv.fyi/blog/happiness/</id>
+        
+        <content type="html">&lt;h2 id=&quot;what-is-happiness&quot;&gt;What is Happiness&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Is it a state when you are not sad&lt;&#x2F;li&gt;
+&lt;li&gt;you are not sad when people do something which is beneficial for their survival and reproduction&lt;&#x2F;li&gt;
+&lt;li&gt;you have this feeling of happiness, when your brain rewards you with some chemicals&lt;&#x2F;li&gt;
+&lt;li&gt;do we have to be happy all the time ??&lt;&#x2F;li&gt;
+&lt;li&gt;Is it immoral to not be happy ??&lt;&#x2F;li&gt;
+&lt;li&gt;Is happiness a social construct ??&lt;&#x2F;li&gt;
+&lt;li&gt;Why do feel sad for people who are not happy&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;how-can-you-be-happy&quot;&gt;How can you be happy&lt;&#x2F;h2&gt;
+&lt;ul&gt;
+&lt;li&gt;have a sense of belonging&lt;&#x2F;li&gt;
+&lt;li&gt;have a sense of agency&lt;&#x2F;li&gt;
+&lt;li&gt;have a sense of purpose&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;find-your-purpose-in-a-tribe&quot;&gt;Find your purpose in a tribe&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;find-a-tribe&quot;&gt;Find a tribe&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;can be your friends, your family, someone you love, a group of people sharing common interests etc. etc.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;get-accepted-by-the-tribe&quot;&gt;Get accepted by the tribe&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;have a sense of belonging&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;help-the-tribe&quot;&gt;Help the tribe&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;make efforts and have a sense that your efforts matter&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;get-appreciated-by-the-tribe-for-your-efforts&quot;&gt;Get appreciated by the tribe for your efforts&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;acknowledged by the tribe for your efforts&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+</content>
+        
+    </entry>
+</feed>
