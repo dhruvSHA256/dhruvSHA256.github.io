@@ -47,23 +47,25 @@
           .getElementsByTagName("tbody")[0];
         var rows = table.rows;
         for (var x = 0; x < targetReps.length; x++) {
-          const removeButton = document.createElement("button");
-          removeButton.className = "remove-button";
-          removeButton.textContent = "X";
           if (x < rows.length) {
             rows[x].cells[1].firstChild.value = targetReps[x];
             rows[x].cells[2].firstChild.value = weights[x];
             rows[x].cells[3].firstChild.value = achievedReps[x];
+
+            const removeButton = document.createElement("button");
+            removeButton.className = "remove-button";
+            removeButton.textContent = "X";
+            removeButton.addEventListener("click", delSet);
             rows[x].insertCell(4).appendChild(removeButton);
           } else {
             const newRow = table.insertRow(table.rows.length);
-            newRow.innerHTML = `
-      <td>${x + 1}</td>
-      <td><input type="text" value="${targetReps[x]}"></td>
-      <td><input type="text" value="${weights[x]}"></td>
-      <td><input type="text" value="${achievedReps[x]}"></td>
-    `;
-            newRow.insertCell(4).appendChild(removeButton);
+            addNewSet(
+              newRow,
+              x + 1,
+              targetReps[x],
+              weights[x],
+              achievedReps[x],
+            );
           }
         }
       }
@@ -140,16 +142,359 @@
           previousWeight = previousRow.cells[2].lastChild.value;
           previousReps = previousRow.cells[3].lastChild.value;
         }
+        addNewSet(
+          newRow,
+          setNumber,
+          previousTargetReps,
+          previousWeight,
+          previousReps,
+        );
+        saveToLocalStorage();
+      }
 
+      function exportData(download) {
+        const exercises = document.querySelectorAll(".exercise-container");
+        const date = new Date();
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const dayName = days[date.getDay()];
+        const formattedDate = `* <${year}-${month}-${day} ${dayName}>`;
+        let data = `${formattedDate}\n`;
+        exercises.forEach((exercise, index) => {
+          const exerciseName =
+            exercise.querySelector("#exercise-name").textContent;
+          data += `- ${exerciseName}\n`;
+          const table = exercise.querySelector("table");
+          const rows = table.querySelectorAll("tbody tr");
+          rows.forEach((row) => {
+            var regex = new RegExp("kg", "gi");
+            const setNumber = row.cells[0].textContent;
+            var targetWeight = row.cells[2]
+              .querySelector("input")
+              .value.replace(regex, "")
+              .replace(" ", "");
+            if (!targetWeight.toLowerCase().includes("plates")) {
+              targetWeight += " kg";
+            } else {
+              var regex = new RegExp("plates", "gi");
+              targetWeight = targetWeight.replace(regex, "");
+              targetWeight += " plates";
+            }
+            const rep = row.cells[3].querySelector("input").value;
+            data += `  - ${targetWeight}, ${rep}\n`;
+          });
+        });
+        var regex = new RegExp("Remarks:", "gi");
+        var remarks = document
+          .getElementById("remarks")
+          .innerText.replace(regex, "");
+        if (remarks.length) data += `- Remarks: ${remarks}\n`;
+        document.getElementById("exported-data").innerText = data;
+        if (download) {
+          if (data !== "") {
+            const blob = new Blob([data], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            const fileName = `${date.getFullYear()}-${(date.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}-${date
+              .getDate()
+              .toString()
+              .padStart(2, "0")}_training_log.txt`;
+            a.href = url;
+            a.download = fileName;
+            a.click();
+          } else {
+            alert("No data to export.");
+          }
+        }
+      }
+
+      function copyToClipboard() {
+        exportData(false);
+        const exportedData = document.getElementById("exported-data");
+        const tempTextArea = document.createElement("textarea");
+        tempTextArea.value = exportedData.innerText;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempTextArea);
+        alert("Exported data copied to clipboard!");
+      }
+
+      function addExerciseWithData(
+        exerciseName,
+        targetReps,
+        weights,
+        achievedReps,
+      ) {
+        addExercise(exerciseName);
+        const exerciseId = exerciseCount;
+        const table = document
+          .getElementById(`exerciseTable${exerciseId}`)
+          .getElementsByTagName("tbody")[0];
+        targetReps.forEach((targetRep, index) => {
+          const newRow = table.insertRow(index);
+          addNewSet(
+            newRow,
+            index + 1,
+            targetRep,
+            weights[index],
+            achievedReps[index],
+          );
+        });
+      }
+
+      const plan = {
+        Monday: [
+          [
+            "Smith squats",
+            [12, 12, 12, 12],
+            ["40 kg", "60 kg", "60 kg", "60 kg"],
+          ],
+          ["Dumbell RDL", [12, 12, 12], ["50 kg", "50 kg", "50 kg"]],
+          ["Reverse Fly", [12, 12, 12], ["8 plates", "8 plates", "8 plates"]],
+          ["Leg Extensions", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
+          [
+            "Lying Leg Curls",
+            [12, 12, 12],
+            ["8 plates", "8 plates", "8 plates"],
+          ],
+          ["Calf Raises", [20, 20, 20, 20], [0, 0, 0, 0]],
+          [
+            "Abs Crunches",
+            [12, 12, 12, 12],
+            ["15 kg", "15 kg", "15 kg", "15 kg"],
+          ],
+        ],
+        Tuesday: [
+          [
+            "High incline smith machine chest press",
+            [12, 12, 12, 12],
+            ["10 kg", "17.5 kg", "17.5 kg", "17.5 kg"],
+          ],
+          [
+            "Machine Chest Press",
+            [12, 12, 12],
+            ["11 plates", "11 plates", "11 plates"],
+          ],
+          [
+            "Low to high cable flyes",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Cable lateral raises",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Dumbell lateral raises",
+            [15, 15, 15],
+            ["7.5 kg", "7.5 kg", "7.5 kg"],
+          ],
+          [
+            "Overhead tricep extension",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Single hand tricep extension",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+        ],
+        Wednesday: [
+          [
+            "Single arm lat pull down",
+            [12, 12, 12],
+            ["25 kg", "25 kg", "25 kg"],
+          ],
+          [
+            "Single arm high to low cable row",
+            [12, 12, 12],
+            ["45 kg", "45 kg", "45 kg"],
+          ],
+          [
+            "Chest supported supinated row",
+            [12, 12, 12],
+            ["11 plates", "11 plates", "11 plates"],
+          ],
+          ["Preacher Curl", [12, 12, 12], ["10 kg", "10 kg", "10 kg"]],
+          [
+            "Incline hammer Curl",
+            [12, 12, 12, 12],
+            ["7.5 kg", "7.5 kg", "7.5 kg", "7.5 kg"],
+          ],
+          [
+            "Incline dumbell Curl",
+            [12, 12, 12, 12],
+            ["7.5 kg", "7.5 kg", "7.5 kg", "7.5 kg"],
+          ],
+          [
+            "Cable Shrugs",
+            [15, 15, 15, 15],
+            ["75 kg", "75 kg", "75 kg", "75 kg"],
+          ],
+        ],
+        Thursday: [
+          [
+            "Smith squats",
+            [12, 12, 12, 12, 12],
+            ["40 kg", "60 kg", "60 kg", "60 kg", "40 kg"],
+          ],
+          ["Dumbell RDL", [12, 12, 12], ["50 kg", "50 kg", "50 kg"]],
+          [
+            "Reverse Fly",
+            [12, 12, 12, 12],
+            ["8 plates", "8 plates", "8 plates", "7 plates"],
+          ],
+          [
+            "Leg Extensions",
+            [12, 12, 12, 12],
+            ["60 kg", "60 kg", "60 kg", "55 kg"],
+          ],
+          [
+            "Seated leg Curls",
+            [12, 12, 12, 12],
+            ["60 kg", "60 kg", "60 kg", "55 kg"],
+          ],
+          ["Calf Raises", [20, 20, 20, 20], [0, 0, 0, 0]],
+          [
+            "Abs Crunches",
+            [12, 12, 12, 12],
+            ["15 kg", "15 kg", "15 kg", "15 kg"],
+          ],
+        ],
+        Friday: [
+          [
+            "High incline smith machine chest press",
+            [12, 12, 12, 12, 12],
+            ["10 kg", "17.5 kg", "17.5 kg", "17.5 kg", "15 kg"],
+          ],
+          [
+            "Machine Chest Press",
+            [12, 12, 12, 12],
+            ["11 plates", "11 plates", "11 plates", "10 plates"],
+          ],
+          [
+            "Low to high cable flyes",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Cable lateral raises",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Dumbell lateral raises",
+            [15, 15, 15],
+            ["7.5 kg", "7.5 kg", "7.5 kg"],
+          ],
+          [
+            "Overhead tricep extension",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ][
+            ("Single hand tricep extension",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"])
+          ],
+        ],
+        Saturday: [
+          [
+            "Single arm lat pull down",
+            [12, 12, 12],
+            ["25 kg", "25 kg", "25 kg"],
+          ],
+          [
+            "Single arm high to low cable row",
+            [12, 12, 12],
+            ["45 kg", "45 kg", "45 kg"],
+          ],
+          [
+            "Chest supported supinated row",
+            [12, 12, 12, 12],
+            ["11 plates", "11 plates", "11 plates", "10 plates"],
+          ],
+          ["Preacher Curl", [12, 12, 12], ["10 kg", "10 kg", "10 kg"]],
+          [
+            "Incline hammer Curl",
+            [12, 12, 12, 12],
+            ["7.5 kg", "7.5 kg", "7.5 kg", "7.5 kg"],
+          ],
+          [
+            "Incline dumbell Curl",
+            [12, 12, 12, 12],
+            ["7.5 kg", "7.5 kg", "7.5 kg", "7.5 kg"],
+          ],
+          [
+            "Cable Shrugs",
+            [15, 15, 15, 15],
+            ["75 kg", "75 kg", "75 kg", "75 kg"],
+          ],
+        ],
+      };
+      document.addEventListener("DOMContentLoaded", function () {
+        const currPlan = plan[today];
+        const savedPlanStr = localStorage.getItem(`${today}_exerciseData`);
+        if (savedPlanStr) {
+          const savedPlan = JSON.parse(savedPlanStr);
+          for (var x = 0; x < savedPlan.length; x++) {
+            var currExercise = savedPlan[x];
+            addExerciseWithData(currExercise["exerciseName"], [], [], []);
+          }
+        } else {
+          currPlan.forEach((exercise, index) => {
+            addExerciseWithData(
+              exercise[0],
+              exercise[1],
+              exercise[2],
+              exercise[1],
+            );
+          });
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        loadFromLocalStorage();
+        const inputFields = document.querySelectorAll("input[type='text']");
+        inputFields.forEach(function (input) {
+          input.addEventListener("input", saveToLocalStorage);
+        });
+      });
+
+      function addNewSet(
+        newRow,
+        setNumber,
+        previousTargetReps,
+        previousWeight,
+        previousReps,
+      ) {
         newRow.innerHTML = `
       <td>${setNumber}</td>
       <td><input type="text" value="${previousTargetReps}"></td>
       <td><input type="text" value="${previousWeight}"></td>
       <td><input type="text" value="${previousReps}"></td>
-      <td><button class='remove-button'>X</button></td>
     `;
-        saveToLocalStorage();
+        const removeButton = document.createElement("button");
+        removeButton.className = "remove-button";
+        removeButton.textContent = "X";
+        removeButton.addEventListener("click", delSet);
+        newRow.insertCell(4).appendChild(removeButton);
       }
+
+      var delSet = function () {
+        const table = this.closest("table");
+        const row = this.closest("tr");
+        if (row) {
+          table.deleteRow(row.rowIndex);
+          saveToLocalStorage();
+        }
+      };
     </script>
     <title></title>
     <style>
@@ -256,338 +601,5 @@
       <button onclick="copyToClipboard()">Copy to Clipboard</button>
     </div>
     <div id="exported-data" style="display: none"></div>
-    <script>
-      function exportData(download) {
-        const exercises = document.querySelectorAll(".exercise-container");
-        const date = new Date();
-        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const dayName = days[date.getDay()];
-        const formattedDate = `* <${year}-${month}-${day} ${dayName}>`;
-        let data = `${formattedDate}\n`;
-        exercises.forEach((exercise, index) => {
-          const exerciseName =
-            exercise.querySelector("#exercise-name").textContent;
-          data += `- ${exerciseName}\n`;
-          const table = exercise.querySelector("table");
-          const rows = table.querySelectorAll("tbody tr");
-          rows.forEach((row) => {
-            var regex = new RegExp("kg", "gi");
-            const setNumber = row.cells[0].textContent;
-            var targetWeight = row.cells[2]
-              .querySelector("input")
-              .value.replace(regex, "")
-              .replace(" ", "");
-            if (!targetWeight.toLowerCase().includes("plates")) {
-              targetWeight += " kg";
-            } else {
-              var regex = new RegExp("plates", "gi");
-              targetWeight = targetWeight.replace(regex, "");
-              targetWeight += " plates";
-            }
-            const rep = row.cells[3].querySelector("input").value;
-            data += `  - ${targetWeight}, ${rep}\n`;
-          });
-        });
-        var regex = new RegExp("Remarks:", "gi");
-        var remarks = document
-          .getElementById("remarks")
-          .innerText.replace(regex, "");
-        console.log(remarks);
-        if (remarks.length) data += `- Remarks: ${remarks}\n`;
-        document.getElementById("exported-data").innerText = data;
-        if (download) {
-          if (data !== "") {
-            const blob = new Blob([data], { type: "text/plain" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            const fileName = `${date.getFullYear()}-${(date.getMonth() + 1)
-              .toString()
-              .padStart(2, "0")}-${date
-              .getDate()
-              .toString()
-              .padStart(2, "0")}_training_log.txt`;
-            a.href = url;
-            a.download = fileName;
-            a.click();
-          } else {
-            alert("No data to export.");
-          }
-        }
-      }
-
-      function copyToClipboard() {
-        exportData(false);
-        const exportedData = document.getElementById("exported-data");
-        const tempTextArea = document.createElement("textarea");
-        tempTextArea.value = exportedData.innerText;
-        document.body.appendChild(tempTextArea);
-        tempTextArea.select();
-        document.execCommand("copy");
-        document.body.removeChild(tempTextArea);
-        alert("Exported data copied to clipboard!");
-      }
-
-      function addExerciseWithData(
-        exerciseName,
-        targetReps,
-        weights,
-        achievedReps,
-      ) {
-        addExercise(exerciseName);
-        const exerciseId = exerciseCount;
-        const table = document
-          .getElementById(`exerciseTable${exerciseId}`)
-          .getElementsByTagName("tbody")[0];
-        targetReps.forEach((targetRep, index) => {
-          const newRow = table.insertRow(index);
-          newRow.innerHTML = `
-        <td>${index + 1}</td>
-        <td><input type="text" value="${targetRep}"></td>
-        <td><input type="text" value="${weights[index]}"></td>
-        <td><input type="text" value="${achievedReps[index]}"></td>
-        <td><button class='remove-button'>X</button></td>
-      `;
-        });
-      }
-      const plan = {
-        Monday: [
-          [
-            "Smith machine hack squats",
-            [12, 12, 12, 12],
-            ["60 kg", "60 kg", "60 kg", "60 kg"],
-          ],
-          ["Dumbell RDL", [12, 12, 12], ["50 kg", "50 kg", "50 kg"]],
-          ["Reverse Fly", [12, 12, 12], ["8 plates", "8 plates", "8 plates"]],
-          ["Leg Extensions", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
-          [
-            "Lying Leg Curls",
-            [12, 12, 12],
-            ["8 plates", "8 plates", "8 plates"],
-          ],
-          ["Calf Raises", [20, 20, 20, 20], [0, 0, 0, 0]],
-          [
-            "Abs Crunches",
-            [12, 12, 12, 12],
-            ["15 kg", "15 kg", "15 kg", "15 kg"],
-          ],
-        ],
-        Tuesday: [
-          [
-            "High incline smith machine chest press",
-            [12, 12, 12, 12],
-            ["10 kg", "17.5 kg", "17.5 kg", "17.5 kg"],
-          ],
-          [
-            "Machine Chest Press",
-            [12, 12, 12],
-            ["11 plates", "11 plates", "11 plates"],
-          ],
-          [
-            "Low to high cable flyes",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          [
-            "Cable lateral raises",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          [
-            "Dumbell lateral raises",
-            [15, 15, 15],
-            ["7.5 kg", "7.5 kg", "7.5 kg"],
-          ],
-          [
-            "Overhead tricep extension",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          [
-            "Single hand tricep extension",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-        ],
-        Wednesday: [
-          [
-            "Single arm lat pull down",
-            [12, 12, 12],
-            ["25 kg", "25 kg", "25 kg"],
-          ],
-          [
-            "Single arm high to low cable row",
-            [12, 12, 12],
-            ["45 kg", "45 kg", "45 kg"],
-          ],
-          [
-            "Chest supported supinated row",
-            [12, 12, 12],
-            ["11 plates", "11 plates", "11 plates"],
-          ],
-          ["Preacher Curl", [12, 12, 12], ["10 kg", "10 kg", "10 kg"]],
-          [
-            "Incline hammer Curl",
-            [12, 12, 12, 12],
-            ["7.5 kg", "7.5 kg", "7.5 kg", "7.5 kg"],
-          ],
-          [
-            "Incline dumbell Curl",
-            [12, 12, 12, 12],
-            ["7.5 kg", "7.5 kg", "7.5 kg", "7.5 kg"],
-          ],
-          [
-            "Cable Shrugs",
-            [15, 15, 15, 15],
-            ["75 kg", "75 kg", "75 kg", "75 kg"],
-          ],
-        ],
-        Thursday: [
-          [
-            "Smith machine hack squats",
-            [12, 12, 12, 12, 12],
-            ["40 kg", "60 kg", "60 kg", "60 kg", "40 kg"],
-          ],
-          ["Dumbell RDL", [12, 12, 12], ["50 kg", "50 kg", "50 kg"]],
-          [
-            "Reverse Fly",
-            [12, 12, 12, 12],
-            ["8 plates", "8 plates", "8 plates", "7 plates"],
-          ],
-          [
-            "Leg Extensions",
-            [12, 12, 12, 12],
-            ["60 kg", "60 kg", "60 kg", "55 kg"],
-          ],
-          [
-            "Seated leg Curls",
-            [12, 12, 12, 12],
-            ["60 kg", "60 kg", "60 kg", "55 kg"],
-          ],
-          ["Calf Raises", [20, 20, 20, 20], [0, 0, 0, 0]],
-          [
-            "Abs Crunches",
-            [12, 12, 12, 12],
-            ["15 kg", "15 kg", "15 kg", "15 kg"],
-          ],
-        ],
-        Friday: [
-          [
-            "High incline smith machine chest press",
-            [12, 12, 12, 12, 12],
-            ["10 kg", "17.5 kg", "17.5 kg", "17.5 kg", "15 kg"],
-          ],
-          [
-            "Machine Chest Press",
-            [12, 12, 12, 12],
-            ["11 plates", "11 plates", "11 plates", "10 plates"],
-          ],
-          [
-            "Low to high cable flyes",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          [
-            "Cable lateral raises",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          [
-            "Dumbell lateral raises",
-            [15, 15, 15],
-            ["7.5 kg", "7.5 kg", "7.5 kg"],
-          ],
-          [
-            "Overhead tricep extension",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ][
-            ("Single hand tricep extension",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"])
-          ],
-        ],
-        Saturday: [
-          [
-            "Single arm lat pull down",
-            [12, 12, 12],
-            ["25 kg", "25 kg", "25 kg"],
-          ],
-          [
-            "Single arm high to low cable row",
-            [12, 12, 12],
-            ["45 kg", "45 kg", "45 kg"],
-          ],
-          [
-            "Chest supported supinated row",
-            [12, 12, 12, 12],
-            ["11 plates", "11 plates", "11 plates", "10 plates"],
-          ],
-          ["Preacher Curl", [12, 12, 12], ["10 kg", "10 kg", "10 kg"]],
-          [
-            "Incline hammer Curl",
-            [12, 12, 12, 12],
-            ["7.5 kg", "7.5 kg", "7.5 kg", "7.5 kg"],
-          ],
-          [
-            "Incline dumbell Curl",
-            [12, 12, 12, 12],
-            ["7.5 kg", "7.5 kg", "7.5 kg", "7.5 kg"],
-          ],
-          [
-            "Cable Shrugs",
-            [15, 15, 15, 15],
-            ["75 kg", "75 kg", "75 kg", "75 kg"],
-          ],
-        ],
-      };
-      document.addEventListener("DOMContentLoaded", function () {
-        const currPlan = plan[today];
-        const savedPlan = JSON.parse(
-          localStorage.getItem(`${today}_exerciseData`),
-        );
-        console.log(savedPlan.length);
-        if (savedPlan) {
-          for (var x = 0; x < savedPlan.length; x++) {
-            var currExercise = savedPlan[x];
-            addExerciseWithData(currExercise["exerciseName"], [], [], []);
-          }
-        } else {
-          currPlan.forEach((exercise, index) => {
-            addExerciseWithData(
-              exercise[0],
-              exercise[1],
-              exercise[2],
-              exercise[1],
-            );
-          });
-        }
-      });
-
-      document.addEventListener("DOMContentLoaded", function () {
-        loadFromLocalStorage();
-        attachEventListeners();
-      });
-      function attachEventListeners() {
-        const inputFields = document.querySelectorAll("input[type='text']");
-        inputFields.forEach(function (input) {
-          input.addEventListener("input", saveToLocalStorage);
-        });
-        const removeButtons = document.querySelectorAll(".remove-button");
-        removeButtons.forEach(function (removeButton) {
-          removeButton.addEventListener("click", function () {
-            const table = this.closest("table");
-            const row = this.closest("tr");
-            console.log(row);
-            if (row) {
-              table.deleteRow(row.rowIndex);
-              saveToLocalStorage();
-            }
-          });
-        });
-      }
-    </script>
   </body>
 </html>
