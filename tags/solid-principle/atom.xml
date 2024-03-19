@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
     <title> - solid principle</title>
-    <link href="https://dhruv.fyi/tags/solid-principle/atom.xml" rel="self" type="application/atom+xml"/>
-    <link href="https://dhruv.fyi"/>
+    <link rel="self" type="application/atom+xml" href="https://dhruv.fyi/tags/solid-principle/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://dhruv.fyi"/>
     <generator uri="https://www.getzola.org/">Zola</generator>
     <updated>2023-05-02T00:00:00+00:00</updated>
     <id>https://dhruv.fyi/tags/solid-principle/atom.xml</id>
@@ -10,13 +10,19 @@
         <title>Solid Principles in Python</title>
         <published>2023-05-02T00:00:00+00:00</published>
         <updated>2023-05-02T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/blog/solid-principles/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/solid-principles/"/>
         <id>https://dhruv.fyi/blog/solid-principles/</id>
         
-        <content type="html">&lt;p&gt;S - Single Responsibility Principle
+        <content type="html" xml:base="https://dhruv.fyi/blog/solid-principles/">&lt;p&gt;S - Single Responsibility Principle
 &lt;br&gt;
 O - Open&#x2F;Closed Principle
 &lt;br&gt;

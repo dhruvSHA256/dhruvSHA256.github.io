@@ -1,22 +1,366 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
     <title></title>
-    <link href="https://dhruv.fyi/atom.xml" rel="self" type="application/atom+xml"/>
-    <link href="https://dhruv.fyi"/>
+    <link rel="self" type="application/atom+xml" href="https://dhruv.fyi/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://dhruv.fyi"/>
     <generator uri="https://www.getzola.org/">Zola</generator>
-    <updated>2023-11-07T00:00:00+00:00</updated>
+    <updated>2023-12-26T00:00:00+00:00</updated>
     <id>https://dhruv.fyi/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Writing a Dns Resolver from scratch in Haskell</title>
+        <published>2023-12-26T00:00:00+00:00</published>
+        <updated>2023-12-26T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/dns-resolver-from-scratch-in-haskell/"/>
+        <id>https://dhruv.fyi/blog/dns-resolver-from-scratch-in-haskell/</id>
+        
+        <content type="html" xml:base="https://dhruv.fyi/blog/dns-resolver-from-scratch-in-haskell/">&lt;h3 id=&quot;what-is-dns-anyway&quot;&gt;What is DNS anyway&lt;&#x2F;h3&gt;
+&lt;p&gt;Every device on internet has an ip address associated to it,
+which is used to make a connection with it,
+but ip addresses doesn’t mean more than random numbers separated by decimal for humans
+so we came up with a method to map ip address of these resources to a human readable key&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;components-of-dns&quot;&gt;Components of DNS&lt;&#x2F;h3&gt;
+&lt;p&gt;Their are three parts to DNS&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Domain name and resource record: This includes the human-readable domain names and corresponding resource records.&lt;&#x2F;li&gt;
+&lt;li&gt;Name Servers: These servers store DNS information and respond to DNS queries.&lt;&#x2F;li&gt;
+&lt;li&gt;Resolvers: Resolvers, typically part of operating systems or network configurations, initiate DNS queries on behalf of clients.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;dns-vs-distributed-kv-stores&quot;&gt;DNS vs. Distributed KV Stores&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Extensibility: DNS supports various data types and query types, making it more adaptable to diverse needs&lt;&#x2F;li&gt;
+&lt;li&gt;Bandwidth Efficiency: Unlike distributed databases, DNS reduces unnecessary bandwidth required for adding, updating, and syncing key values.&lt;&#x2F;li&gt;
+&lt;li&gt;Network Performance: DNS employs UDP as its underlying protocol, which eliminates the need for a handshake, resulting in faster connections.&lt;&#x2F;li&gt;
+&lt;li&gt;Hierarchy: The hierarchical structure of DNS allows for the mapping of multiple resources under a single namespace and different subdomains.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;anatomy-of-a-dns-packet&quot;&gt;Anatomy of a DNS Packet&lt;&#x2F;h3&gt;
+&lt;p&gt;DNS uses two types of messages, queries (which we send to name server) and response (which we receive from nameserver), both of them have same format
+A DNS packet consist of 5 segments,&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;DNS header: Contains metadata with a fixed length of 12 bytes, including flags and counts of records in other sections.&lt;&#x2F;li&gt;
+&lt;li&gt;DNS Question: Specifies the query for the name server, including the domain name, query type, and class, can be of variable length&lt;&#x2F;li&gt;
+&lt;li&gt;DNS Answer: Resource records providing answers to the query.&lt;&#x2F;li&gt;
+&lt;li&gt;Authority Section: Resource records indicating authority for the queried domain.&lt;&#x2F;li&gt;
+&lt;li&gt;Additional Section: Resource records holding additional information.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h4 id=&quot;dns-header&quot;&gt;DNS Header&lt;&#x2F;h4&gt;
+&lt;pre style=&quot;background-color:#282c34;color:#abb2bf;&quot;&gt;&lt;code&gt;&lt;span&gt;     0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;   |                      ID                       |
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;   |QR|   Opcode  |AA|TC|RD|RA|   Z    |   RCODE   |
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;   |                    QDCOUNT                    |
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;   |                    ANCOUNT                    |
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;   |                    NSCOUNT                    |
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;   |                    ARCOUNT                    |
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;headers consist of several flags and number of records in other sections
+QR, if the packet is a query (0) or response (1)
+OPCODE can be standard query (0), inverse query (1), or server status request (2)
+AA, if DNS server is authoritative for the queried host
+TC, if message is truncated due to excessive length or not
+RD, if query is a recursive query
+RA, if nameserver supports recursive query or not
+Z is reserved for future use
+RCODE indicates the response code like no error (0), format error (1), server fail (2), domain does not exist (3), etc&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;dns-question&quot;&gt;DNS Question&lt;&#x2F;h4&gt;
+&lt;pre style=&quot;background-color:#282c34;color:#abb2bf;&quot;&gt;&lt;code&gt;&lt;span&gt;    0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;   |                     QNAME                     |
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;   |                     QTYPE                     |
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;   |                     QCLASS                    |
+&lt;&#x2F;span&gt;&lt;span&gt;   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;QNAME,  name of requested resources
+QTYPE, types of question, A for IPv4 address, AAAA for IPv6 address, MX for mail exchange, CNAME for canonical name etc, our DNS resolver currently supports A record
+QCLASS, the class of query being made like internet (1, most widely used), chaos (3, rarely used) and hesiod (4, also rarely used)&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;dns-resource-record&quot;&gt;DNS Resource Record&lt;&#x2F;h4&gt;
+&lt;p&gt;Each record has a type, expiration date and type specific data&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#282c34;color:#abb2bf;&quot;&gt;&lt;code&gt;&lt;span&gt;    0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+&lt;&#x2F;span&gt;&lt;span&gt;  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;  |                      NAME                     |
+&lt;&#x2F;span&gt;&lt;span&gt;  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;  |                      TYPE                     |
+&lt;&#x2F;span&gt;&lt;span&gt;  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;  |                     CLASS                     |
+&lt;&#x2F;span&gt;&lt;span&gt;  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;  |                      TTL                      |
+&lt;&#x2F;span&gt;&lt;span&gt;  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;span&gt;  |                    RDLENGTH                   |
+&lt;&#x2F;span&gt;&lt;span&gt;  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--|
+&lt;&#x2F;span&gt;&lt;span&gt;  |                    RDATA                      |
+&lt;&#x2F;span&gt;&lt;span&gt;  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;NAME, domain name belonging to resource record
+TYPE, type of resource record similar to type of question
+CLASS, class of data similar to class of question
+TTL, time to live
+RDLENGTH, length of data in RR
+RDATA, contains specific data associated with type of RR, for A record it will contain IPv4 address&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;communicating-with-a-nameserver&quot;&gt;Communicating with a Nameserver&lt;&#x2F;h3&gt;
+&lt;p&gt;Their are a couple of steps we need for implementing any network protocol like,&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;whether to use TCP or UDP, on which port we need to send request or listen to&lt;&#x2F;li&gt;
+&lt;li&gt;represent the packet format described for that protocol in the language we are using&lt;&#x2F;li&gt;
+&lt;li&gt;construction the request and send it to server&lt;&#x2F;li&gt;
+&lt;li&gt;receiving and processing the response
+we will tackle these one by one&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h4 id=&quot;dns-protocol-specs&quot;&gt;DNS protocol specs&lt;&#x2F;h4&gt;
+&lt;p&gt;So the DNS runs on port 53 and uses UDP as a transport protocol,
+which is not as reliable as TCP and we might encounter packet loss.
+But why do DNS chooses to use UDP instead ?
+The answer is simple, Cost to establish connection.
+One of the things that makes TCP reliable is a 3 way handshake and it makes TCP connection establishment slower as compared to UDP.
+It is not acceptable for DNS resolver to do a handshake with nameserver for every fresh query.&lt;&#x2F;p&gt;
+&lt;h4 id=&quot;representing-the-dns-packet&quot;&gt;Representing the DNS packet&lt;&#x2F;h4&gt;
+&lt;p&gt;We can easily represent DNS header, question, resource record and the complete DNS packet
+using custom data types in haskell like shown below&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;hs&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-hs &quot;&gt;&lt;code class=&quot;language-hs&quot; data-lang=&quot;hs&quot;&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;import qualified &lt;&#x2F;span&gt;&lt;span&gt;Data.ByteString.Char8 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;as &lt;&#x2F;span&gt;&lt;span&gt;BS
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;import &lt;&#x2F;span&gt;&lt;span&gt;Data.Word (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word32&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;data &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSHeader &lt;&#x2F;span&gt;&lt;span&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSHeader
+&lt;&#x2F;span&gt;&lt;span&gt;  { dnsHeaderId :: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Word16&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsHeaderFlags &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5c6370;&quot;&gt;-- QR OPCODE AA TC RD RA Z RCODE
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsHeaderNumQuestion &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsHeaderNumAnswer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsHeaderNumAuthority &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsHeaderNumAdditional &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16
+&lt;&#x2F;span&gt;&lt;span&gt;  }
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;deriving&lt;&#x2F;span&gt;&lt;span&gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Show&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;data &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSQuestion &lt;&#x2F;span&gt;&lt;span&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSQuestion
+&lt;&#x2F;span&gt;&lt;span&gt;  { dnsQuestionName :: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;ByteString&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsQuestionType &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsQuestionClass &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16
+&lt;&#x2F;span&gt;&lt;span&gt;  }
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;deriving&lt;&#x2F;span&gt;&lt;span&gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Show&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;data &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSRecord &lt;&#x2F;span&gt;&lt;span&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSRecord
+&lt;&#x2F;span&gt;&lt;span&gt;  { dnsRecordName :: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;ByteString&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsRecordType &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsRecordClass &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsRecordTtl &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word32&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsRecordData &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString
+&lt;&#x2F;span&gt;&lt;span&gt;  }
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;deriving&lt;&#x2F;span&gt;&lt;span&gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Show&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;data &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSPacket &lt;&#x2F;span&gt;&lt;span&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSPacket
+&lt;&#x2F;span&gt;&lt;span&gt;  { dnsPacketHeader :: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSHeader&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsPacketQuestions &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSQuestion&lt;&#x2F;span&gt;&lt;span&gt;],
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsPacketAnswers &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSRecord&lt;&#x2F;span&gt;&lt;span&gt;],
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsPacketAuthorities &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSRecord&lt;&#x2F;span&gt;&lt;span&gt;],
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;dnsPacketAdditionals &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSRecord&lt;&#x2F;span&gt;&lt;span&gt;]
+&lt;&#x2F;span&gt;&lt;span&gt;  }
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;deriving&lt;&#x2F;span&gt;&lt;span&gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Show&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h4 id=&quot;construct-the-request-and-sending-to-server&quot;&gt;Construct the request and sending to server&lt;&#x2F;h4&gt;
+&lt;p&gt;So a DNS query consist of the domain name we want to resolve and the query type
+for example we want to resolve IPv4 address for google.com which is a type A query
+we’ll use a helper function to create a DNS packet for our query&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;haskell&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-haskell &quot;&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;encodeQuery &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: String -&amp;gt; Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16 -&amp;gt; IO BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString
+&lt;&#x2F;span&gt;&lt;span&gt;encodeQuery domainName recordType = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; _id = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;1
+&lt;&#x2F;span&gt;&lt;span&gt;      recursionDesired = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt; `&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Bits&lt;&#x2F;span&gt;&lt;span&gt;.shiftL` &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;8
+&lt;&#x2F;span&gt;&lt;span&gt;      header = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSHeader&lt;&#x2F;span&gt;&lt;span&gt; _id recursionDesired &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;1 0 0 0
+&lt;&#x2F;span&gt;&lt;span&gt;      question = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSQuestion&lt;&#x2F;span&gt;&lt;span&gt; (encodeDNSName domainName) recordType classIn
+&lt;&#x2F;span&gt;&lt;span&gt;      queryBytes = headerToBytes header &amp;lt;&amp;gt; questionToBytes question
+&lt;&#x2F;span&gt;&lt;span&gt;  return queryBytes
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;the above function will return a bytestring of DNS packet which we will send to the nameserver&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;decoding-and-processing-the-response&quot;&gt;Decoding and Processing the response&lt;&#x2F;h3&gt;
+&lt;p&gt;We will receive a DNS packet in bytestring form from the nameserver which may contain
+the actual answer we are looking for, we just need to decode and process it.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;haskell&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-haskell &quot;&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;decodeQuery &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString -&amp;gt; Either String DNSPacket
+&lt;&#x2F;span&gt;&lt;span&gt;decodeQuery bs =
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;case&lt;&#x2F;span&gt;&lt;span&gt; runGetOrFail (getDNSPacket bs) (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;LBS&lt;&#x2F;span&gt;&lt;span&gt;.fromStrict bs) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;of
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Left&lt;&#x2F;span&gt;&lt;span&gt; (_, _, err) -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Left&lt;&#x2F;span&gt;&lt;span&gt; err
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Right&lt;&#x2F;span&gt;&lt;span&gt; (_, _, dnsPacket) -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Right&lt;&#x2F;span&gt;&lt;span&gt; dnsPacket
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;getDNSPacket &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString -&amp;gt; Get DNSPacket
+&lt;&#x2F;span&gt;&lt;span&gt;getDNSPacket input = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;  header &amp;lt;- getDNSHeader
+&lt;&#x2F;span&gt;&lt;span&gt;  questions &amp;lt;- getDNSQuestionNE input (dnsHeaderNumQuestion header)
+&lt;&#x2F;span&gt;&lt;span&gt;  answers &amp;lt;- getDNSRecordList input (dnsHeaderNumAnswer header)
+&lt;&#x2F;span&gt;&lt;span&gt;  authorities &amp;lt;- getDNSRecordList input (dnsHeaderNumAuthority header)
+&lt;&#x2F;span&gt;&lt;span&gt;  additionals &amp;lt;- getDNSRecordList input (dnsHeaderNumAdditional header)
+&lt;&#x2F;span&gt;&lt;span&gt;  return $ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSPacket&lt;&#x2F;span&gt;&lt;span&gt; header questions answers authorities additionals
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;getDNSHeader &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Get DNSHeader
+&lt;&#x2F;span&gt;&lt;span&gt;getDNSHeader = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSHeader &lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;$&amp;gt; getWord16be &amp;lt;*&amp;gt; getWord16be &amp;lt;*&amp;gt; getWord16be &amp;lt;*&amp;gt; getWord16be &amp;lt;*&amp;gt; getWord16be &amp;lt;*&amp;gt; getWord16be
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;getDNSQuestionNE &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString -&amp;gt; Word16 -&amp;gt; Get&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSQuestion&lt;&#x2F;span&gt;&lt;span&gt;]
+&lt;&#x2F;span&gt;&lt;span&gt;getDNSQuestionNE input x = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;  replicateM (fromIntegral x) getDNSQuestion
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;where
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;getDNSQuestion &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Get DNSQuestion
+&lt;&#x2F;span&gt;&lt;span&gt;    getDNSQuestion = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;DNSQuestion &lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;$&amp;gt; getDomainName input &amp;lt;*&amp;gt; getWord16be &amp;lt;*&amp;gt; getWord16be
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;getDNSRecordList &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString -&amp;gt; Word16 -&amp;gt; Get&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSRecord&lt;&#x2F;span&gt;&lt;span&gt;]
+&lt;&#x2F;span&gt;&lt;span&gt;getDNSRecordList input count = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;  replicateM (fromIntegral count) getDNSRecord
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;where
+&lt;&#x2F;span&gt;&lt;span&gt;    getDNSRecord = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;      domain &amp;lt;- getDomainName input
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;type&lt;&#x2F;span&gt;&lt;span&gt;&amp;#39; &amp;lt;- getWord16be
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;class&lt;&#x2F;span&gt;&lt;span&gt;&amp;#39; &amp;lt;- &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getWord16be
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;ttl&lt;&#x2F;span&gt;&lt;span&gt; &amp;lt;- &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getWord32be
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;data_len&lt;&#x2F;span&gt;&lt;span&gt; &amp;lt;- &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getInt16be
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;data_&lt;&#x2F;span&gt;&lt;span&gt; &amp;lt;- &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getRecordData&lt;&#x2F;span&gt;&lt;span&gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;fromIntegral type&lt;&#x2F;span&gt;&lt;span&gt;&amp;#39;) (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;fromIntegral data_len&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;return&lt;&#x2F;span&gt;&lt;span&gt; $ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;DNSRecord&lt;&#x2F;span&gt;&lt;span&gt; {&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;dnsRecordName&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;domain&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;dnsRecordType&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;type&lt;&#x2F;span&gt;&lt;span&gt;&amp;#39;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;dnsRecordClass&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;class&lt;&#x2F;span&gt;&lt;span&gt;&amp;#39;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;dnsRecordTtl&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;ttl&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;dnsRecordData&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;data_&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getRecordData&lt;&#x2F;span&gt;&lt;span&gt; :: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;16 -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Int&lt;&#x2F;span&gt;&lt;span&gt; -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Get BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;ByteString
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getRecordData type_ data_len
+&lt;&#x2F;span&gt;&lt;span&gt;      | &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;type_&lt;&#x2F;span&gt;&lt;span&gt; == &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;typeNs&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getDomainName input
+&lt;&#x2F;span&gt;&lt;span&gt;      | &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;type_&lt;&#x2F;span&gt;&lt;span&gt; == &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;typeA&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;          &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;ipBytes&lt;&#x2F;span&gt;&lt;span&gt; &amp;lt;- &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getByteString&lt;&#x2F;span&gt;&lt;span&gt; $ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;fromIntegral data_len
+&lt;&#x2F;span&gt;&lt;span&gt;          &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;return&lt;&#x2F;span&gt;&lt;span&gt; $ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;pack&lt;&#x2F;span&gt;&lt;span&gt; $ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;ipToString&lt;&#x2F;span&gt;&lt;span&gt; $ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;B&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;unpack ipBytes
+&lt;&#x2F;span&gt;&lt;span&gt;      | &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;otherwise&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;getByteString&lt;&#x2F;span&gt;&lt;span&gt; $ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;fromIntegral data_len
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;ipToString&lt;&#x2F;span&gt;&lt;span&gt; :: [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;8] -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;String
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;ipToString&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;intercalate&lt;&#x2F;span&gt;&lt;span&gt; &amp;quot;.&amp;quot; . &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;map show
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now the decoding most of the fields are straightforward but, 
+DNS uses domain name compression for space optimization, 
+for example if we query for domain “google.com”, the string “google.com” will be present
+multiple times in the DNS packet. 
+Instead of storing it multiple times what DNS do is it stores the pointer to that string
+present previously. So we also need to take this compression in account while decoding
+domain name.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;haskell&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-haskell &quot;&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;getDomainName &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString -&amp;gt; Get BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString
+&lt;&#x2F;span&gt;&lt;span&gt;getDomainName input&amp;#39; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;  len &amp;lt;- getInt8
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; lengthValue = len &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Bits&lt;&#x2F;span&gt;&lt;span&gt;..&amp;amp;. &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;63
+&lt;&#x2F;span&gt;&lt;span&gt;  getDomainName&amp;#39; input&amp;#39; len lengthValue
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;where
+&lt;&#x2F;span&gt;&lt;span&gt;    getDomainName&amp;#39; input len lengthValue
+&lt;&#x2F;span&gt;&lt;span&gt;      | len == &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;0 &lt;&#x2F;span&gt;&lt;span&gt;= return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;BS&lt;&#x2F;span&gt;&lt;span&gt;.empty
+&lt;&#x2F;span&gt;&lt;span&gt;      | isPointer len = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;          d &amp;lt;- getInt8
+&lt;&#x2F;span&gt;&lt;span&gt;          &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; offset = fromIntegral $ lengthValue * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;256 &lt;&#x2F;span&gt;&lt;span&gt;+ fromIntegral d &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#5c6370;&quot;&gt;-- converting bits to int
+&lt;&#x2F;span&gt;&lt;span&gt;          decodeCompressed offset input
+&lt;&#x2F;span&gt;&lt;span&gt;      | otherwise = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;          label &amp;lt;- getByteString $ fromIntegral lengthValue
+&lt;&#x2F;span&gt;&lt;span&gt;          rest &amp;lt;- getDomainName input
+&lt;&#x2F;span&gt;&lt;span&gt;          return $
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;BS&lt;&#x2F;span&gt;&lt;span&gt;.null rest
+&lt;&#x2F;span&gt;&lt;span&gt;              &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;then&lt;&#x2F;span&gt;&lt;span&gt; label
+&lt;&#x2F;span&gt;&lt;span&gt;              &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;else&lt;&#x2F;span&gt;&lt;span&gt; label &amp;lt;&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;BS&lt;&#x2F;span&gt;&lt;span&gt;.pack &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;.&amp;quot; &lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&amp;gt; rest
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;decodeCompressed &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Int -&amp;gt; BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString -&amp;gt; Get BS&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;ByteString
+&lt;&#x2F;span&gt;&lt;span&gt;    decodeCompressed offset input = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; msg = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;BS&lt;&#x2F;span&gt;&lt;span&gt;.drop offset input
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;case&lt;&#x2F;span&gt;&lt;span&gt; runGetOrFail (getDomainName input) (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;LBS&lt;&#x2F;span&gt;&lt;span&gt;.fromStrict msg) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;of
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Left&lt;&#x2F;span&gt;&lt;span&gt; (_, _, err) -&amp;gt; traceShow (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;err: &amp;quot; &lt;&#x2F;span&gt;&lt;span&gt;++ show err) $ return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;BS&lt;&#x2F;span&gt;&lt;span&gt;.empty
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Right&lt;&#x2F;span&gt;&lt;span&gt; (_, _, domain) -&amp;gt; return domain
+&lt;&#x2F;span&gt;&lt;span&gt;    isPointer c = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Bits&lt;&#x2F;span&gt;&lt;span&gt;.testBit c &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;7&lt;&#x2F;span&gt;&lt;span&gt; &amp;amp;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Bits&lt;&#x2F;span&gt;&lt;span&gt;.testBit c &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;6
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;if the two MSB are set, then it indicates that remaining 14 bits represents pointer to the domain name backwards&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;recursive-nature-of-dns&quot;&gt;Recursive Nature of DNS&lt;&#x2F;h3&gt;
+&lt;p&gt;See it is not the case that every time we query for a domain name, nameserver will respond with its ip.
+DNS resolution can involve multiple steps, as it may recursively query different name servers until it obtains the desired information.
+It can we possible that it may return ip of another nameserver which many have the
+answer or even the domain name of that nameserver, so our resolve function will look like this&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;haskell&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-haskell &quot;&gt;&lt;code class=&quot;language-haskell&quot; data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;matchRecordType &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: Word16 -&amp;gt;&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSRecord&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;-&amp;gt; Maybe String
+&lt;&#x2F;span&gt;&lt;span&gt;matchRecordType recordType records = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; matchingRecord = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;L&lt;&#x2F;span&gt;&lt;span&gt;.find (\x -&amp;gt; dnsRecordType x == recordType) records
+&lt;&#x2F;span&gt;&lt;span&gt;  (\x -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Just&lt;&#x2F;span&gt;&lt;span&gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;BS&lt;&#x2F;span&gt;&lt;span&gt;.unpack $ dnsRecordData x)) =&amp;lt;&amp;lt; matchingRecord
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;getAnswer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSRecord&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;-&amp;gt; Maybe String
+&lt;&#x2F;span&gt;&lt;span&gt;getAnswer = matchRecordType typeA
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;getNsIp &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSRecord&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;-&amp;gt; Maybe String
+&lt;&#x2F;span&gt;&lt;span&gt;getNsIp = matchRecordType typeA
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;getNs &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt; [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;DNSRecord&lt;&#x2F;span&gt;&lt;span&gt;] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;-&amp;gt; Maybe String
+&lt;&#x2F;span&gt;&lt;span&gt;getNs = matchRecordType typeNs
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#61afef;&quot;&gt;resolve &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;:: String -&amp;gt; Data&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Word16 -&amp;gt; String -&amp;gt; IO&lt;&#x2F;span&gt;&lt;span&gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;Maybe String&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;resolve domainName recordType nameserver = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;  query &amp;lt;- encodeQuery domainName recordType
+&lt;&#x2F;span&gt;&lt;span&gt;  byteString &amp;lt;- sendUDPRequest nameserver &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;53&lt;&#x2F;span&gt;&lt;span&gt; query
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;case&lt;&#x2F;span&gt;&lt;span&gt; decodeQuery byteString &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;of
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Left&lt;&#x2F;span&gt;&lt;span&gt; err -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;      traceShow (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;Error parsing DNS packet: &amp;quot; &lt;&#x2F;span&gt;&lt;span&gt;++ err) (return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Nothing&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Right&lt;&#x2F;span&gt;&lt;span&gt; packet -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; mIp = getAnswer $ dnsPacketAnswers packet
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; mNsIp = getNsIp $ dnsPacketAdditionals packet
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span&gt; mNsDomain = getNs $ dnsPacketAuthorities packet
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;case&lt;&#x2F;span&gt;&lt;span&gt; (mIp, mNsIp, mNsDomain) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;of
+&lt;&#x2F;span&gt;&lt;span&gt;        (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Just&lt;&#x2F;span&gt;&lt;span&gt; ip, _, _) -&amp;gt; return $ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Just&lt;&#x2F;span&gt;&lt;span&gt; ip
+&lt;&#x2F;span&gt;&lt;span&gt;        (_, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Just&lt;&#x2F;span&gt;&lt;span&gt; nsIp, _) -&amp;gt; resolve domainName recordType nsIp
+&lt;&#x2F;span&gt;&lt;span&gt;        (_, _, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Just&lt;&#x2F;span&gt;&lt;span&gt; nsDomain) -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;do
+&lt;&#x2F;span&gt;&lt;span&gt;          nameserver &amp;lt;- resolve nsDomain typeA nameserver
+&lt;&#x2F;span&gt;&lt;span&gt;          resolve domainName recordType $ fromMaybe &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; nameserver
+&lt;&#x2F;span&gt;&lt;span&gt;        (_, _, _) -&amp;gt; traceShow &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;Error Occured&amp;quot; &lt;&#x2F;span&gt;&lt;span&gt;$ return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Nothing
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;final-step-testing&quot;&gt;Final Step (testing)&lt;&#x2F;h3&gt;
+&lt;p&gt;Our poorman’s DNS resolver is finally completed now, 
+you can test it by querying any domain name.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;sh&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-sh &quot;&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span&gt;&amp;gt; cabal &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;run&lt;&#x2F;span&gt;&lt;span&gt; haskell-dns-resolver google.com
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;Just &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;142.251.42.78&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt; dig &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;@8.8.8.8&lt;&#x2F;span&gt;&lt;span&gt; google.com
+&lt;&#x2F;span&gt;&lt;span&gt;; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;9.10.6 &lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&amp;lt;&amp;gt;&amp;gt; @8.8.8.8 google.com
+&lt;&#x2F;span&gt;&lt;span&gt;; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt; server found)
+&lt;&#x2F;span&gt;&lt;span&gt;;; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;global&lt;&#x2F;span&gt;&lt;span&gt; options: +cmd
+&lt;&#x2F;span&gt;&lt;span&gt;;; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;Got&lt;&#x2F;span&gt;&lt;span&gt; answer:
+&lt;&#x2F;span&gt;&lt;span&gt;;; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;&amp;gt;HEADER&amp;lt;&amp;lt;- &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;opcode&lt;&#x2F;span&gt;&lt;span&gt;: QUERY, status: NOERROR, id: 5539
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;;; OPT PSEUDOSECTION:
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;; EDNS: version: 0, flags:; udp: 512
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;;; QUESTION SECTION:
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;;google.com.                    IN      A
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;;; ANSWER SECTION:
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;google.com.             227     IN      A       142.250.70.78
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;;; Query time: 49 msec
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;;; SERVER: 8.8.8.8#53(8.8.8.8)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;;; WHEN: Mon Mar 18 19:17:16 IST 2024
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;;; MSG SIZE  rcvd: 55
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;reference&quot;&gt;Reference&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;datatracker.ietf.org&#x2F;doc&#x2F;html&#x2F;rfc1034&quot;&gt;RFC 1034 - Domain names - concepts and facilities&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;datatracker.ietf.org&#x2F;doc&#x2F;html&#x2F;rfc1035&quot;&gt;RFC 1035 - Domain names - implementation and specification&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;implement-dns.wizardzines.com&#x2F;&quot;&gt;Implement DNS in a weekend&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a rel=&quot;noopener&quot; target=&quot;_blank&quot; href=&quot;https:&#x2F;&#x2F;github.com&#x2F;dhruvSHA256&#x2F;haskell-dns-resolver&quot;&gt;dhruvSHA256&#x2F;haskell-dns-resolver&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+</content>
+        
+    </entry>
     <entry xml:lang="en">
         <title>Network Load balancer from scratch in Python</title>
         <published>2023-11-07T00:00:00+00:00</published>
         <updated>2023-11-07T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/blog/load-balancer-python/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/load-balancer-python/"/>
         <id>https://dhruv.fyi/blog/load-balancer-python/</id>
         
-        <content type="html">&lt;p&gt;Have you ever wondered how web applications handle increasing traffic? As a software engineer, you might have heard of load balancers,&lt;br &#x2F;&gt;
+        <content type="html" xml:base="https://dhruv.fyi/blog/load-balancer-python/">&lt;p&gt;Have you ever wondered how web applications handle increasing traffic? As a software engineer, you might have heard of load balancers,&lt;br &#x2F;&gt;
 which play a crucial role in managing the distribution of requests to multiple servers.&lt;&#x2F;p&gt;
 &lt;p&gt;This weekend, I decided to dive deep into socket programming and create a simple yet functional a load balancer from scratch in Python. 
 In this blog post, I’ll walk you through the process.&lt;&#x2F;p&gt;
@@ -130,13 +474,19 @@ We must perform this operation without blocking our primary server, so we’ll c
         <title>Solid Principles in Python</title>
         <published>2023-05-02T00:00:00+00:00</published>
         <updated>2023-05-02T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/blog/solid-principles/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/solid-principles/"/>
         <id>https://dhruv.fyi/blog/solid-principles/</id>
         
-        <content type="html">&lt;p&gt;S - Single Responsibility Principle
+        <content type="html" xml:base="https://dhruv.fyi/blog/solid-principles/">&lt;p&gt;S - Single Responsibility Principle
 &lt;br&gt;
 O - Open&#x2F;Closed Principle
 &lt;br&gt;
@@ -359,13 +709,19 @@ StripePayment class) and take that as an argument&lt;&#x2F;p&gt;
         <title>Postgresql Indexes</title>
         <published>2022-12-19T00:00:00+00:00</published>
         <updated>2022-12-19T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/blog/postgresql-indexes/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/postgresql-indexes/"/>
         <id>https://dhruv.fyi/blog/postgresql-indexes/</id>
         
-        <content type="html">&lt;h2 id=&quot;indexes&quot;&gt;Indexes&lt;&#x2F;h2&gt;
+        <content type="html" xml:base="https://dhruv.fyi/blog/postgresql-indexes/">&lt;h2 id=&quot;indexes&quot;&gt;Indexes&lt;&#x2F;h2&gt;
 &lt;h3 id=&quot;what&quot;&gt;What&lt;&#x2F;h3&gt;
 &lt;ul&gt;
 &lt;li&gt;a data structure, can make some queries fast&lt;&#x2F;li&gt;
@@ -475,13 +831,19 @@ StripePayment class) and take that as an argument&lt;&#x2F;p&gt;
         <title>On God</title>
         <published>2022-09-25T00:00:00+00:00</published>
         <updated>2022-09-25T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/private/on-god/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/private/on-god/"/>
         <id>https://dhruv.fyi/private/on-god/</id>
         
-        <content type="html">&lt;h2 id=&quot;randomness-and-uncertainity&quot;&gt;Randomness and Uncertainity&lt;&#x2F;h2&gt;
+        <content type="html" xml:base="https://dhruv.fyi/private/on-god/">&lt;h2 id=&quot;randomness-and-uncertainity&quot;&gt;Randomness and Uncertainity&lt;&#x2F;h2&gt;
 &lt;ul&gt;
 &lt;li&gt;nothing is certain in this world and everything is random&lt;&#x2F;li&gt;
 &lt;li&gt;from the place of your birth to the friends and presence of your loved ones in your life,&lt;&#x2F;li&gt;
@@ -603,13 +965,19 @@ StripePayment class) and take that as an argument&lt;&#x2F;p&gt;
         <title>Happiness</title>
         <published>2022-08-14T00:00:00+00:00</published>
         <updated>2022-08-14T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/blog/happiness/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/happiness/"/>
         <id>https://dhruv.fyi/blog/happiness/</id>
         
-        <content type="html">&lt;h2 id=&quot;what-is-happiness&quot;&gt;What is Happiness&lt;&#x2F;h2&gt;
+        <content type="html" xml:base="https://dhruv.fyi/blog/happiness/">&lt;h2 id=&quot;what-is-happiness&quot;&gt;What is Happiness&lt;&#x2F;h2&gt;
 &lt;ul&gt;
 &lt;li&gt;Is it a state when you are not sad&lt;&#x2F;li&gt;
 &lt;li&gt;you are not sad when people do something which is beneficial for their survival and reproduction&lt;&#x2F;li&gt;
@@ -649,13 +1017,19 @@ StripePayment class) and take that as an argument&lt;&#x2F;p&gt;
         <title>Car Radio - Twenty One Pilots</title>
         <published>2022-08-08T00:00:00+00:00</published>
         <updated>2022-08-08T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/blog/car-radio-by-top/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/car-radio-by-top/"/>
         <id>https://dhruv.fyi/blog/car-radio-by-top/</id>
         
-        <content type="html">&lt;h2 id=&quot;distracting-yourself-by-listening-to-car-radio&quot;&gt;distracting yourself by listening to car radio&lt;&#x2F;h2&gt;
+        <content type="html" xml:base="https://dhruv.fyi/blog/car-radio-by-top/">&lt;h2 id=&quot;distracting-yourself-by-listening-to-car-radio&quot;&gt;distracting yourself by listening to car radio&lt;&#x2F;h2&gt;
 &lt;pre data-lang=&quot;_&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-_ &quot;&gt;&lt;code class=&quot;language-_&quot; data-lang=&quot;_&quot;&gt;&lt;span&gt;I ponder of something great
 &lt;&#x2F;span&gt;&lt;span&gt;My lungs will fill and then deflate
 &lt;&#x2F;span&gt;&lt;span&gt;They fill with fire
@@ -753,13 +1127,19 @@ force them to think, as it liberated him&lt;&#x2F;li&gt;
         <title>Map, Filter, Reduce in python</title>
         <published>2022-07-18T00:00:00+00:00</published>
         <updated>2022-07-18T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/blog/map-filter-reduce-in-python/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/map-filter-reduce-in-python/"/>
         <id>https://dhruv.fyi/blog/map-filter-reduce-in-python/</id>
         
-        <content type="html">&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span&gt;     li = [x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;range&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;100&lt;&#x2F;span&gt;&lt;span&gt;)]
+        <content type="html" xml:base="https://dhruv.fyi/blog/map-filter-reduce-in-python/">&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span&gt;     li = [x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;range&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;100&lt;&#x2F;span&gt;&lt;span&gt;)]
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;h2 id=&quot;map&quot;&gt;map:&lt;&#x2F;h2&gt;
 &lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span&gt;  li = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;list&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;lambda &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;x &lt;&#x2F;span&gt;&lt;span&gt;: x&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;2&lt;&#x2F;span&gt;&lt;span&gt;,li))
@@ -816,13 +1196,19 @@ iteritable&lt;&#x2F;li&gt;
         <title>Absurdism Extentialism Nihilism</title>
         <published>2022-07-17T00:00:00+00:00</published>
         <updated>2022-07-17T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/blog/absurdism-extentialism-nihilism/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/absurdism-extentialism-nihilism/"/>
         <id>https://dhruv.fyi/blog/absurdism-extentialism-nihilism/</id>
         
-        <content type="html">&lt;h2 id=&quot;nihilism&quot;&gt;Nihilism&lt;&#x2F;h2&gt;
+        <content type="html" xml:base="https://dhruv.fyi/blog/absurdism-extentialism-nihilism/">&lt;h2 id=&quot;nihilism&quot;&gt;Nihilism&lt;&#x2F;h2&gt;
 &lt;ul&gt;
 &lt;li&gt;I know that there is no objective meaning outside the illusions we (humans) as a society created.&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;

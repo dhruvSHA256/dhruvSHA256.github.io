@@ -15,6 +15,10 @@
         <lastmod>2022-08-08</lastmod>
     </url>
     <url>
+        <loc>https://dhruv.fyi/blog/dns-resolver-from-scratch-in-haskell/</loc>
+        <lastmod>2023-12-26</lastmod>
+    </url>
+    <url>
         <loc>https://dhruv.fyi/blog/happiness/</loc>
         <lastmod>2022-08-14</lastmod>
     </url>
@@ -67,6 +71,9 @@
     </url>
     <url>
         <loc>https://dhruv.fyi/tags/happiness/</loc>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/tags/haskell/</loc>
     </url>
     <url>
         <loc>https://dhruv.fyi/tags/music/</loc>

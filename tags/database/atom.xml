@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
     <title> - database</title>
-    <link href="https://dhruv.fyi/tags/database/atom.xml" rel="self" type="application/atom+xml"/>
-    <link href="https://dhruv.fyi"/>
+    <link rel="self" type="application/atom+xml" href="https://dhruv.fyi/tags/database/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://dhruv.fyi"/>
     <generator uri="https://www.getzola.org/">Zola</generator>
     <updated>2022-12-19T00:00:00+00:00</updated>
     <id>https://dhruv.fyi/tags/database/atom.xml</id>
@@ -10,13 +10,19 @@
         <title>Postgresql Indexes</title>
         <published>2022-12-19T00:00:00+00:00</published>
         <updated>2022-12-19T00:00:00+00:00</updated>
+        
         <author>
-          <name>Unknown</name>
+          <name>
+            
+              Unknown
+            
+          </name>
         </author>
-        <link rel="alternate" href="https://dhruv.fyi/blog/postgresql-indexes/" type="text/html"/>
+        
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/postgresql-indexes/"/>
         <id>https://dhruv.fyi/blog/postgresql-indexes/</id>
         
-        <content type="html">&lt;h2 id=&quot;indexes&quot;&gt;Indexes&lt;&#x2F;h2&gt;
+        <content type="html" xml:base="https://dhruv.fyi/blog/postgresql-indexes/">&lt;h2 id=&quot;indexes&quot;&gt;Indexes&lt;&#x2F;h2&gt;
 &lt;h3 id=&quot;what&quot;&gt;What&lt;&#x2F;h3&gt;
 &lt;ul&gt;
 &lt;li&gt;a data structure, can make some queries fast&lt;&#x2F;li&gt;
