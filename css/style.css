@@ -227,15 +227,6 @@ textarea {
     color: var(--metaColor)
 }
 
-/* Site Specific Styling */
-.wrapper {
-    min-height: 100vh;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    gap: 2rem;
-
-}
-
 /* Icons settings */
 .icons {
     width: 2.0rem;
@@ -348,9 +339,6 @@ pre code {
     scrollbar-width: none;
 }
 
-/* Add Padding */
-@media (max-width: 650px) {
-    .wrapper {
-        margin: 1rem;
-    }
+.wrapper {
+    margin: 10px;
 }
