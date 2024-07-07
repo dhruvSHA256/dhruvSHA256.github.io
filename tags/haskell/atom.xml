@@ -234,10 +234,10 @@ the actual answer we are looking for, we just need to decode and process it.&lt;
 &lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;ipToString&lt;&#x2F;span&gt;&lt;span&gt; :: [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;Word&lt;&#x2F;span&gt;&lt;span&gt;8] -&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;String
 &lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;ipToString&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;intercalate&lt;&#x2F;span&gt;&lt;span&gt; &amp;quot;.&amp;quot; . &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;map show
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Now the decoding most of the fields are straightforward but, 
-DNS uses domain name compression for space optimization, 
+&lt;p&gt;Now the decoding most of the fields are straightforward but,
+DNS uses domain name compression for space optimization,
 for example if we query for domain “google.com”, the string “google.com” will be present
-multiple times in the DNS packet. 
+multiple times in the DNS packet.
 Instead of storing it multiple times what DNS do is it stores the pointer to that string
 present previously. So we also need to take this compression in account while decoding
 domain name.&lt;&#x2F;p&gt;
@@ -308,7 +308,7 @@ answer or even the domain name of that nameserver, so our resolve function will 
 &lt;&#x2F;span&gt;&lt;span&gt;        (_, _, _) -&amp;gt; traceShow &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;Error Occured&amp;quot; &lt;&#x2F;span&gt;&lt;span&gt;$ return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;Nothing
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;h3 id=&quot;final-step-testing&quot;&gt;Final Step (testing)&lt;&#x2F;h3&gt;
-&lt;p&gt;Our poorman’s DNS resolver is finally completed now, 
+&lt;p&gt;Our poorman’s DNS resolver is finally completed now,
 you can test it by querying any domain name.&lt;&#x2F;p&gt;
 &lt;pre data-lang=&quot;sh&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-sh &quot;&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span&gt;&amp;gt; cabal &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;run&lt;&#x2F;span&gt;&lt;span&gt; haskell-dns-resolver google.com
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;Just &lt;&#x2F;span&gt;&lt;span style=&quot;color:#98c379;&quot;&gt;&amp;quot;142.251.42.78&amp;quot;
