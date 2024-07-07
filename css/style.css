@@ -336,7 +336,7 @@ pre code {
     white-space: pre;
     background-color: inherit;
     color: inherit;
-    scrollbar-width: none;
+    scrollbar-width: thin;
 }
 
 .wrapper {
