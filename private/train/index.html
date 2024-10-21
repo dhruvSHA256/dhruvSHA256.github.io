@@ -6,11 +6,11 @@
     <script>
       var prevDay = localStorage.getItem("prevDay");
       prevCurrMap = {
-        Legs: "Push",
+        // Legs: "Push",
         Push: "Pull",
         Pull: "Arms",
-        Arms: "Legs",
-        null: "Legs",
+        Arms: "Push",
+        null: "Push",
       };
       var currDay = prevCurrMap[prevDay];
 
@@ -22,56 +22,42 @@
         document.getElementById("dropdownOptions").style.display = "none";
       }
       const plan = {
-        Legs: [
-          [
-            "Smith squats",
-            [6, 12, 12, 12],
-            ["20 kg", "60 kg", "60 kg", "60 kg"],
-          ],
-          ["Dumbell RDL", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
-          ["Leg Extensions", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
-          ["Seated Leg Curls", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
-          ["Single Leg Calf Raises", [12, 12, 12, 12], [0, 0, 0, 0]],
-        ],
+        // Legs: [
+        //   [
+        //     "Smith squats",
+        //     [6, 12, 12, 12],
+        //     ["20 kg", "60 kg", "60 kg", "60 kg"],
+        //   ],
+        //   ["Dumbbell RDL", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
+        //   ["Leg Extensions", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
+        //   ["Seated Leg Curls", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
+        //   ["Single Leg Calf Raises", [12, 12, 12, 12], [0, 0, 0, 0]],
+        // ],
         Push: [
           [
-            "Incline Smith",
-            [6, 12, 12, 12],
+            "Dumbbell Press",
+            [8, 12, 12, 12],
             ["10 kg", "20 kg", "20 kg", "20 kg"],
           ],
           [
             "Machine Chest Press",
-            [12, 12, 12],
+            [8, 12, 12, 12],
             ["11 plates", "11 plates", "11 plates"],
           ],
           [
-            "Low to high cable flyes",
+            "Machine Fly, Lean Forward",
             [12, 12, 12, 12],
             ["10 kg", "10 kg", "10 kg", "10 kg"],
           ],
           [
-            "Cable Lateral Raises",
+            "Lateral Raises",
             [12, 12, 12, 12],
             ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          [
-            "Dumbell Lateral Raises",
-            [12, 12, 12],
-            ["7.5 kg", "7.5 kg", "7.5 kg"],
           ],
         ],
         Pull: [
-          ["Assisted Pullups", [12, 12, 12, 12], ["", "", "", ""]],
-          [
-            "Single arm high to low cable row",
-            [12, 12, 12],
-            ["55 kg", "55 kg", "55 kg"],
-          ],
-          [
-            "Chest supported supinated row",
-            [12, 12, 12],
-            ["11 plates", "11 plates", "11 plates"],
-          ],
+          ["Vertical Pull", [12, 12, 12, 12], ["", "", "", ""]],
+          ["Horizontal Pull", [12, 12, 12, 12], ["", "", "", ""]],
           [
             "Cable Shrugs",
             [15, 15, 15, 15],
@@ -81,6 +67,11 @@
             "Reverse Fly",
             [12, 12, 12, 12],
             ["8 plates", "8 plates", "8 plates", "8 plates"],
+          ],
+          [
+            "Leg Extensions/Seated Leg Curls",
+            [12, 12, 12],
+            ["60 kg", "60 kg", "60 kg"],
           ],
         ],
         Arms: [
@@ -94,14 +85,18 @@
             [12, 12, 12, 12],
             ["10 kg", "10 kg", "10 kg", "10 kg"],
           ],
-          ["Preacher Curl", [12, 12, 12], ["10 kg", "10 kg", "10 kg", "10 kg"]],
-          ["Hammer Curl", [12, 12, 12], ["10 kg", "10 kg", "10 kg", "10 kg"]],
           [
-            "Dumbell Curl",
+            "Preacher Curl",
             [12, 12, 12, 12],
-            ["7.5 kg", "7.5 kg", "7.5 kg", "7.5 kg"],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
           ],
-          ["Abs Crunch", [12, 12, 12], ["20 kg", "20 kg", "20 kg"]],
+          [
+            "Hammer Curl",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          ["Calf Raises", [12, 12, 12, 12], [0, 0, 0, 0]],
+          // ["Abs Crunch", [12, 12, 12], ["20 kg", "20 kg", "20 kg"]],
         ],
       };
 
@@ -476,7 +471,7 @@
     <div class="container">
       <h2 id="day"></h2>
       <div id="dropdownOptions" class="dropdown-content">
-        <a href="#" onclick="selectOption(this)">Legs</a>
+        <!-- <a href="#" onclick="selectOption(this)">Legs</a> -->
         <a href="#" onclick="selectOption(this)">Push</a>
         <a href="#" onclick="selectOption(this)">Pull</a>
         <a href="#" onclick="selectOption(this)">Arms</a>
