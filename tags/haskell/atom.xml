@@ -19,10 +19,10 @@
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/dns-resolver-from-scratch-in-haskell/"/>
-        <id>https://dhruv.fyi/blog/dns-resolver-from-scratch-in-haskell/</id>
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/posts/dns-resolver-from-scratch-in-haskell/"/>
+        <id>https://dhruv.fyi/posts/dns-resolver-from-scratch-in-haskell/</id>
         
-        <content type="html" xml:base="https://dhruv.fyi/blog/dns-resolver-from-scratch-in-haskell/">&lt;h3 id=&quot;what-is-dns-anyway&quot;&gt;What is DNS anyway&lt;&#x2F;h3&gt;
+        <content type="html" xml:base="https://dhruv.fyi/posts/dns-resolver-from-scratch-in-haskell/">&lt;h3 id=&quot;what-is-dns-anyway&quot;&gt;What is DNS anyway&lt;&#x2F;h3&gt;
 &lt;p&gt;Every device on internet has an ip address associated to it,
 which is used to make a connection with it,
 but ip addresses doesn’t mean more than random numbers separated by decimal for humans

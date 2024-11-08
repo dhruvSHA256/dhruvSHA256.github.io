@@ -19,10 +19,10 @@
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/postgresql-indexes/"/>
-        <id>https://dhruv.fyi/blog/postgresql-indexes/</id>
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/posts/postgresql-indexes/"/>
+        <id>https://dhruv.fyi/posts/postgresql-indexes/</id>
         
-        <content type="html" xml:base="https://dhruv.fyi/blog/postgresql-indexes/">&lt;h2 id=&quot;indexes&quot;&gt;Indexes&lt;&#x2F;h2&gt;
+        <content type="html" xml:base="https://dhruv.fyi/posts/postgresql-indexes/">&lt;h2 id=&quot;indexes&quot;&gt;Indexes&lt;&#x2F;h2&gt;
 &lt;h3 id=&quot;what&quot;&gt;What&lt;&#x2F;h3&gt;
 &lt;ul&gt;
 &lt;li&gt;a data structure, can make some queries fast&lt;&#x2F;li&gt;

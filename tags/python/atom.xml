@@ -19,10 +19,10 @@
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/load-balancer-python/"/>
-        <id>https://dhruv.fyi/blog/load-balancer-python/</id>
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/posts/load-balancer-python/"/>
+        <id>https://dhruv.fyi/posts/load-balancer-python/</id>
         
-        <content type="html" xml:base="https://dhruv.fyi/blog/load-balancer-python/">&lt;p&gt;Have you ever wondered how web applications handle increasing traffic? As a software engineer, you might have heard of load balancers,&lt;br &#x2F;&gt;
+        <content type="html" xml:base="https://dhruv.fyi/posts/load-balancer-python/">&lt;p&gt;Have you ever wondered how web applications handle increasing traffic? As a software engineer, you might have heard of load balancers,&lt;br &#x2F;&gt;
 which play a crucial role in managing the distribution of requests to multiple servers.&lt;&#x2F;p&gt;
 &lt;p&gt;This weekend, I decided to dive deep into socket programming and create a simple yet functional a load balancer from scratch in Python.
 In this blog post, I’ll walk you through the process.&lt;&#x2F;p&gt;
@@ -145,10 +145,10 @@ We must perform this operation without blocking our primary server, so we’ll c
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/solid-principles/"/>
-        <id>https://dhruv.fyi/blog/solid-principles/</id>
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/posts/solid-principles/"/>
+        <id>https://dhruv.fyi/posts/solid-principles/</id>
         
-        <content type="html" xml:base="https://dhruv.fyi/blog/solid-principles/">&lt;p&gt;S - Single Responsibility Principle
+        <content type="html" xml:base="https://dhruv.fyi/posts/solid-principles/">&lt;p&gt;S - Single Responsibility Principle
 &lt;br&gt;
 O - Open&#x2F;Closed Principle
 &lt;br&gt;
@@ -380,10 +380,10 @@ StripePayment class) and take that as an argument&lt;&#x2F;p&gt;
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/map-filter-reduce-in-python/"/>
-        <id>https://dhruv.fyi/blog/map-filter-reduce-in-python/</id>
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/posts/map-filter-reduce-in-python/"/>
+        <id>https://dhruv.fyi/posts/map-filter-reduce-in-python/</id>
         
-        <content type="html" xml:base="https://dhruv.fyi/blog/map-filter-reduce-in-python/">&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span&gt;     li = [x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;range&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;100&lt;&#x2F;span&gt;&lt;span&gt;)]
+        <content type="html" xml:base="https://dhruv.fyi/posts/map-filter-reduce-in-python/">&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span&gt;     li = [x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;range&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;100&lt;&#x2F;span&gt;&lt;span&gt;)]
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;h2 id=&quot;map&quot;&gt;map:&lt;&#x2F;h2&gt;
 &lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#282c34;color:#abb2bf;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span&gt;  li = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;list&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#56b6c2;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c678dd;&quot;&gt;lambda &lt;&#x2F;span&gt;&lt;span style=&quot;color:#e06c75;&quot;&gt;x &lt;&#x2F;span&gt;&lt;span&gt;: x&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d19a66;&quot;&gt;2&lt;&#x2F;span&gt;&lt;span&gt;,li))

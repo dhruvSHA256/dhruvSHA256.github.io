@@ -4,48 +4,48 @@
         <loc>https://dhruv.fyi/</loc>
     </url>
     <url>
-        <loc>https://dhruv.fyi/blog/</loc>
-    </url>
-    <url>
-        <loc>https://dhruv.fyi/blog/absurdism-extentialism-nihilism/</loc>
-        <lastmod>2022-07-17</lastmod>
-    </url>
-    <url>
-        <loc>https://dhruv.fyi/blog/car-radio-by-top/</loc>
-        <lastmod>2022-08-08</lastmod>
-    </url>
-    <url>
-        <loc>https://dhruv.fyi/blog/dns-resolver-from-scratch-in-haskell/</loc>
-        <lastmod>2023-12-26</lastmod>
-    </url>
-    <url>
-        <loc>https://dhruv.fyi/blog/happiness/</loc>
-        <lastmod>2022-08-14</lastmod>
-    </url>
-    <url>
-        <loc>https://dhruv.fyi/blog/load-balancer-python/</loc>
-        <lastmod>2023-11-07</lastmod>
-    </url>
-    <url>
-        <loc>https://dhruv.fyi/blog/map-filter-reduce-in-python/</loc>
-        <lastmod>2022-07-18</lastmod>
-    </url>
-    <url>
-        <loc>https://dhruv.fyi/blog/page/1/</loc>
-    </url>
-    <url>
-        <loc>https://dhruv.fyi/blog/postgresql-indexes/</loc>
-        <lastmod>2022-12-19</lastmod>
-    </url>
-    <url>
-        <loc>https://dhruv.fyi/blog/solid-principles/</loc>
-        <lastmod>2023-05-02</lastmod>
-    </url>
-    <url>
         <loc>https://dhruv.fyi/books/</loc>
     </url>
     <url>
         <loc>https://dhruv.fyi/podcasts/</loc>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/</loc>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/absurdism-extentialism-nihilism/</loc>
+        <lastmod>2022-07-17</lastmod>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/car-radio-by-top/</loc>
+        <lastmod>2022-08-08</lastmod>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/dns-resolver-from-scratch-in-haskell/</loc>
+        <lastmod>2023-12-26</lastmod>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/happiness/</loc>
+        <lastmod>2022-08-14</lastmod>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/load-balancer-python/</loc>
+        <lastmod>2023-11-07</lastmod>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/map-filter-reduce-in-python/</loc>
+        <lastmod>2022-07-18</lastmod>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/page/1/</loc>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/postgresql-indexes/</loc>
+        <lastmod>2022-12-19</lastmod>
+    </url>
+    <url>
+        <loc>https://dhruv.fyi/posts/solid-principles/</loc>
+        <lastmod>2023-05-02</lastmod>
     </url>
     <url>
         <loc>https://dhruv.fyi/private/on-god/</loc>

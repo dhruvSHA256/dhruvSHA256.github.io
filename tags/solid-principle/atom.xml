@@ -19,10 +19,10 @@
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://dhruv.fyi/blog/solid-principles/"/>
-        <id>https://dhruv.fyi/blog/solid-principles/</id>
+        <link rel="alternate" type="text/html" href="https://dhruv.fyi/posts/solid-principles/"/>
+        <id>https://dhruv.fyi/posts/solid-principles/</id>
         
-        <content type="html" xml:base="https://dhruv.fyi/blog/solid-principles/">&lt;p&gt;S - Single Responsibility Principle
+        <content type="html" xml:base="https://dhruv.fyi/posts/solid-principles/">&lt;p&gt;S - Single Responsibility Principle
 &lt;br&gt;
 O - Open&#x2F;Closed Principle
 &lt;br&gt;
