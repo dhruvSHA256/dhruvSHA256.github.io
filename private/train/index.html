@@ -1,4 +1,10 @@
-<!doctype html><html lang=en><head><meta charset=UTF-8><meta content="IE=edge" http-equiv=X-UA-Compatible><meta content="text/html; charset=UTF-8" http-equiv=content-type><meta content="width=device-width,initial-scale=1,user-scalable=no" name=viewport><meta content="index, follow" name=robots><title>Train</title><meta content=Train name=title><meta content=website property=og:type><meta content=https://dhruv.fyi/private/train/ property=og:url><meta property=og:site_name><meta content=Train property=og:title><meta content=summary_large_image property=twitter:card><meta content=https://dhruv.fyi/private/train/ property=twitter:url><meta content=Train property=twitter:title><link href=https://dhruv.fyi/private/train/ rel=canonical><link href=https://dhruv.fyi/atom.xml rel=alternate title=RSS type=application/atom+xml><link href=https://dhruv.fyi/css/style.css rel=stylesheet><script src=https://dhruv.fyi/js/script.js></script><script src="https://www.googletagmanager.com/gtag/js?id=G-25FRCXX5P4" async></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[];gtag(`js`,new Date());gtag(`config`,`G-25FRCXX5P4`)</script><body><div class=wrapper><header><nav class=navBar><a href=https://dhruv.fyi>/home</a><a href=https://dhruv.fyi/posts>/posts</a><a href=https://dhruv.fyi/projects>/projects</a><a href=https://dhruv.fyi/resume>/resume</a><a href=https://dhruv.fyi/atom.xml>/feed</a><div class=themeSwitch><button class="themeButton dark" onclick="setTheme('dark')" title="Dark mode"><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#darkMode></use></svg></button><button class="themeButton light" onclick="setTheme('light')" title="Light mode"><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#lightMode></use></svg></button></div></nav></header><main><h1>Train</h1><!doctype html><meta charset=UTF-8><meta content="width=device-width,initial-scale=1.0" name=viewport><script>var prevDay = localStorage.getItem("prevDay");
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      var prevDay = localStorage.getItem("prevDay");
       prevCurrMap = {
         // Legs: "Push",
         Push: "Pull",
@@ -7,459 +13,460 @@
         null: "Push",
       };
       var currDay = prevCurrMap[prevDay];
-<pre style="background-color:#282c34;color:#abb2bf;"><code><span>  function selectOption(option) {
-</span><span>    var selectedOption = option.textContent;
-</span><span>    document.getElementById(&quot;day&quot;).textContent = selectedOption;
-</span><span>    currDay = selectedOption;
-</span><span>    loadPlan(selectedOption);
-</span><span>    document.getElementById(&quot;dropdownOptions&quot;).style.display = &quot;none&quot;;
-</span><span>  }
-</span><span>  const plan = {
-</span><span>    // Legs: [
-</span><span>    //   [
-</span><span>    //     &quot;Smith squats&quot;,
-</span><span>    //     [6, 12, 12, 12],
-</span><span>    //     [&quot;20 kg&quot;, &quot;60 kg&quot;, &quot;60 kg&quot;, &quot;60 kg&quot;],
-</span><span>    //   ],
-</span><span>    //   [&quot;Dumbbell RDL&quot;, [12, 12, 12], [&quot;60 kg&quot;, &quot;60 kg&quot;, &quot;60 kg&quot;]],
-</span><span>    //   [&quot;Leg Extensions&quot;, [12, 12, 12], [&quot;60 kg&quot;, &quot;60 kg&quot;, &quot;60 kg&quot;]],
-</span><span>    //   [&quot;Seated Leg Curls&quot;, [12, 12, 12], [&quot;60 kg&quot;, &quot;60 kg&quot;, &quot;60 kg&quot;]],
-</span><span>    //   [&quot;Single Leg Calf Raises&quot;, [12, 12, 12, 12], [0, 0, 0, 0]],
-</span><span>    // ],
-</span><span>    Push: [
-</span><span>      [
-</span><span>        &quot;Dumbbell Press&quot;,
-</span><span>        [8, 12, 12, 12],
-</span><span>        [&quot;10 kg&quot;, &quot;20 kg&quot;, &quot;20 kg&quot;, &quot;20 kg&quot;],
-</span><span>      ],
-</span><span>      [
-</span><span>        &quot;Machine Chest Press&quot;,
-</span><span>        [8, 12, 12, 12],
-</span><span>        [&quot;11 plates&quot;, &quot;11 plates&quot;, &quot;11 plates&quot;],
-</span><span>      ],
-</span><span>      [
-</span><span>        &quot;Machine Fly, Lean Forward&quot;,
-</span><span>        [12, 12, 12, 12],
-</span><span>        [&quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;],
-</span><span>      ],
-</span><span>      [
-</span><span>        &quot;Lateral Raises&quot;,
-</span><span>        [12, 12, 12, 12],
-</span><span>        [&quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;],
-</span><span>      ],
-</span><span>    ],
-</span><span>    Pull: [
-</span><span>      [&quot;Vertical Pull&quot;, [12, 12, 12, 12], [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;]],
-</span><span>      [&quot;Horizontal Pull&quot;, [12, 12, 12, 12], [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;]],
-</span><span>      [
-</span><span>        &quot;Cable Shrugs&quot;,
-</span><span>        [15, 15, 15, 15],
-</span><span>        [&quot;75 kg&quot;, &quot;75 kg&quot;, &quot;75 kg&quot;, &quot;75 kg&quot;],
-</span><span>      ],
-</span><span>      [
-</span><span>        &quot;Reverse Fly&quot;,
-</span><span>        [12, 12, 12, 12],
-</span><span>        [&quot;8 plates&quot;, &quot;8 plates&quot;, &quot;8 plates&quot;, &quot;8 plates&quot;],
-</span><span>      ],
-</span><span>      [
-</span><span>        &quot;Leg Extensions/Seated Leg Curls&quot;,
-</span><span>        [12, 12, 12],
-</span><span>        [&quot;60 kg&quot;, &quot;60 kg&quot;, &quot;60 kg&quot;],
-</span><span>      ],
-</span><span>    ],
-</span><span>    Arms: [
-</span><span>      [
-</span><span>        &quot;Overhead tricep extension&quot;,
-</span><span>        [12, 12, 12, 12],
-</span><span>        [&quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;],
-</span><span>      ],
-</span><span>      [
-</span><span>        &quot;Single hand tricep extension&quot;,
-</span><span>        [12, 12, 12, 12],
-</span><span>        [&quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;],
-</span><span>      ],
-</span><span>      [
-</span><span>        &quot;Preacher Curl&quot;,
-</span><span>        [12, 12, 12, 12],
-</span><span>        [&quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;],
-</span><span>      ],
-</span><span>      [
-</span><span>        &quot;Hammer Curl&quot;,
-</span><span>        [12, 12, 12, 12],
-</span><span>        [&quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;, &quot;10 kg&quot;],
-</span><span>      ],
-</span><span>      [&quot;Calf Raises&quot;, [12, 12, 12, 12], [0, 0, 0, 0]],
-</span><span>      // [&quot;Abs Crunch&quot;, [12, 12, 12], [&quot;20 kg&quot;, &quot;20 kg&quot;, &quot;20 kg&quot;]],
-</span><span>    ],
-</span><span>  };
-</span><span>
-</span><span>  document.addEventListener(&quot;DOMContentLoaded&quot;, function () {
-</span><span>    document.getElementById(&quot;day&quot;).innerText = currDay;
-</span><span>    document.getElementById(&quot;day&quot;).addEventListener(&quot;click&quot;, function () {
-</span><span>      document.getElementById(&quot;dropdownOptions&quot;).style.display = &quot;block&quot;;
-</span><span>    });
-</span><span>    document.getElementById(&quot;dropdownOptions&quot;).style.display = &quot;none&quot;;
-</span><span>
-</span><span>    loadPlan(currDay);
-</span><span>    const inputFields = document.querySelectorAll(&quot;input[type=&#39;text&#39;]&quot;);
-</span><span>    inputFields.forEach(function (input) {
-</span><span>      input.addEventListener(&quot;input&quot;, saveToLocalStorage);
-</span><span>    });
-</span><span>  });
-</span><span>
-</span><span>  let exerciseCount = 0;
-</span><span>  function addExercise(exerciseName) {
-</span><span>    exerciseCount++;
-</span><span>    // Create a button to remove the exercise container
-</span><span>    const removeButton = document.createElement(&quot;button&quot;);
-</span><span>    removeButton.textContent = &quot;Remove Exercise&quot;;
-</span><span>    removeButton.addEventListener(&quot;click&quot;, function () {
-</span><span>      this.closest(&quot;.exercise-container&quot;).remove(); // Remove the closest exercise container
-</span><span>      saveToLocalStorage(); // Save data after removing the exercise container
-</span><span>    });
-</span><span>    const exerciseContainer = document.createElement(&quot;div&quot;);
-</span><span>    exerciseContainer.classList.add(&quot;exercise-container&quot;);
-</span><span>    exerciseContainer.innerHTML = `
-</span><span>  &lt;h4 id=&quot;exercise-name&quot; contentEditable=&quot;true&quot;&gt;${exerciseName}&lt;/h4&gt;
-</span><span>  &lt;table id=&quot;exerciseTable${exerciseCount}&quot;&gt;
-</span><span>    &lt;thead&gt;
-</span><span>      &lt;tr&gt;
-</span><span>        &lt;th&gt;Set&lt;/th&gt;
-</span><span>        &lt;th&gt;Target Reps&lt;/th&gt;
-</span><span>        &lt;th&gt;Target Weight&lt;/th&gt;
-</span><span>        &lt;th&gt;Achieved Reps&lt;/th&gt;
-</span><span>        &lt;th&gt;&lt;/th&gt;
-</span><span>      &lt;/tr&gt;
-</span><span>    &lt;/thead&gt;
-</span><span>    &lt;tbody&gt;&lt;/tbody&gt;
-</span><span>  &lt;/table&gt;
-</span><span>  &lt;button onclick=&quot;addSet(${exerciseCount})&quot;&gt;Add Set&lt;/button&gt;
-</span><span>`;
-</span><span>    exerciseContainer.appendChild(removeButton);
-</span><span>    document.getElementById(&quot;exercises&quot;).appendChild(exerciseContainer);
-</span><span>  }
-</span><span>
-</span><span>  function addSet(exerciseId) {
-</span><span>    const table = document
-</span><span>      .getElementById(`exerciseTable${exerciseId}`)
-</span><span>      .getElementsByTagName(&quot;tbody&quot;)[0];
-</span><span>    const setNumber = table.rows.length + 1;
-</span><span>    const newRow = table.insertRow(table.rows.length);
-</span><span>    let previousTargetReps = 0;
-</span><span>    let previousWeight = 0;
-</span><span>    let previousReps = 0;
-</span><span>    if (table.rows.length &gt;= 2) {
-</span><span>      const previousRow = table.rows[table.rows.length - 2];
-</span><span>      previousTargetReps = previousRow.cells[1].lastChild.value;
-</span><span>      previousWeight = previousRow.cells[2].lastChild.value;
-</span><span>      previousReps = previousRow.cells[3].lastChild.value;
-</span><span>    }
-</span><span>    addNewSet(
-</span><span>      newRow,
-</span><span>      setNumber,
-</span><span>      previousTargetReps,
-</span><span>      previousWeight,
-</span><span>      previousReps,
-</span><span>    );
-</span><span>    saveToLocalStorage();
-</span><span>  }
-</span><span>
-</span><span>  function exportData(download) {
-</span><span>    const exercises = document.querySelectorAll(&quot;.exercise-container&quot;);
-</span><span>    const date = new Date();
-</span><span>    const days = [&quot;Sun&quot;, &quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;, &quot;Sat&quot;];
-</span><span>    const year = date.getFullYear();
-</span><span>    const month = String(date.getMonth() + 1).padStart(2, &quot;0&quot;);
-</span><span>    const day = String(date.getDate()).padStart(2, &quot;0&quot;);
-</span><span>    const dayName = days[date.getDay()];
-</span><span>    const formattedDate = `* &lt;${year}-${month}-${day} ${dayName}&gt;`;
-</span><span>    let data = `${formattedDate}\n`;
-</span><span>    exercises.forEach((exercise, index) =&gt; {
-</span><span>      const exerciseName =
-</span><span>        exercise.querySelector(&quot;#exercise-name&quot;).textContent;
-</span><span>      data += `- ${exerciseName}\n`;
-</span><span>      const table = exercise.querySelector(&quot;table&quot;);
-</span><span>      const rows = table.querySelectorAll(&quot;tbody tr&quot;);
-</span><span>      rows.forEach((row) =&gt; {
-</span><span>        var regex = new RegExp(&quot;kg&quot;, &quot;gi&quot;);
-</span><span>        const setNumber = row.cells[0].textContent;
-</span><span>        var targetWeight = row.cells[2]
-</span><span>          .querySelector(&quot;input&quot;)
-</span><span>          .value.replace(regex, &quot;&quot;)
-</span><span>          .replace(&quot; &quot;, &quot;&quot;);
-</span><span>        if (!targetWeight.toLowerCase().includes(&quot;plates&quot;)) {
-</span><span>          targetWeight += &quot; kg&quot;;
-</span><span>        } else {
-</span><span>          var regex = new RegExp(&quot;plates&quot;, &quot;gi&quot;);
-</span><span>          targetWeight = targetWeight.replace(regex, &quot;&quot;);
-</span><span>          targetWeight += &quot; plates&quot;;
-</span><span>        }
-</span><span>        const rep = row.cells[3].querySelector(&quot;input&quot;).value;
-</span><span>        data += `  - ${targetWeight}, ${rep}\n`;
-</span><span>      });
-</span><span>    });
-</span><span>    var regex = new RegExp(&quot;Remarks:&quot;, &quot;gi&quot;);
-</span><span>    var remarks = document
-</span><span>      .getElementById(&quot;remarks&quot;)
-</span><span>      .innerText.replace(regex, &quot;&quot;);
-</span><span>    if (remarks.length) data += `- Remarks: ${remarks}\n`;
-</span><span>    document.getElementById(&quot;exported-data&quot;).innerText = data;
-</span><span>    if (download) {
-</span><span>      if (data !== &quot;&quot;) {
-</span><span>        const blob = new Blob([data], { type: &quot;text/plain&quot; });
-</span><span>        const url = URL.createObjectURL(blob);
-</span><span>        const a = document.createElement(&quot;a&quot;);
-</span><span>        const fileName = `${date.getFullYear()}-${(date.getMonth() + 1)
-</span><span>          .toString()
-</span><span>          .padStart(2, &quot;0&quot;)}-${date
-</span><span>          .getDate()
-</span><span>          .toString()
-</span><span>          .padStart(2, &quot;0&quot;)}_training_log.txt`;
-</span><span>        a.href = url;
-</span><span>        a.download = fileName;
-</span><span>        a.click();
-</span><span>      } else {
-</span><span>        alert(&quot;No data to export.&quot;);
-</span><span>      }
-</span><span>    }
-</span><span>    localStorage.setItem(&quot;prevDay&quot;, currDay);
-</span><span>  }
-</span><span>
-</span><span>  function addExerciseWithData(
-</span><span>    exerciseName,
-</span><span>    targetReps,
-</span><span>    weights,
-</span><span>    achievedReps,
-</span><span>  ) {
-</span><span>    addExercise(exerciseName);
-</span><span>    const exerciseId = exerciseCount;
-</span><span>    const table = document
-</span><span>      .getElementById(`exerciseTable${exerciseId}`)
-</span><span>      .getElementsByTagName(&quot;tbody&quot;)[0];
-</span><span>    targetReps.forEach((targetRep, index) =&gt; {
-</span><span>      const newRow = table.insertRow(index);
-</span><span>      addNewSet(
-</span><span>        newRow,
-</span><span>        index + 1,
-</span><span>        targetRep,
-</span><span>        weights[index],
-</span><span>        achievedReps[index],
-</span><span>      );
-</span><span>    });
-</span><span>  }
-</span><span>
-</span><span>  function setExerciseData(
-</span><span>    exerciseId,
-</span><span>    exerciseName,
-</span><span>    targetReps,
-</span><span>    weights,
-</span><span>    achievedReps,
-</span><span>  ) {
-</span><span>    const table = document
-</span><span>      .getElementById(`exerciseTable${exerciseId}`)
-</span><span>      .getElementsByTagName(&quot;tbody&quot;)[0];
-</span><span>    var rows = table.rows;
-</span><span>    for (var x = 0; x &lt; targetReps.length; x++) {
-</span><span>      if (x &lt; rows.length) {
-</span><span>        rows[x].cells[1].firstChild.value = targetReps[x];
-</span><span>        rows[x].cells[2].firstChild.value = weights[x];
-</span><span>        rows[x].cells[3].firstChild.value = achievedReps[x];
-</span><span>
-</span><span>        const removeButton = document.createElement(&quot;button&quot;);
-</span><span>        removeButton.className = &quot;remove-button&quot;;
-</span><span>        removeButton.textContent = &quot;X&quot;;
-</span><span>        removeButton.addEventListener(&quot;click&quot;, delSet);
-</span><span>        rows[x].insertCell(4).appendChild(removeButton);
-</span><span>      } else {
-</span><span>        const newRow = table.insertRow(table.rows.length);
-</span><span>        addNewSet(
-</span><span>          newRow,
-</span><span>          x + 1,
-</span><span>          targetReps[x],
-</span><span>          weights[x],
-</span><span>          achievedReps[x],
-</span><span>        );
-</span><span>      }
-</span><span>    }
-</span><span>  }
-</span><span>
-</span><span>  function loadPlan(day) {
-</span><span>    var exerciseContainer = document.querySelectorAll(
-</span><span>      &quot;.exercise-container&quot;,
-</span><span>    );
-</span><span>    exerciseContainer.forEach((val) =&gt; val.remove());
-</span><span>    const savedPlanStr = localStorage.getItem(`${day}_exerciseData`);
-</span><span>    if (savedPlanStr) {
-</span><span>      const savedPlan = JSON.parse(savedPlanStr);
-</span><span>      for (var x = 0; x &lt; savedPlan.length; x++) {
-</span><span>        var currExercise = savedPlan[x];
-</span><span>        addExerciseWithData(
-</span><span>          currExercise[&quot;exerciseName&quot;],
-</span><span>          currExercise[&quot;targetReps&quot;],
-</span><span>          currExercise[&quot;weights&quot;],
-</span><span>          currExercise[&quot;achievedReps&quot;],
-</span><span>        );
-</span><span>      }
-</span><span>    } else {
-</span><span>      var currPlan = plan[day];
-</span><span>      currPlan.forEach((exercise, index) =&gt; {
-</span><span>        addExerciseWithData(
-</span><span>          exercise[0],
-</span><span>          exercise[1],
-</span><span>          exercise[2],
-</span><span>          exercise[1],
-</span><span>        );
-</span><span>      });
-</span><span>    }
-</span><span>  }
-</span><span>
-</span><span>  function addNewSet(
-</span><span>    newRow,
-</span><span>    setNumber,
-</span><span>    previousTargetReps,
-</span><span>    previousWeight,
-</span><span>    previousReps,
-</span><span>  ) {
-</span><span>    newRow.innerHTML = `
-</span><span>  &lt;td&gt;${setNumber}&lt;/td&gt;
-</span><span>  &lt;td&gt;&lt;input type=&quot;text&quot; value=&quot;${previousTargetReps}&quot;&gt;&lt;/td&gt;
-</span><span>  &lt;td&gt;&lt;input type=&quot;text&quot; value=&quot;${previousWeight}&quot;&gt;&lt;/td&gt;
-</span><span>  &lt;td&gt;&lt;input type=&quot;text&quot; value=&quot;${previousReps}&quot;&gt;&lt;/td&gt;
-</span><span>`;
-</span><span>    const removeButton = document.createElement(&quot;button&quot;);
-</span><span>    removeButton.className = &quot;remove-button&quot;;
-</span><span>    removeButton.textContent = &quot;X&quot;;
-</span><span>    removeButton.addEventListener(&quot;click&quot;, delSet);
-</span><span>    newRow.insertCell(4).appendChild(removeButton);
-</span><span>  }
-</span><span>
-</span><span>  var delSet = function () {
-</span><span>    const table = this.closest(&quot;table&quot;);
-</span><span>    const row = this.closest(&quot;tr&quot;);
-</span><span>    if (row) {
-</span><span>      table.deleteRow(row.rowIndex);
-</span><span>    }
-</span><span>    saveToLocalStorage();
-</span><span>  };
-</span><span>
-</span><span>  function saveToLocalStorage() {
-</span><span>    const exercises = document.querySelectorAll(&quot;.exercise-container&quot;);
-</span><span>    const data = [];
-</span><span>    exercises.forEach((exercise) =&gt; {
-</span><span>      const exerciseName =
-</span><span>        exercise.querySelector(&quot;#exercise-name&quot;).textContent;
-</span><span>      const table = exercise.querySelector(&quot;table&quot;);
-</span><span>      const rows = table.querySelectorAll(&quot;tbody tr&quot;);
-</span><span>      const targetReps = [];
-</span><span>      const weights = [];
-</span><span>      const achievedReps = [];
-</span><span>      rows.forEach((row) =&gt; {
-</span><span>        const targetRep = row.cells[1].querySelector(&quot;input&quot;).value;
-</span><span>        const weight = row.cells[2].querySelector(&quot;input&quot;).value;
-</span><span>        const achievedRep = row.cells[3].querySelector(&quot;input&quot;).value;
-</span><span>        targetReps.push(targetRep);
-</span><span>        weights.push(weight);
-</span><span>        achievedReps.push(achievedRep);
-</span><span>      });
-</span><span>      data.push({ exerciseName, targetReps, weights, achievedReps });
-</span><span>    });
-</span><span>    localStorage.setItem(`${currDay}_exerciseData`, JSON.stringify(data));
-</span><span>  }
-</span><span>&lt;/script&gt;
-</span><span>&lt;title&gt;&lt;/title&gt;
-</span><span>&lt;style&gt;
-</span><span>  body {
-</span><span>    font-family: Arial, sans-serif;
-</span><span>    margin: 0;
-</span><span>    padding: 0;
-</span><span>    background-color: #f0f0f0;
-</span><span>  }
-</span><span>
-</span><span>  .container {
-</span><span>    background-color: #fff;
-</span><span>    padding: 20px;
-</span><span>    border-radius: 10px;
-</span><span>    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-</span><span>    max-width: 800px;
-</span><span>    margin: 20px auto;
-</span><span>  }
-</span><span>
-</span><span>  h1 {
-</span><span>    text-align: center;
-</span><span>  }
-</span><span>
-</span><span>  table {
-</span><span>    width: 100%;
-</span><span>    border-collapse: collapse;
-</span><span>    margin-bottom: 20px;
-</span><span>  }
-</span><span>
-</span><span>  th,
-</span><span>  td {
-</span><span>    padding: 10px;
-</span><span>    text-align: left;
-</span><span>    border-bottom: 1px solid #ddd;
-</span><span>  }
-</span><span>
-</span><span>  th {
-</span><span>    background-color: #f2f2f2;
-</span><span>  }
-</span><span>
-</span><span>  th:first-child,
-</span><span>  td:first-child {
-</span><span>    width: 25%;
-</span><span>  }
-</span><span>
-</span><span>  td input {
-</span><span>    width: calc(100% - 20px);
-</span><span>    padding: 5px;
-</span><span>    border: none;
-</span><span>    border-radius: 5px;
-</span><span>    box-sizing: border-box;
-</span><span>  }
-</span><span>
-</span><span>  button {
-</span><span>    padding: 5px 8px;
-</span><span>    background-color: #007bff;
-</span><span>    color: #fff;
-</span><span>    border: none;
-</span><span>    border-radius: 5px;
-</span><span>    cursor: pointer;
-</span><span>    margin-right: 10px;
-</span><span>  }
-</span><span>
-</span><span>  button:hover {
-</span><span>    background-color: #0056b3;
-</span><span>  }
-</span><span>
-</span><span>  .exercise-container {
-</span><span>    margin-bottom: 20px;
-</span><span>  }
-</span><span>
-</span><span>  .exercise-name {
-</span><span>    border: none;
-</span><span>    background-color: transparent;
-</span><span>    font-size: inherit;
-</span><span>    font-weight: inherit;
-</span><span>    font-style: inherit;
-</span><span>    font-family: inherit;
-</span><span>    color: inherit;
-</span><span>    width: auto;
-</span><span>    display: inline;
-</span><span>    padding: 0;
-</span><span>    margin: 0;
-</span><span>    outline: none;
-</span><span>  }
-</span><span>
-</span><span>  @media screen and (max-width: 600px) {
-</span><span>    .container {
-</span><span>      padding: 10px;
-</span><span>      margin: 0;
-</span><span>    }
-</span><span>  }
-</span><span>&lt;/style&gt;
-</span></code></pre>
+
+      function selectOption(option) {
+        var selectedOption = option.textContent;
+        document.getElementById("day").textContent = selectedOption;
+        currDay = selectedOption;
+        loadPlan(selectedOption);
+        document.getElementById("dropdownOptions").style.display = "none";
+      }
+      const plan = {
+        // Legs: [
+        //   [
+        //     "Smith squats",
+        //     [6, 12, 12, 12],
+        //     ["20 kg", "60 kg", "60 kg", "60 kg"],
+        //   ],
+        //   ["Dumbbell RDL", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
+        //   ["Leg Extensions", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
+        //   ["Seated Leg Curls", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
+        //   ["Single Leg Calf Raises", [12, 12, 12, 12], [0, 0, 0, 0]],
+        // ],
+        Push: [
+          [
+            "Dumbbell Press",
+            [8, 12, 12, 12],
+            ["10 kg", "20 kg", "20 kg", "20 kg"],
+          ],
+          [
+            "Machine Chest Press",
+            [8, 12, 12, 12],
+            ["11 plates", "11 plates", "11 plates"],
+          ],
+          [
+            "Machine Fly, Lean Forward",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Lateral Raises",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+        ],
+        Pull: [
+          ["Vertical Pull", [12, 12, 12, 12], ["", "", "", ""]],
+          ["Horizontal Pull", [12, 12, 12, 12], ["", "", "", ""]],
+          [
+            "Cable Shrugs",
+            [15, 15, 15, 15],
+            ["75 kg", "75 kg", "75 kg", "75 kg"],
+          ],
+          [
+            "Reverse Fly",
+            [12, 12, 12, 12],
+            ["8 plates", "8 plates", "8 plates", "8 plates"],
+          ],
+          [
+            "Leg Extensions/Seated Leg Curls",
+            [12, 12, 12],
+            ["60 kg", "60 kg", "60 kg"],
+          ],
+        ],
+        Arms: [
+          [
+            "Overhead tricep extension",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Single hand tricep extension",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Preacher Curl",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Hammer Curl",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          ["Calf Raises", [12, 12, 12, 12], [0, 0, 0, 0]],
+          // ["Abs Crunch", [12, 12, 12], ["20 kg", "20 kg", "20 kg"]],
+        ],
+      };
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("day").innerText = currDay;
+        document.getElementById("day").addEventListener("click", function () {
+          document.getElementById("dropdownOptions").style.display = "block";
+        });
+        document.getElementById("dropdownOptions").style.display = "none";
+
+        loadPlan(currDay);
+        const inputFields = document.querySelectorAll("input[type='text']");
+        inputFields.forEach(function (input) {
+          input.addEventListener("input", saveToLocalStorage);
+        });
+      });
+
+      let exerciseCount = 0;
+      function addExercise(exerciseName) {
+        exerciseCount++;
+        // Create a button to remove the exercise container
+        const removeButton = document.createElement("button");
+        removeButton.textContent = "Remove Exercise";
+        removeButton.addEventListener("click", function () {
+          this.closest(".exercise-container").remove(); // Remove the closest exercise container
+          saveToLocalStorage(); // Save data after removing the exercise container
+        });
+        const exerciseContainer = document.createElement("div");
+        exerciseContainer.classList.add("exercise-container");
+        exerciseContainer.innerHTML = `
+      <h4 id="exercise-name" contentEditable="true">${exerciseName}</h4>
+      <table id="exerciseTable${exerciseCount}">
+        <thead>
+          <tr>
+            <th>Set</th>
+            <th>Target Reps</th>
+            <th>Target Weight</th>
+            <th>Achieved Reps</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button onclick="addSet(${exerciseCount})">Add Set</button>
+    `;
+        exerciseContainer.appendChild(removeButton);
+        document.getElementById("exercises").appendChild(exerciseContainer);
+      }
+
+      function addSet(exerciseId) {
+        const table = document
+          .getElementById(`exerciseTable${exerciseId}`)
+          .getElementsByTagName("tbody")[0];
+        const setNumber = table.rows.length + 1;
+        const newRow = table.insertRow(table.rows.length);
+        let previousTargetReps = 0;
+        let previousWeight = 0;
+        let previousReps = 0;
+        if (table.rows.length >= 2) {
+          const previousRow = table.rows[table.rows.length - 2];
+          previousTargetReps = previousRow.cells[1].lastChild.value;
+          previousWeight = previousRow.cells[2].lastChild.value;
+          previousReps = previousRow.cells[3].lastChild.value;
+        }
+        addNewSet(
+          newRow,
+          setNumber,
+          previousTargetReps,
+          previousWeight,
+          previousReps,
+        );
+        saveToLocalStorage();
+      }
+
+      function exportData(download) {
+        const exercises = document.querySelectorAll(".exercise-container");
+        const date = new Date();
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const dayName = days[date.getDay()];
+        const formattedDate = `* <${year}-${month}-${day} ${dayName}>`;
+        let data = `${formattedDate}\n`;
+        exercises.forEach((exercise, index) => {
+          const exerciseName =
+            exercise.querySelector("#exercise-name").textContent;
+          data += `- ${exerciseName}\n`;
+          const table = exercise.querySelector("table");
+          const rows = table.querySelectorAll("tbody tr");
+          rows.forEach((row) => {
+            var regex = new RegExp("kg", "gi");
+            const setNumber = row.cells[0].textContent;
+            var targetWeight = row.cells[2]
+              .querySelector("input")
+              .value.replace(regex, "")
+              .replace(" ", "");
+            if (!targetWeight.toLowerCase().includes("plates")) {
+              targetWeight += " kg";
+            } else {
+              var regex = new RegExp("plates", "gi");
+              targetWeight = targetWeight.replace(regex, "");
+              targetWeight += " plates";
+            }
+            const rep = row.cells[3].querySelector("input").value;
+            data += `  - ${targetWeight}, ${rep}\n`;
+          });
+        });
+        var regex = new RegExp("Remarks:", "gi");
+        var remarks = document
+          .getElementById("remarks")
+          .innerText.replace(regex, "");
+        if (remarks.length) data += `- Remarks: ${remarks}\n`;
+        document.getElementById("exported-data").innerText = data;
+        if (download) {
+          if (data !== "") {
+            const blob = new Blob([data], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            const fileName = `${date.getFullYear()}-${(date.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}-${date
+              .getDate()
+              .toString()
+              .padStart(2, "0")}_training_log.txt`;
+            a.href = url;
+            a.download = fileName;
+            a.click();
+          } else {
+            alert("No data to export.");
+          }
+        }
+        localStorage.setItem("prevDay", currDay);
+      }
+
+      function addExerciseWithData(
+        exerciseName,
+        targetReps,
+        weights,
+        achievedReps,
+      ) {
+        addExercise(exerciseName);
+        const exerciseId = exerciseCount;
+        const table = document
+          .getElementById(`exerciseTable${exerciseId}`)
+          .getElementsByTagName("tbody")[0];
+        targetReps.forEach((targetRep, index) => {
+          const newRow = table.insertRow(index);
+          addNewSet(
+            newRow,
+            index + 1,
+            targetRep,
+            weights[index],
+            achievedReps[index],
+          );
+        });
+      }
+
+      function setExerciseData(
+        exerciseId,
+        exerciseName,
+        targetReps,
+        weights,
+        achievedReps,
+      ) {
+        const table = document
+          .getElementById(`exerciseTable${exerciseId}`)
+          .getElementsByTagName("tbody")[0];
+        var rows = table.rows;
+        for (var x = 0; x < targetReps.length; x++) {
+          if (x < rows.length) {
+            rows[x].cells[1].firstChild.value = targetReps[x];
+            rows[x].cells[2].firstChild.value = weights[x];
+            rows[x].cells[3].firstChild.value = achievedReps[x];
+
+            const removeButton = document.createElement("button");
+            removeButton.className = "remove-button";
+            removeButton.textContent = "X";
+            removeButton.addEventListener("click", delSet);
+            rows[x].insertCell(4).appendChild(removeButton);
+          } else {
+            const newRow = table.insertRow(table.rows.length);
+            addNewSet(
+              newRow,
+              x + 1,
+              targetReps[x],
+              weights[x],
+              achievedReps[x],
+            );
+          }
+        }
+      }
+
+      function loadPlan(day) {
+        var exerciseContainer = document.querySelectorAll(
+          ".exercise-container",
+        );
+        exerciseContainer.forEach((val) => val.remove());
+        const savedPlanStr = localStorage.getItem(`${day}_exerciseData`);
+        if (savedPlanStr) {
+          const savedPlan = JSON.parse(savedPlanStr);
+          for (var x = 0; x < savedPlan.length; x++) {
+            var currExercise = savedPlan[x];
+            addExerciseWithData(
+              currExercise["exerciseName"],
+              currExercise["targetReps"],
+              currExercise["weights"],
+              currExercise["achievedReps"],
+            );
+          }
+        } else {
+          var currPlan = plan[day];
+          currPlan.forEach((exercise, index) => {
+            addExerciseWithData(
+              exercise[0],
+              exercise[1],
+              exercise[2],
+              exercise[1],
+            );
+          });
+        }
+      }
+
+      function addNewSet(
+        newRow,
+        setNumber,
+        previousTargetReps,
+        previousWeight,
+        previousReps,
+      ) {
+        newRow.innerHTML = `
+      <td>${setNumber}</td>
+      <td><input type="text" value="${previousTargetReps}"></td>
+      <td><input type="text" value="${previousWeight}"></td>
+      <td><input type="text" value="${previousReps}"></td>
+    `;
+        const removeButton = document.createElement("button");
+        removeButton.className = "remove-button";
+        removeButton.textContent = "X";
+        removeButton.addEventListener("click", delSet);
+        newRow.insertCell(4).appendChild(removeButton);
+      }
+
+      var delSet = function () {
+        const table = this.closest("table");
+        const row = this.closest("tr");
+        if (row) {
+          table.deleteRow(row.rowIndex);
+        }
+        saveToLocalStorage();
+      };
+
+      function saveToLocalStorage() {
+        const exercises = document.querySelectorAll(".exercise-container");
+        const data = [];
+        exercises.forEach((exercise) => {
+          const exerciseName =
+            exercise.querySelector("#exercise-name").textContent;
+          const table = exercise.querySelector("table");
+          const rows = table.querySelectorAll("tbody tr");
+          const targetReps = [];
+          const weights = [];
+          const achievedReps = [];
+          rows.forEach((row) => {
+            const targetRep = row.cells[1].querySelector("input").value;
+            const weight = row.cells[2].querySelector("input").value;
+            const achievedRep = row.cells[3].querySelector("input").value;
+            targetReps.push(targetRep);
+            weights.push(weight);
+            achievedReps.push(achievedRep);
+          });
+          data.push({ exerciseName, targetReps, weights, achievedReps });
+        });
+        localStorage.setItem(`${currDay}_exerciseData`, JSON.stringify(data));
+      }
+    </script>
+    <title></title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+      }
+
+      .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 20px auto;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      th:first-child,
+      td:first-child {
+        width: 25%;
+      }
+
+      td input {
+        width: calc(100% - 20px);
+        padding: 5px;
+        border: none;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+
+      button {
+        padding: 5px 8px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .exercise-container {
+        margin-bottom: 20px;
+      }
+
+      .exercise-name {
+        border: none;
+        background-color: transparent;
+        font-size: inherit;
+        font-weight: inherit;
+        font-style: inherit;
+        font-family: inherit;
+        color: inherit;
+        width: auto;
+        display: inline;
+        padding: 0;
+        margin: 0;
+        outline: none;
+      }
+
+      @media screen and (max-width: 600px) {
+        .container {
+          padding: 10px;
+          margin: 0;
+        }
+      }
+    </style>
   </head>
+
   <body>
     <div class="container">
       <h2 id="day"></h2>
@@ -476,37 +483,5 @@
       <button onclick="exportData(true)">Export Data</button>
     </div>
     <div id="exported-data" style="display: none"></div>
-  </body>
-</html>
-
-
-
-
-
-
-<ul class="titleList">
-
-</ul>
-
-
-
-      </main>
-      <footer>
-        <!-- <hr> -->
-<!-- <div class=footContainer> -->
-<!--   <div class="footLeft"> -->
-<!--     <p>Licensed under <a target="_blank" rel="noopener noreferrer" href="https://fr.wikipedia.org/wiki/Licence_MIT">MIT</a><br> -->
-<!--       Built with <a target="_blank" rel="noopener noreferrer" href="https://www.getzola.org">Zola</a> using <a target="_blank" rel="noopener noreferrer" href="https://github.com/Speyll/anemone">anemone</a> theme &amp; <a target="_blank" rel="noopener noreferrer" href="https://github.com/Speyll/veqev">veqev</a> colors.<br> -->
-<!--     </p> -->
-<!--   </div> -->
-<!--    -->
-<!--   <div class="footRight"> -->
-<!--     <a class="icons__background" target="_blank" rel="noopener noreferrer" href="https://dhruv.fyi/atom.xml" title="Subscribe via RSS for updates."><svg class="icons icons__background"><use href="https://dhruv.fyi/icons.svg#rss"></use></svg></a> -->
-<!--   </div> -->
-<!--    -->
-<!-- </div> -->
-
-      </footer>
-    </div>
   </body>
 </html>
