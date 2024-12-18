@@ -1,3 +1,9 @@
+<!-- mon: chest + lateral delts + calfs: 1 push + 1 fly + calf raise -->
+<!-- tue: back + rear delt + hams: 1 horizontal row + 1 vertical row + rdf + ham curl -->
+<!-- wed: chest + lateral delts + calfs: 1 push + 1 fly + calf raise -->
+<!-- thu: biceps + rear delts + traps: 2 curls + rdf + shrugs -->
+<!-- fri: chest + lateral delts + calfs + tricep: 1 push + 1 fly + calf raise + 1 tricep -->
+<!-- sat: biceps + rear delts + traps + quads: 2 curls + rdf + shrugs -->
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,10 +13,13 @@
       var prevDay = localStorage.getItem("prevDay");
       prevCurrMap = {
         // Legs: "Push",
-        Push: "Pull",
-        Pull: "Arms",
-        Arms: "Push",
-        null: "Push",
+        Mon: "Tue",
+        Tue: "Wed",
+        Wed: "Thu",
+        Thu: "Fri",
+        Fri: "Sat",
+        Sat: "Mon",
+        null: "Mon",
       };
       var currDay = prevCurrMap[prevDay];
 
@@ -33,35 +42,111 @@
         //   ["Seated Leg Curls", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
         //   ["Single Leg Calf Raises", [12, 12, 12, 12], [0, 0, 0, 0]],
         // ],
-        Push: [
+        Mon: [
           [
             "Dumbbell Press",
             [8, 12, 12, 12],
-            ["10 kg", "20 kg", "20 kg", "20 kg"],
-          ],
-          [
-            "Machine Chest Press",
-            [8, 12, 12, 12],
-            ["11 plates", "11 plates", "11 plates"],
+            ["", "", "", ""],
           ],
           [
             "Machine Fly, Lean Forward",
             [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
+            ["", "", "", ""],
           ],
           [
             "Lateral Raises",
             [12, 12, 12, 12],
             ["10 kg", "10 kg", "10 kg", "10 kg"],
           ],
+          ["Calf Raise", [12,12,12,12], ["", "", "", ""]]
         ],
-        Pull: [
+        Tue: [
           ["Vertical Pull", [12, 12, 12, 12], ["", "", "", ""]],
           ["Horizontal Pull", [12, 12, 12, 12], ["", "", "", ""]],
+          [
+            "Reverse Fly",
+            [12, 12, 12, 12],
+            ["8 plates", "8 plates", "8 plates", "8 plates"],
+          ],
           [
             "Cable Shrugs",
             [15, 15, 15, 15],
             ["75 kg", "75 kg", "75 kg", "75 kg"],
+          ],
+        ],
+        Wed: [
+          [
+            "Dumbbell Press",
+            [8, 12, 12, 12],
+            ["", "", "", ""],
+          ],
+          [
+            "Machine Fly, Lean Forward",
+            [12, 12, 12, 12],
+            ["", "", "", ""],
+          ],
+          [
+            "Lateral Raises",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          ["Calf Raise", [12,12,12,12], ["", "", "", ""]]
+        ],
+        Thu: [
+          [
+            "Preacher Curl",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Hammer Curl",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Reverse Fly",
+            [12, 12, 12, 12],
+            ["8 plates", "8 plates", "8 plates", "8 plates"],
+          ],
+          [
+            "Cable Shrugs",
+            [15, 15, 15, 15],
+            ["75 kg", "75 kg", "75 kg", "75 kg"],
+          ],
+        ],
+        Fri: [
+          [
+            "Dumbbell Press",
+            [8, 12, 12, 12],
+            ["", "", "", ""],
+          ],
+          [
+            "Machine Fly, Lean Forward",
+            [12, 12, 12, 12],
+            ["", "", "", ""],
+          ],
+          [
+            "Lateral Raises",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          ["Calf Raise", [12,12,12,12], ["", "", "", ""]],
+          [
+            "Single hand/over head extension",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+        ],
+        Sat: [
+          [
+            "Preacher Curl",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
+          ],
+          [
+            "Hammer Curl",
+            [12, 12, 12, 12],
+            ["10 kg", "10 kg", "10 kg", "10 kg"],
           ],
           [
             "Reverse Fly",
@@ -73,31 +158,8 @@
             [12, 12, 12],
             ["60 kg", "60 kg", "60 kg"],
           ],
-        ],
-        Arms: [
-          [
-            "Overhead tricep extension",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          [
-            "Single hand tricep extension",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          [
-            "Preacher Curl",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          [
-            "Hammer Curl",
-            [12, 12, 12, 12],
-            ["10 kg", "10 kg", "10 kg", "10 kg"],
-          ],
-          ["Calf Raises", [12, 12, 12, 12], [0, 0, 0, 0]],
-          // ["Abs Crunch", [12, 12, 12], ["20 kg", "20 kg", "20 kg"]],
-        ],
+        ]
+
       };
 
       document.addEventListener("DOMContentLoaded", function () {
@@ -472,9 +534,12 @@
       <h2 id="day"></h2>
       <div id="dropdownOptions" class="dropdown-content">
         <!-- <a href="#" onclick="selectOption(this)">Legs</a> -->
-        <a href="#" onclick="selectOption(this)">Push</a>
-        <a href="#" onclick="selectOption(this)">Pull</a>
-        <a href="#" onclick="selectOption(this)">Arms</a>
+        <a href="#" onclick="selectOption(this)">Mon</a>
+        <a href="#" onclick="selectOption(this)">Tue</a>
+        <a href="#" onclick="selectOption(this)">Wed</a>
+        <a href="#" onclick="selectOption(this)">Thu</a>
+        <a href="#" onclick="selectOption(this)">Fri</a>
+        <a href="#" onclick="selectOption(this)">Sat</a>
       </div>
       <h4>Remarks:</h4>
       <p id="remarks" contenteditable="true"></p>
