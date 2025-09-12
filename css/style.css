@@ -156,7 +156,6 @@ hr {
 img {
     width: 100%;
     height: auto;
-    align: center;
     margin: .2rem;
     padding: .2rem;
     /* border: dashed .2rem var(--metaColor); */
@@ -170,13 +169,6 @@ div code {
     border-radius: .3rem;
     color: var(--bgColor);
     background-color: var(--fgColor);
-}
-
-pre code {
-    padding: 0;
-    border-radius: 0;
-    color: inherit;
-    background-color: inherit;
 }
 
 iframe {
@@ -329,7 +321,7 @@ textarea {
 
 pre code {
     display: block;
-    max-width: 64rem;
+    /* max-width: 64rem; */
     overflow-x: auto;
     border: none;
     padding: 10px;
