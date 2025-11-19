@@ -80,7 +80,7 @@
 </span><span>      recursionDesired = </span><span style=color:#d19a66>1</span><span> `</span><span style=color:#d19a66>Data</span><span>.</span><span style=color:#d19a66>Bits</span><span>.shiftL` </span><span style=color:#d19a66>8
 </span><span>      header = </span><span style=color:#d19a66>DNSHeader</span><span> _id recursionDesired </span><span style=color:#d19a66>1 0 0 0
 </span><span>      question = </span><span style=color:#d19a66>DNSQuestion</span><span> (encodeDNSName domainName) recordType classIn
-</span><span>      queryBytes = headerToBytes header <> questionToBytes question
+</span><span>      queryBytes = headerToBytes header &lt;> questionToBytes question
 </span><span>  return queryBytes
 </span></code></pre><p>the above function will return a bytestring of DNS packet which we will send to the nameserver<h3 id=decoding-and-processing-the-response>Decoding and Processing the response</h3><p>We will receive a DNS packet in bytestring form from the nameserver which may contain the actual answer we are looking for, we just need to decode and process it.<pre class=language-haskell data-lang=haskell style=color:#abb2bf;background-color:#282c34><code class=language-haskell data-lang=haskell><span style=color:#61afef>decodeQuery </span><span style=color:#c678dd>:: BS</span><span>.</span><span style=color:#c678dd>ByteString -> Either String DNSPacket
 </span><span>decodeQuery bs =
@@ -91,63 +91,63 @@
 </span><span>
 </span><span style=color:#61afef>getDNSPacket </span><span style=color:#c678dd>:: BS</span><span>.</span><span style=color:#c678dd>ByteString -> Get DNSPacket
 </span><span>getDNSPacket input = </span><span style=color:#c678dd>do
-</span><span>  header &LT- getDNSHeader
-</span><span>  questions &LT- getDNSQuestionNE input (dnsHeaderNumQuestion header)
-</span><span>  answers &LT- getDNSRecordList input (dnsHeaderNumAnswer header)
-</span><span>  authorities &LT- getDNSRecordList input (dnsHeaderNumAuthority header)
-</span><span>  additionals &LT- getDNSRecordList input (dnsHeaderNumAdditional header)
+</span><span>  header &lt;- getDNSHeader
+</span><span>  questions &lt;- getDNSQuestionNE input (dnsHeaderNumQuestion header)
+</span><span>  answers &lt;- getDNSRecordList input (dnsHeaderNumAnswer header)
+</span><span>  authorities &lt;- getDNSRecordList input (dnsHeaderNumAuthority header)
+</span><span>  additionals &lt;- getDNSRecordList input (dnsHeaderNumAdditional header)
 </span><span>  return $ </span><span style=color:#d19a66>DNSPacket</span><span> header questions answers authorities additionals
 </span><span>
 </span><span style=color:#61afef>getDNSHeader </span><span style=color:#c678dd>:: Get DNSHeader
-</span><span>getDNSHeader = </span><span style=color:#d19a66>DNSHeader </span><span><$> getWord16be <*> getWord16be <*> getWord16be <*> getWord16be <*> getWord16be <*> getWord16be
+</span><span>getDNSHeader = </span><span style=color:#d19a66>DNSHeader </span><span>&lt;$> getWord16be &lt;*> getWord16be &lt;*> getWord16be &lt;*> getWord16be &lt;*> getWord16be &lt;*> getWord16be
 </span><span>
 </span><span style=color:#61afef>getDNSQuestionNE </span><span style=color:#c678dd>:: BS</span><span>.</span><span style=color:#c678dd>ByteString -> Word16 -> Get</span><span> [</span><span style=color:#c678dd>DNSQuestion</span><span>]
 </span><span>getDNSQuestionNE input x = </span><span style=color:#c678dd>do
 </span><span>  replicateM (fromIntegral x) getDNSQuestion
 </span><span>  </span><span style=color:#c678dd>where
 </span><span>    </span><span style=color:#61afef>getDNSQuestion </span><span style=color:#c678dd>:: Get DNSQuestion
-</span><span>    getDNSQuestion = </span><span style=color:#d19a66>DNSQuestion </span><span><$> getDomainName input <*> getWord16be <*> getWord16be
+</span><span>    getDNSQuestion = </span><span style=color:#d19a66>DNSQuestion </span><span>&lt;$> getDomainName input &lt;*> getWord16be &lt;*> getWord16be
 </span><span>
 </span><span style=color:#61afef>getDNSRecordList </span><span style=color:#c678dd>:: BS</span><span>.</span><span style=color:#c678dd>ByteString -> Word16 -> Get</span><span> [</span><span style=color:#c678dd>DNSRecord</span><span>]
 </span><span>getDNSRecordList input count = </span><span style=color:#c678dd>do
 </span><span>  replicateM (fromIntegral count) getDNSRecord
 </span><span>  </span><span style=color:#c678dd>where
 </span><span>    getDNSRecord = </span><span style=color:#c678dd>do
-</span><span>      domain &LT- getDomainName input
-</span><span>      </span><span style=color:#c678dd>type</span><span>' &LT- getWord16be
-</span><span>      </span><span style=color:#c678dd>class</span><span>' &LT- </span><span style=color:#e06c75>getWord16be
-</span><span>      </span><span style=color:#e06c75>ttl</span><span> &LT- </span><span style=color:#e06c75>getWord32be
-</span><span>      </span><span style=color:#e06c75>data_len</span><span> &LT- </span><span style=color:#e06c75>getInt16be
-</span><span>      </span><span style=color:#e06c75>data_</span><span> &LT- </span><span style=color:#e06c75>getRecordData</span><span> (</span><span style=color:#e06c75>fromIntegral type</span><span>') (</span><span style=color:#e06c75>fromIntegral data_len</span><span>)
+</span><span>      domain &lt;- getDomainName input
+</span><span>      </span><span style=color:#c678dd>type</span><span>' &lt;- getWord16be
+</span><span>      </span><span style=color:#c678dd>class</span><span>' &lt;- </span><span style=color:#e06c75>getWord16be
+</span><span>      </span><span style=color:#e06c75>ttl</span><span> &lt;- </span><span style=color:#e06c75>getWord32be
+</span><span>      </span><span style=color:#e06c75>data_len</span><span> &lt;- </span><span style=color:#e06c75>getInt16be
+</span><span>      </span><span style=color:#e06c75>data_</span><span> &lt;- </span><span style=color:#e06c75>getRecordData</span><span> (</span><span style=color:#e06c75>fromIntegral type</span><span>') (</span><span style=color:#e06c75>fromIntegral data_len</span><span>)
 </span><span>      </span><span style=color:#e06c75>return</span><span> $ </span><span style=color:#98c379>DNSRecord</span><span> {</span><span style=color:#e06c75>dnsRecordName</span><span> = </span><span style=color:#e06c75>domain</span><span>, </span><span style=color:#e06c75>dnsRecordType</span><span> = </span><span style=color:#e06c75>type</span><span>', </span><span style=color:#e06c75>dnsRecordClass</span><span> = </span><span style=color:#e06c75>class</span><span>', </span><span style=color:#e06c75>dnsRecordTtl</span><span> = </span><span style=color:#e06c75>ttl</span><span>, </span><span style=color:#e06c75>dnsRecordData</span><span> = </span><span style=color:#e06c75>data_</span><span>}
 </span><span>    </span><span style=color:#e06c75>getRecordData</span><span> :: </span><span style=color:#98c379>Data</span><span>.</span><span style=color:#98c379>Word</span><span>.</span><span style=color:#98c379>Word</span><span>16 -> </span><span style=color:#98c379>Int</span><span> -> </span><span style=color:#98c379>Get BS</span><span>.</span><span style=color:#98c379>ByteString
 </span><span>    </span><span style=color:#e06c75>getRecordData type_ data_len
 </span><span>      | </span><span style=color:#e06c75>type_</span><span> == </span><span style=color:#e06c75>typeNs</span><span> = </span><span style=color:#e06c75>getDomainName input
 </span><span>      | </span><span style=color:#e06c75>type_</span><span> == </span><span style=color:#e06c75>typeA</span><span> = </span><span style=color:#e06c75>do
-</span><span>          </span><span style=color:#e06c75>ipBytes</span><span> &LT- </span><span style=color:#e06c75>getByteString</span><span> $ </span><span style=color:#e06c75>fromIntegral data_len
+</span><span>          </span><span style=color:#e06c75>ipBytes</span><span> &lt;- </span><span style=color:#e06c75>getByteString</span><span> $ </span><span style=color:#e06c75>fromIntegral data_len
 </span><span>          </span><span style=color:#e06c75>return</span><span> $ </span><span style=color:#98c379>BS</span><span>.</span><span style=color:#e06c75>pack</span><span> $ </span><span style=color:#e06c75>ipToString</span><span> $ </span><span style=color:#98c379>B</span><span>.</span><span style=color:#e06c75>unpack ipBytes
 </span><span>      | </span><span style=color:#e06c75>otherwise</span><span> = </span><span style=color:#e06c75>getByteString</span><span> $ </span><span style=color:#e06c75>fromIntegral data_len
 </span><span>    </span><span style=color:#e06c75>ipToString</span><span> :: [</span><span style=color:#98c379>Word</span><span>8] -> </span><span style=color:#98c379>String
 </span><span>    </span><span style=color:#e06c75>ipToString</span><span> = </span><span style=color:#e06c75>intercalate</span><span> "." . </span><span style=color:#e06c75>map show
 </span></code></pre><p>Now the decoding most of the fields are straightforward but, DNS uses domain name compression for space optimization, for example if we query for domain “google.com”, the string “google.com” will be present multiple times in the DNS packet. Instead of storing it multiple times what DNS do is it stores the pointer to that string present previously. So we also need to take this compression in account while decoding domain name.<pre class=language-haskell data-lang=haskell style=color:#abb2bf;background-color:#282c34><code class=language-haskell data-lang=haskell><span style=color:#61afef>getDomainName </span><span style=color:#c678dd>:: BS</span><span>.</span><span style=color:#c678dd>ByteString -> Get BS</span><span>.</span><span style=color:#c678dd>ByteString
 </span><span>getDomainName input' = </span><span style=color:#c678dd>do
-</span><span>  len &LT- getInt8
+</span><span>  len &lt;- getInt8
 </span><span>  </span><span style=color:#c678dd>let</span><span> lengthValue = len </span><span style=color:#d19a66>Data</span><span>.</span><span style=color:#d19a66>Bits</span><span>..&. </span><span style=color:#d19a66>63
 </span><span>  getDomainName' input' len lengthValue
 </span><span>  </span><span style=color:#c678dd>where
 </span><span>    getDomainName' input len lengthValue
 </span><span>      | len == </span><span style=color:#d19a66>0 </span><span>= return </span><span style=color:#d19a66>BS</span><span>.empty
 </span><span>      | isPointer len = </span><span style=color:#c678dd>do
-</span><span>          d &LT- getInt8
+</span><span>          d &lt;- getInt8
 </span><span>          </span><span style=color:#c678dd>let</span><span> offset = fromIntegral $ lengthValue * </span><span style=color:#d19a66>256 </span><span>+ fromIntegral d </span><span style=color:#5c6370;font-style:italic>-- converting bits to int
 </span><span>          decodeCompressed offset input
 </span><span>      | otherwise = </span><span style=color:#c678dd>do
-</span><span>          label &LT- getByteString $ fromIntegral lengthValue
-</span><span>          rest &LT- getDomainName input
+</span><span>          label &lt;- getByteString $ fromIntegral lengthValue
+</span><span>          rest &lt;- getDomainName input
 </span><span>          return $
 </span><span>            </span><span style=color:#c678dd>if </span><span style=color:#d19a66>BS</span><span>.null rest
 </span><span>              </span><span style=color:#c678dd>then</span><span> label
-</span><span>              </span><span style=color:#c678dd>else</span><span> label <> </span><span style=color:#d19a66>BS</span><span>.pack </span><span style=color:#98c379>"." </span><span><> rest
+</span><span>              </span><span style=color:#c678dd>else</span><span> label &lt;> </span><span style=color:#d19a66>BS</span><span>.pack </span><span style=color:#98c379>"." </span><span>&lt;> rest
 </span><span>    </span><span style=color:#61afef>decodeCompressed </span><span style=color:#c678dd>:: Int -> BS</span><span>.</span><span style=color:#c678dd>ByteString -> Get BS</span><span>.</span><span style=color:#c678dd>ByteString
 </span><span>    decodeCompressed offset input = </span><span style=color:#c678dd>do
 </span><span>      </span><span style=color:#c678dd>let</span><span> msg = </span><span style=color:#d19a66>BS</span><span>.drop offset input
@@ -158,7 +158,7 @@
 </span></code></pre><p>if the two MSB are set, then it indicates that remaining 14 bits represents pointer to the domain name backwards<h3 id=recursive-nature-of-dns>Recursive Nature of DNS</h3><p>See it is not the case that every time we query for a domain name, nameserver will respond with its ip. DNS resolution can involve multiple steps, as it may recursively query different name servers until it obtains the desired information. It can we possible that it may return ip of another nameserver which many have the answer or even the domain name of that nameserver, so our resolve function will look like this<pre class=language-haskell data-lang=haskell style=color:#abb2bf;background-color:#282c34><code class=language-haskell data-lang=haskell><span style=color:#61afef>matchRecordType </span><span style=color:#c678dd>:: Word16 -></span><span> [</span><span style=color:#c678dd>DNSRecord</span><span>] </span><span style=color:#c678dd>-> Maybe String
 </span><span>matchRecordType recordType records = </span><span style=color:#c678dd>do
 </span><span>  </span><span style=color:#c678dd>let</span><span> matchingRecord = </span><span style=color:#d19a66>L</span><span>.find (\x -> dnsRecordType x == recordType) records
-</span><span>  (\x -> </span><span style=color:#d19a66>Just</span><span> (</span><span style=color:#d19a66>BS</span><span>.unpack $ dnsRecordData x)) =<< matchingRecord
+</span><span>  (\x -> </span><span style=color:#d19a66>Just</span><span> (</span><span style=color:#d19a66>BS</span><span>.unpack $ dnsRecordData x)) =&lt;&lt; matchingRecord
 </span><span>
 </span><span style=color:#61afef>getAnswer </span><span style=color:#c678dd>::</span><span> [</span><span style=color:#c678dd>DNSRecord</span><span>] </span><span style=color:#c678dd>-> Maybe String
 </span><span>getAnswer = matchRecordType typeA
@@ -171,8 +171,8 @@
 </span><span>
 </span><span style=color:#61afef>resolve </span><span style=color:#c678dd>:: String -> Data</span><span>.</span><span style=color:#c678dd>Word</span><span>.</span><span style=color:#c678dd>Word16 -> String -> IO</span><span> (</span><span style=color:#c678dd>Maybe String</span><span>)
 </span><span>resolve domainName recordType nameserver = </span><span style=color:#c678dd>do
-</span><span>  query &LT- encodeQuery domainName recordType
-</span><span>  byteString &LT- sendUDPRequest nameserver </span><span style=color:#d19a66>53</span><span> query
+</span><span>  query &lt;- encodeQuery domainName recordType
+</span><span>  byteString &lt;- sendUDPRequest nameserver </span><span style=color:#d19a66>53</span><span> query
 </span><span>  </span><span style=color:#c678dd>case</span><span> decodeQuery byteString </span><span style=color:#c678dd>of
 </span><span>    </span><span style=color:#d19a66>Left</span><span> err -> </span><span style=color:#c678dd>do
 </span><span>      traceShow (</span><span style=color:#98c379>"Error parsing DNS packet: " </span><span>++ err) (return </span><span style=color:#d19a66>Nothing</span><span>)
@@ -184,18 +184,18 @@
 </span><span>        (</span><span style=color:#d19a66>Just</span><span> ip, _, _) -> return $ </span><span style=color:#d19a66>Just</span><span> ip
 </span><span>        (_, </span><span style=color:#d19a66>Just</span><span> nsIp, _) -> resolve domainName recordType nsIp
 </span><span>        (_, _, </span><span style=color:#d19a66>Just</span><span> nsDomain) -> </span><span style=color:#c678dd>do
-</span><span>          nameserver &LT- resolve nsDomain typeA nameserver
+</span><span>          nameserver &lt;- resolve nsDomain typeA nameserver
 </span><span>          resolve domainName recordType $ fromMaybe </span><span style=color:#98c379>""</span><span> nameserver
 </span><span>        (_, _, _) -> traceShow </span><span style=color:#98c379>"Error Occured" </span><span>$ return </span><span style=color:#d19a66>Nothing
 </span></code></pre><h3 id=final-step-testing>Final Step (testing)</h3><p>Our poorman’s DNS resolver is finally completed now, you can test it by querying any domain name.<pre class=language-sh data-lang=sh style=color:#abb2bf;background-color:#282c34><code class=language-sh data-lang=sh><span>> cabal </span><span style=color:#e06c75>run</span><span> haskell-dns-resolver google.com
 </span><span style=color:#e06c75>Just </span><span style=color:#98c379>"142.251.42.78"
 </span><span>
 </span><span>> dig </span><span style=color:#e06c75>@8.8.8.8</span><span> google.com
-</span><span>; <<>> DiG </span><span style=color:#e06c75>9.10.6 </span><span><<>> @8.8.8.8 google.com
+</span><span>; &lt;&lt;>> DiG </span><span style=color:#e06c75>9.10.6 </span><span>&lt;&lt;>> @8.8.8.8 google.com
 </span><span>; (</span><span style=color:#e06c75>1</span><span> server found)
 </span><span>;; </span><span style=color:#e06c75>global</span><span> options: +cmd
 </span><span>;; </span><span style=color:#e06c75>Got</span><span> answer:
-</span><span>;; </span><span style=color:#e06c75>-</span><span>>>HEADER<&LT- </span><span style=color:#c678dd>opcode</span><span>: QUERY, status: NOERROR, id: 5539
+</span><span>;; </span><span style=color:#e06c75>-</span><span>>>HEADER&lt;&lt;- </span><span style=color:#c678dd>opcode</span><span>: QUERY, status: NOERROR, id: 5539
 </span><span style=color:#98c379>;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
 </span><span style=color:#98c379>
 </span><span style=color:#98c379>;; OPT PSEUDOSECTION:

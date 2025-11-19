@@ -17,7 +17,8 @@
             Tue: "Wed",
             Wed: "Thu",
             Thu: "Fri",
-            Fri: "Mon",
+            Fri: "Sat",
+            Sat: "Mon",
             null: "Mon",
         };
         var currDay = prevCurrMap[prevDay];
@@ -31,37 +32,44 @@
         }
         const plan = {
             Mon: [
-                ["Machine Fly", [12, 12, 12], ["", "", ""]],
-                ["Dumbbell Press", [12, 12, 12], ["", "", ""]],
-                ["Lateral Raises", [12, 12, 12, 12], ["10 kg", "10 kg", "10 kg", "10 kg"]],
-                ["Tricep extension", [12, 12, 12, 12], ["10 kg", "10 kg", "10 kg", "10 kg"]],
+                ["Chest Press", [8, 8, 8], ["", "", ""]],
+                ["Lateral Raises", [12, 12, 12, 12], ["5", "5", "5", "5"]],
+                ["Preacher Curl", [8, 8, 8], ["7.5", "7.5", "7.5"]],
+                ["Forearm Curl", [8, 8, 8], ["7.5", "7.5", "7.5"]],
+                ["Quad Extension", [8, 8, 8], ["", "", ""]],
             ],
             Tue: [
-                ["Vertical Pull", [12, 12, 12], ["", "", ""]],
-                ["Reverse Fly", [12, 12, 12], ["", "", ""]],
-                ["Preacher Curl", [12, 12, 12], ["10 kg", "10 kg", "10 kg"]],
-                ["Cable Shrugs", [15, 15, 15], ["75 kg", "75 kg", "75 kg"]],
-                ["Calf Raise", [12, 12, 12, 12], ["", "", "", ""]]
+                ["Wide Grip Row", [8, 8, 8], ["", "", ""]],
+                ["Rear Delt Fly", [8, 8, 8], ["", "", ""]],
+                ["Tricep extension", [8, 8, 8], ["", "", ""]],
+                ["Calf Raise", [15, 15, 15, 15], ["", "", "", ""]]
+                ["Ham Curl", [15, 15, 15], ["", "", ""]]
             ],
             Wed: [
-                ["Machine Fly, Lean Forward", [12, 12, 12], ["", "", ""]],
-                ["Dumbbell Press", [12, 12, 12], ["", "", ""]],
-                ["Lateral Raises", [12, 12, 12, 12], ["10 kg", "10 kg", "10 kg", "10 kg"]],
-                ["Tricep extension", [12, 12, 12, 12], ["10 kg", "10 kg", "10 kg", "10 kg"]],
+                ["Chest Fly", [8, 8, 8], ["", "", ""]],
+                ["Lateral Raises", [12, 12, 12, 12], ["", "", "", "5"]],
+                ["Bicep Curl", [8, 8, 8], ["", "", ""]],
+                ["Forearm Curl", [8, 8, 8], ["", "", ""]],
             ],
             Thu: [
-                ["Horizontal Pull", [12, 12, 12], ["", "", ""]],
-                ["Reverse Fly", [12, 12, 12], ["", "", ""]],
-                ["Preacher Curl", [12, 12, 12], ["10 kg", "10 kg", "10 kg"]],
-                ["Cable Shrugs", [15, 15, 15], ["75 kg", "75 kg", "75 kg"]],
-                ["Calf Raise", [12, 12, 12, 12], ["", "", "", ""]]
+                ["Close Grip Row", [8, 8, 8], ["", "", ""]],
+                ["Rear Delt Fly", [8, 8, 8], ["", "", ""]],
+                ["Shrugs", [12, 12, 12], ["", "", ""]],
+                ["Tricep extension", [8, 8, 8], ["", "", ""]],
+                ["Calf Raise", [15, 15, 15, 15], ["", "", "", ""]]
             ],
             Fri: [
-                ["Machine Fly", [12, 12, 12], ["", "", ""]],
-                ["Dumbbell Press", [12, 12, 12], ["", "", ""]],
-                ["Lateral Raises", [12, 12, 12, 12], ["10 kg", "10 kg", "10 kg", "10 kg"]],
-                ["Tricep extension", [12, 12, 12, 12], ["10 kg", "10 kg", "10 kg", "10 kg"]],
-                ["Leg Extensions/Seated Leg Curls", [12, 12, 12], ["60 kg", "60 kg", "60 kg"]],
+                ["Chest Fly", [8, 8, 8], ["", "", ""]],
+                ["Lateral Raises", [12, 12, 12, 12], ["", "", "", "5"]],
+                ["Bicep Curl", [8, 8, 8], ["", "", ""]],
+                ["Forearm Curl", [8, 8, 8], ["", "", ""]],
+            ],
+            Sat: [
+                ["Lat pulldown", [8, 8, 8], ["", "", ""]],
+                ["Rear Delt Fly", [8, 8, 8], ["", "", ""]],
+                ["Shrugs", [12, 12, 12], ["", "", ""]],
+                ["Tricep extension", [8, 8, 8], ["", "", ""]],
+                ["Calf Raise", [15, 15, 15, 15], ["", "", "", ""]]
             ],
         };
 
