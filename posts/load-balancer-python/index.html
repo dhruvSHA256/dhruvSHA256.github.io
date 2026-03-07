@@ -10,57 +10,57 @@ sequenceDiagram
     LoadBalancer->>Server: Request R2
     Server->>LoadBalancer: Response R1
     LoadBalancer->>Client: Response R2
-</pre><ul><li>A layer 4 load balancer on the other hand works on (you guess), which is Transport Layer of OSI model. It instead of decoding the request, directly sends the packet to server. It basically act as a relay between client and server, which is faster but … dumb.</ul><h3 id=the-code>The code</h3><p>Let’s dive into the code to build our Layer 4 load balancer. The first step is to listen to an address and receive data from clients. We will be using Python’s socket library for this.<pre class=language-py data-lang=py style=color:#abb2bf;background-color:#282c34><code class=language-py data-lang=py><span>    sock = socket.</span><span style=color:#e06c75>socket</span><span>(socket.</span><span style=color:#e06c75>AF_INET</span><span>, socket.</span><span style=color:#e06c75>SOCK_STREAM</span><span>)
-</span><span>    </span><span style=color:#c678dd>try</span><span>:
-</span><span>        sock.</span><span style=color:#e06c75>bind</span><span>((</span><span style=color:#e06c75>HOST</span><span>, </span><span style=color:#e06c75>PORT</span><span>))
-</span><span>        sock.</span><span style=color:#e06c75>listen</span><span>()
-</span><span>        </span><span style=color:#56b6c2>print</span><span>(</span><span style=color:#c678dd>f</span><span style=color:#98c379>"Listening on port: </span><span>{</span><span style=color:#e06c75>PORT</span><span>}</span><span style=color:#98c379>"</span><span>)
-</span><span>        </span><span style=color:#c678dd>while </span><span style=color:#d19a66>True</span><span>:
-</span><span>            client_conn, client_addr = sock.</span><span style=color:#e06c75>accept</span><span>()
-</span><span>            </span><span style=color:#c678dd>with </span><span>client_conn:
-</span><span>                </span><span style=color:#56b6c2>print</span><span>(</span><span style=color:#c678dd>f</span><span style=color:#98c379>"Connected by </span><span>{client_addr}</span><span style=color:#98c379>"</span><span>)
-</span><span>                data = client_conn.</span><span style=color:#e06c75>recv</span><span>(</span><span style=color:#d19a66>1024</span><span>)
-</span><span>                </span><span style=color:#56b6c2>print</span><span>(data.</span><span style=color:#e06c75>decode</span><span>())
-</span><span>    </span><span style=color:#c678dd>finally</span><span>:
-</span><span>        sock.</span><span style=color:#e06c75>close</span><span>()
-</span></code></pre><p>Now that we are receiving connections from clients, we need to somehow relay requests and responses between them.<pre class=language-py data-lang=py style=color:#abb2bf;background-color:#282c34><code class=language-py data-lang=py><span>    </span><span style=color:#c678dd>def </span><span style=color:#61afef>forward_request</span><span>(</span><span style=color:#e06c75>source</span><span>, </span><span style=color:#e06c75>destination</span><span>):
-</span><span>        </span><span style=color:#56b6c2>print</span><span>(</span><span style=color:#c678dd>f</span><span style=color:#98c379>"Sending data from </span><span>{source.</span><span style=color:#e06c75>getsockname</span><span>()}</span><span style=color:#98c379> to </span><span>{destination.</span><span style=color:#e06c75>getsockname</span><span>()}</span><span style=color:#98c379>"</span><span>)
-</span><span>        </span><span style=color:#c678dd>try</span><span>:
-</span><span>            </span><span style=color:#c678dd>while </span><span style=color:#d19a66>True</span><span>:
-</span><span>                data = source.</span><span style=color:#e06c75>recv</span><span>(</span><span style=color:#d19a66>1024</span><span>)
-</span><span>                </span><span style=color:#c678dd>if </span><span style=color:#56b6c2>len</span><span>(data) == </span><span style=color:#d19a66>0</span><span>:
-</span><span>                    </span><span style=color:#c678dd>break
-</span><span>                destination.</span><span style=color:#e06c75>send</span><span>(data)
-</span><span>        </span><span style=color:#c678dd>finally</span><span>:
-</span><span>            source.</span><span style=color:#e06c75>close</span><span>()
-</span><span>            destination.</span><span style=color:#e06c75>close</span><span>()
-</span></code></pre><p>We will be needing two separate threads for this (one for receiving client request and sending it to server, and one receiving server response and sending it to client)<pre class=language-py data-lang=py style=color:#abb2bf;background-color:#282c34><code class=language-py data-lang=py><span>    c2b_thread = threading.</span><span style=color:#e06c75>Thread</span><span>(</span><span style=color:#e06c75>target</span><span>=forward_request, </span><span style=color:#e06c75>args</span><span>=(client_conn, backend_conn))
-</span><span>    b2c_thread = threading.</span><span style=color:#e06c75>Thread</span><span>(</span><span style=color:#e06c75>target</span><span>=forward_request, </span><span style=color:#e06c75>args</span><span>=(backend_conn, client_conn))
-</span><span>    c2b_thread.</span><span style=color:#e06c75>start</span><span>()
-</span><span>    b2c_thread.</span><span style=color:#e06c75>start</span><span>()
-</span><span>    c2b_thread.</span><span style=color:#e06c75>join</span><span>()
-</span><span>    b2c_thread.</span><span style=color:#e06c75>join</span><span>()
-</span></code></pre><p>Now comes the tricky part: what if one server dies? It would be foolish to relay requests to a dead server.<br> We need a heartbeat mechanism to periodically check if the server is up and running. If it isn’t, we should exclude it from our pool of servers. We must perform this operation without blocking our primary server, so we’ll create a separate thread for it.<pre class=language-py data-lang=py style=color:#abb2bf;background-color:#282c34><code class=language-py data-lang=py><span>    </span><span style=color:#c678dd>def </span><span style=color:#61afef>get_server_heart_beat</span><span>(</span><span style=color:#e06c75>server</span><span>):
-</span><span>        </span><span style=color:#c678dd>try</span><span>:
-</span><span>            resp = requests.</span><span style=color:#e06c75>get</span><span>(</span><span style=color:#c678dd>f</span><span style=color:#98c379>"http://</span><span>{server.host}</span><span style=color:#98c379>:</span><span>{server.port}</span><span style=color:#98c379>/health"</span><span>)
-</span><span>            </span><span style=color:#c678dd>return </span><span>resp.text == </span><span style=color:#98c379>"up"
-</span><span>        </span><span style=color:#c678dd>except</span><span>:
-</span><span>            </span><span style=color:#c678dd>return </span><span style=color:#d19a66>False
-</span><span>
-</span><span>    </span><span style=color:#c678dd>def </span><span style=color:#61afef>update_heartbeat</span><span>(</span><span style=color:#e06c75>server</span><span>, </span><span style=color:#e06c75>delay</span><span>):
-</span><span>        </span><span style=color:#c678dd>while </span><span style=color:#d19a66>True</span><span>:
-</span><span>            server_heart_beat = </span><span style=color:#e06c75>get_server_heart_beat</span><span>(server)
-</span><span>            server.</span><span style=color:#e06c75>update_health_status</span><span>(server_heart_beat)
-</span><span>            </span><span style=color:#e06c75>sleep</span><span>(delay)
-</span><span>
-</span><span>    </span><span style=color:#c678dd>def </span><span style=color:#61afef>check_health</span><span>(</span><span style=color:#e06c75>servers</span><span>):
-</span><span>        threads = []
-</span><span>        </span><span style=color:#c678dd>for </span><span>s </span><span style=color:#c678dd>in </span><span>servers:
-</span><span>            t = threading.</span><span style=color:#e06c75>Thread</span><span>(</span><span style=color:#e06c75>target</span><span>=update_heartbeat, </span><span style=color:#e06c75>args</span><span>=(s, </span><span style=color:#d19a66>2</span><span>))
-</span><span>            threads.</span><span style=color:#e06c75>append</span><span>(t)
-</span><span>            t.</span><span style=color:#e06c75>start</span><span>()
-</span><span>        </span><span style=color:#c678dd>return </span><span>threads
-</span></code></pre><p>We are almost done just need to test our load balancer. <img alt=xyx src=/media/load-balancer-test.gif><p>Full code can be found on my <a href=https://github.com/dhruvSHA256/load-balancer rel=noopener target=_blank>github</a></p><script src=https://cdn.jsdelivr.net/npm/mermaid@10.3.0/dist/mermaid.min.js></script><script src=/js/mermaid.js></script><script>window.initMermaid();</script><p class=tagsData><a href=/tags/python>/python/</a> <a href=/tags/networking>/networking/</a> <a href=/tags/codingchallenges>/codingchallenges/</a></p><script>var script = document.createElement("script");
+</pre><ul><li>A layer 4 load balancer on the other hand works on (you guess), which is Transport Layer of OSI model. It instead of decoding the request, directly sends the packet to server. It basically act as a relay between client and server, which is faster but … dumb.</ul><h3 id=the-code>The code</h3><p>Let’s dive into the code to build our Layer 4 load balancer. The first step is to listen to an address and receive data from clients. We will be using Python’s socket library for this.<pre><code data-lang=py>    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.bind((HOST, PORT))
+        sock.listen()
+        print(f"Listening on port: {PORT}")
+        while True:
+            client_conn, client_addr = sock.accept()
+            with client_conn:
+                print(f"Connected by {client_addr}")
+                data = client_conn.recv(1024)
+                print(data.decode())
+    finally:
+        sock.close()
+</code></pre><p>Now that we are receiving connections from clients, we need to somehow relay requests and responses between them.<pre><code data-lang=py>    def forward_request(source, destination):
+        print(f"Sending data from {source.getsockname()} to {destination.getsockname()}")
+        try:
+            while True:
+                data = source.recv(1024)
+                if len(data) == 0:
+                    break
+                destination.send(data)
+        finally:
+            source.close()
+            destination.close()
+</code></pre><p>We will be needing two separate threads for this (one for receiving client request and sending it to server, and one receiving server response and sending it to client)<pre><code data-lang=py>    c2b_thread = threading.Thread(target=forward_request, args=(client_conn, backend_conn))
+    b2c_thread = threading.Thread(target=forward_request, args=(backend_conn, client_conn))
+    c2b_thread.start()
+    b2c_thread.start()
+    c2b_thread.join()
+    b2c_thread.join()
+</code></pre><p>Now comes the tricky part: what if one server dies? It would be foolish to relay requests to a dead server.<br> We need a heartbeat mechanism to periodically check if the server is up and running. If it isn’t, we should exclude it from our pool of servers. We must perform this operation without blocking our primary server, so we’ll create a separate thread for it.<pre><code data-lang=py>    def get_server_heart_beat(server):
+        try:
+            resp = requests.get(f"http://{server.host}:{server.port}/health")
+            return resp.text == "up"
+        except:
+            return False
+
+    def update_heartbeat(server, delay):
+        while True:
+            server_heart_beat = get_server_heart_beat(server)
+            server.update_health_status(server_heart_beat)
+            sleep(delay)
+
+    def check_health(servers):
+        threads = []
+        for s in servers:
+            t = threading.Thread(target=update_heartbeat, args=(s, 2))
+            threads.append(t)
+            t.start()
+        return threads
+</code></pre><p>We are almost done just need to test our load balancer. <img alt=xyx src=/media/load-balancer-test.gif><p>Full code can be found on my <a rel="noopener external" href=https://github.com/dhruvSHA256/load-balancer target=_blank>github</a></p><script src=https://cdn.jsdelivr.net/npm/mermaid@10.3.0/dist/mermaid.min.js></script><script src=/js/mermaid.js></script><script>window.initMermaid();</script><p class=tagsData><a href=/tags/python>/python/</a> <a href=/tags/networking>/networking/</a> <a href=/tags/codingchallenges>/codingchallenges/</a></p><script>var script = document.createElement("script");
     script.src = "https://giscus.app/client.js";
     script.setAttribute("data-repo", "dhruvsha256/dhruvsha256.github.io");
     script.setAttribute("data-repo-id", "R_kgDOIYOkrQ");
