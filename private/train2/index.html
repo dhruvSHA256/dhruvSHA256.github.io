@@ -239,10 +239,28 @@
       <label>Split Name</label>
       <input type="text" id="splitNameInput" placeholder="e.g. Push Pull Legs" autocomplete="off" autocorrect="off" autocapitalize="words" />
     </div>
-    <div class="modal-field">
-      <label>GitHub Gist Raw URL</label>
-      <input type="url" id="splitUrlInput" placeholder="https://gist.githubusercontent.com/…/raw/split.json" autocomplete="off" autocorrect="off" autocapitalize="none" inputmode="url" />
-      <div class="modal-hint">Paste a GitHub Gist <code>raw</code> URL. Fetched once, cached offline forever.</div>
+    <!-- Source toggle -->
+    <div style="display:flex;gap:0;margin-bottom:12px;border:1px solid var(--border);border-radius:4px;overflow:hidden">
+      <button id="srcTabUrl"  onclick="setSrcTab('url')"  style="flex:1;padding:9px;font-family:var(--mono);font-size:12px;border:none;cursor:pointer;background:var(--accent);color:#0d0d0d;font-weight:700;transition:all .15s">URL</button>
+      <button id="srcTabFile" onclick="setSrcTab('file')" style="flex:1;padding:9px;font-family:var(--mono);font-size:12px;border:none;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">JSON File</button>
+    </div>
+    <!-- URL pane -->
+    <div id="srcPaneUrl">
+      <div class="modal-field">
+        <label>GitHub Gist Raw URL</label>
+        <input type="url" id="splitUrlInput" placeholder="https://gist.githubusercontent.com/…/raw/split.json" autocomplete="off" autocorrect="off" autocapitalize="none" inputmode="url" />
+        <div class="modal-hint">Paste a GitHub Gist <code>raw</code> URL. Fetched once, cached offline forever.</div>
+      </div>
+    </div>
+    <!-- File pane -->
+    <div id="srcPaneFile" style="display:none">
+      <div class="modal-field">
+        <label>Select JSON File</label>
+        <input type="file" id="splitFileInput" accept=".json,application/json" onchange="previewSplitFile(this)"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:15px;padding:10px 12px;outline:none;-webkit-appearance:none;appearance:none" />
+        <div class="modal-hint">Pick a <code>.json</code> file from your device. Stored locally, works offline.</div>
+      </div>
+      <div id="filePreview" style="font-size:11px;color:var(--muted);min-height:18px"></div>
     </div>
     <details style="margin-top:10px">
       <summary style="font-size:11px;color:var(--muted);cursor:pointer;padding:6px 0;user-select:none">▶ JSON format</summary>
@@ -311,11 +329,69 @@ const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const PLATES=[20,15,10,5,2.5,1.25];
 const BAR=20;
 
+// ── HARDCODED SPLIT ──
+const BUILTIN_SPLIT = {
+  name: 'My Split',
+  builtin: true,
+  plan: {
+    Mon: [
+      ["Chest Press",    [8,8,8],         ["","",""]],
+      ["Lateral Raises", [12,12,12,12],   ["5","5","5","5"]],
+      ["Preacher Curl",  [8,8,8],         ["7.5","7.5","7.5"]],
+      ["Forearm Curl",   [8,8,8],         ["7.5","7.5","7.5"]],
+      ["Quad Extension", [8,8,8],         ["","",""]]
+    ],
+    Tue: [
+      ["Wide Grip Row",    [8,8,8],       ["","",""]],
+      ["Rear Delt Fly",    [8,8,8],       ["","",""]],
+      ["Tricep extension", [8,8,8],       ["","",""]],
+      ["Calf Raise",       [15,15,15,15], ["","","",""]],
+      ["Ham Curl",         [15,15,15],    ["","",""]]
+    ],
+    Wed: [
+      ["Chest Fly",      [8,8,8],         ["","",""]],
+      ["Lateral Raises", [12,12,12,12],   ["","","","5"]],
+      ["Bicep Curl",     [8,8,8],         ["","",""]],
+      ["Forearm Curl",   [8,8,8],         ["","",""]]
+    ],
+    Thu: [
+      ["Close Grip Row",   [8,8,8],       ["","",""]],
+      ["Rear Delt Fly",    [8,8,8],       ["","",""]],
+      ["Shrugs",           [12,12,12],    ["","",""]],
+      ["Tricep extension", [8,8,8],       ["","",""]],
+      ["Calf Raise",       [15,15,15,15], ["","","",""]]
+    ],
+    Fri: [
+      ["Chest Fly",      [8,8,8],         ["","",""]],
+      ["Lateral Raises", [12,12,12,12],   ["","","","5"]],
+      ["Bicep Curl",     [8,8,8],         ["","",""]],
+      ["Forearm Curl",   [8,8,8],         ["","",""]]
+    ],
+    Sat: [
+      ["Lat pulldown",     [8,8,8],       ["","",""]],
+      ["Rear Delt Fly",    [8,8,8],       ["","",""]],
+      ["Shrugs",           [12,12,12],    ["","",""]],
+      ["Tricep extension", [8,8,8],       ["","",""]],
+      ["Calf Raise",       [15,15,15,15], ["","","",""]]
+    ]
+  }
+};
+
 let S={splits:[],activeSplitIdx:-1,currDay:'Mon'};
 let exCount=0;
 
 // ── STATE ──
-function loadAppState(){try{const r=localStorage.getItem('tl_state');if(r){const p=JSON.parse(r);S.splits=p.splits||[];S.activeSplitIdx=p.activeSplitIdx??-1;}}catch(e){}}
+function loadAppState(){
+  try{const r=localStorage.getItem('tl_state');if(r){const p=JSON.parse(r);S.splits=p.splits||[];S.activeSplitIdx=p.activeSplitIdx??-1;}}catch(e){}
+  // Ensure builtin split is always at index 0
+  const hasBuiltin = S.splits.length>0 && S.splits[0].builtin;
+  if(!hasBuiltin){
+    S.splits.unshift({name:BUILTIN_SPLIT.name, builtin:true, url:null});
+    if(S.activeSplitIdx>=0) S.activeSplitIdx++; // shift other indices up
+    if(S.activeSplitIdx<0) S.activeSplitIdx=0;  // default to builtin on first run
+    saveAppState();
+  }
+}
 function saveAppState(){localStorage.setItem('tl_state',JSON.stringify({splits:S.splits,activeSplitIdx:S.activeSplitIdx}));}
 function planKey(day){const sfx=S.activeSplitIdx>=0?'_'+S.splits[S.activeSplitIdx].name.replace(/\W+/g,'_'):'';return`tl_plan${sfx}_${day}`;}
 function prevKey(name){const sfx=S.activeSplitIdx>=0?'_'+S.splits[S.activeSplitIdx].name.replace(/\W+/g,'_'):'';return`tl_prev${sfx}_${name.toLowerCase().replace(/\W+/g,'_')}`;}
@@ -405,7 +481,11 @@ function renderChips(){
   S.splits.forEach((sp,i)=>{
     const ch=document.createElement('div');
     ch.className='split-chip'+(i===S.activeSplitIdx?' active':'');
-    ch.innerHTML=`<span>${esc(sp.name)}</span><button class="chip-del">✕</button>`;
+    if(sp.builtin){
+      ch.innerHTML=`<span>${esc(sp.name)}</span>`;
+    } else {
+      ch.innerHTML=`<span>${esc(sp.name)}</span><button class="chip-del">✕</button>`;
+    }
     ch.addEventListener('click',e=>{if(e.target.classList.contains('chip-del')){deleteSplit(i);return;}activateSplit(i);});
     c.appendChild(ch);
   });
@@ -415,28 +495,89 @@ function updateStatusBar(){document.getElementById('activeSplitName').textConten
 // ── SPLIT CRUD ──
 function openAddSplitModal(){
   closeModal('manageSplitsModal');
-  document.getElementById('splitNameInput').value='';document.getElementById('splitUrlInput').value='';
-  openModal('addSplitModal');setTimeout(()=>document.getElementById('splitNameInput').focus(),120);
+  document.getElementById('splitNameInput').value='';
+  document.getElementById('splitUrlInput').value='';
+  document.getElementById('splitFileInput').value='';
+  document.getElementById('filePreview').textContent='';
+  setSrcTab('url');
+  openModal('addSplitModal');
+  setTimeout(()=>document.getElementById('splitNameInput').focus(),120);
 }
+function setSrcTab(tab){
+  const isUrl = tab==='url';
+  document.getElementById('srcPaneUrl').style.display  = isUrl?'':'none';
+  document.getElementById('srcPaneFile').style.display = isUrl?'none':'';
+  document.getElementById('srcTabUrl').style.background  = isUrl?'var(--accent)':'transparent';
+  document.getElementById('srcTabUrl').style.color       = isUrl?'#0d0d0d':'var(--muted)';
+  document.getElementById('srcTabUrl').style.fontWeight  = isUrl?'700':'400';
+  document.getElementById('srcTabFile').style.background = isUrl?'transparent':'var(--accent)';
+  document.getElementById('srcTabFile').style.color      = isUrl?'var(--muted)':'#0d0d0d';
+  document.getElementById('srcTabFile').style.fontWeight = isUrl?'400':'700';
+}
+async function previewSplitFile(input){
+  const file=input.files[0];
+  const preview=document.getElementById('filePreview');
+  if(!file){preview.textContent='';return;}
+  try{
+    const text=await file.text();
+    const json=JSON.parse(text);
+    const root=resolveRoot(json);
+    const days=DAYS.filter(d=>root[d]&&root[d].length>0);
+    preview.style.color='var(--green)';
+    preview.textContent=`✓ ${file.name} — ${days.length} days (${days.join(', ')})`;
+    // Auto-fill name if empty
+    const nameIn=document.getElementById('splitNameInput');
+    if(!nameIn.value) nameIn.value=file.name.replace(/\.json$/i,'');
+  }catch(e){
+    document.getElementById('filePreview').style.color='var(--red)';
+    document.getElementById('filePreview').textContent='✗ Invalid JSON: '+e.message;
+  }
+}
+
 async function confirmAddSplit(){
   const name=document.getElementById('splitNameInput').value.trim();
-  const url=document.getElementById('splitUrlInput').value.trim();
   if(!name){toast('Enter a split name');return;}
-  if(!url||!url.startsWith('http')){toast('Enter a valid URL');return;}
-  toast('Fetching…');
-  try{
-    const json=await fetchJSON(url);
-    const root=resolveRoot(json);
-    const days=DAYS.filter(d=>root[d]&&root[d].length>0).length;
-    S.splits.push({name,url});saveAppState();closeModal('addSplitModal');renderChips();
-    activateSplit(S.splits.length-1);
-    toast(`"${name}" added — ${days} training days ✓`);
-  }catch(e){toast('Error: '+e.message);}
+  const isFile = document.getElementById('srcPaneFile').style.display!=='none';
+  if(isFile){
+    // ── FILE MODE ──
+    const file=document.getElementById('splitFileInput').files[0];
+    if(!file){toast('Select a JSON file');return;}
+    try{
+      const text=await file.text();
+      const json=JSON.parse(text);
+      const root=resolveRoot(json);
+      const days=DAYS.filter(d=>root[d]&&root[d].length>0).length;
+      if(!days){toast('No training days found in JSON');return;}
+      // Store entire JSON inline (no URL needed, works fully offline)
+      const inlineKey='tl_inline_'+Date.now();
+      localStorage.setItem(inlineKey, text);
+      S.splits.push({name, url:null, inlineKey});
+      saveAppState();closeModal('addSplitModal');renderChips();
+      activateSplit(S.splits.length-1);
+      toast(`"${name}" loaded — ${days} training days ✓`);
+    }catch(e){toast('Invalid JSON: '+e.message);}
+  } else {
+    // ── URL MODE ──
+    const url=document.getElementById('splitUrlInput').value.trim();
+    if(!url||!url.startsWith('http')){toast('Enter a valid URL');return;}
+    toast('Fetching…');
+    try{
+      const json=await fetchJSON(url);
+      const root=resolveRoot(json);
+      const days=DAYS.filter(d=>root[d]&&root[d].length>0).length;
+      S.splits.push({name,url});saveAppState();closeModal('addSplitModal');renderChips();
+      activateSplit(S.splits.length-1);
+      toast(`"${name}" added — ${days} training days ✓`);
+    }catch(e){toast('Error: '+e.message);}
+  }
 }
 function deleteSplit(idx){
+  if(S.splits[idx].builtin){toast("Can't remove the built-in split");return;}
   if(!confirm(`Remove "${S.splits[idx].name}"?`))return;
+  // Clean up inline storage if applicable
+  if(S.splits[idx].inlineKey) localStorage.removeItem(S.splits[idx].inlineKey);
   S.splits.splice(idx,1);
-  if(S.activeSplitIdx===idx)S.activeSplitIdx=-1;
+  if(S.activeSplitIdx===idx)S.activeSplitIdx=0;
   else if(S.activeSplitIdx>idx)S.activeSplitIdx--;
   saveAppState();renderChips();updateStatusBar();toast('Split removed');
 }
@@ -453,7 +594,7 @@ function openManageSplits(){
           <div style="font-size:10px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.url)}</div>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="activateSplit(${i});closeModal('manageSplitsModal')">Load</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteSplit(${i});openManageSplits()">Del</button>
+        ${s.builtin?'':`<button class="btn btn-sm btn-danger" onclick="deleteSplit(${i});openManageSplits()">Del</button>`}
       </div>`).join('');
   }
   openModal('manageSplitsModal');
@@ -469,6 +610,7 @@ function parseEx(ex){
 
 // ── FETCH + CACHE ──
 async function fetchJSON(url,forceNetwork=false){
+  if(!url) return BUILTIN_SPLIT; // builtin — no network needed
   const k='tl_json_'+btoa(unescape(encodeURIComponent(url))).replace(/[=+/]/g,'_');
   if(!forceNetwork){try{const c=localStorage.getItem(k);if(c)return JSON.parse(c);}catch(e){}}
   try{
@@ -483,14 +625,36 @@ async function fetchJSON(url,forceNetwork=false){
     throw new Error(e.message+' — connect once to cache the split.');
   }
 }
-function getCachedJSON(url){const k='tl_json_'+btoa(unescape(encodeURIComponent(url))).replace(/[=+/]/g,'_');try{const c=localStorage.getItem(k);return c?JSON.parse(c):null;}catch(e){return null;}}
+function getCachedJSON(url){
+  if(!url) return BUILTIN_SPLIT; // builtin
+  const k='tl_json_'+btoa(unescape(encodeURIComponent(url))).replace(/[=+/]/g,'_');
+  try{const c=localStorage.getItem(k);return c?JSON.parse(c):null;}catch(e){return null;}
+}
 
 // ── RELOAD ──
+// Returns parsed JSON for a split — handles builtin, inline file, and URL splits
+async function getSplitJSON(sp, forceNetwork=false){
+  if(sp.builtin) return BUILTIN_SPLIT;
+  if(sp.inlineKey){
+    const raw=localStorage.getItem(sp.inlineKey);
+    if(!raw) throw new Error('Inline split data missing from storage');
+    return JSON.parse(raw);
+  }
+  return fetchJSON(sp.url, forceNetwork);
+}
+function getCachedSplitJSON(sp){
+  if(sp.builtin) return BUILTIN_SPLIT;
+  if(sp.inlineKey){
+    try{const r=localStorage.getItem(sp.inlineKey);return r?JSON.parse(r):null;}catch(e){return null;}
+  }
+  return getCachedJSON(sp.url);
+}
+
 async function reloadFromSplit(forceNetwork=false){
   if(S.activeSplitIdx<0){toast('No split selected');return;}
   const sp=S.splits[S.activeSplitIdx];bar(30);
   try{
-    const json=await fetchJSON(sp.url,forceNetwork);
+    const json=await getSplitJSON(sp,forceNetwork);
     const root=resolveRoot(json);bar(70);
     const plan=root[S.currDay]||[];
     clearEx();
@@ -600,7 +764,7 @@ function loadDayPlan(day){
     if(saved){const data=JSON.parse(saved);if(data&&data.length){data.forEach(ex=>addExWithData(ex.exerciseName,ex.targetReps,ex.weights,ex.achievedReps,ex.done));return;}}
   }catch(e){}
   if(S.activeSplitIdx>=0){
-    const cached=getCachedJSON(S.splits[S.activeSplitIdx].url);
+    const cached=getCachedSplitJSON(S.splits[S.activeSplitIdx]);
     if(cached){try{const root=resolveRoot(cached);const plan=root[day]||[];plan.forEach(ex=>{const{name,sets,weights}=parseEx(ex);addExWithData(name,sets,weights,Array(sets.length).fill(''),null);});return;}catch(e){}}
   }
   updateEmpty();
