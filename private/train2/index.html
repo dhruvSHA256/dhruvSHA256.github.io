@@ -64,9 +64,8 @@
     .remarks-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
     #remarks{width:100%;background:transparent;border:none;outline:none;color:var(--dim);font-family:var(--mono);font-size:16px;resize:none;min-height:38px;line-height:1.5}
     #remarks:focus{color:var(--text)}
-    #exercises.reordering{user-select:none;-webkit-user-select:none;touch-action:none}
-    .exercise-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:12px;overflow:hidden}
-    .exercise-card.dragging{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);opacity:.82}
+    .exercise-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:12px;overflow:hidden;animation:slideIn .18s ease}
+    @keyframes slideIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
     .ex-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-bottom:1px solid var(--border);gap:8px}
     .ex-name{font-family:var(--cond);font-weight:700;font-size:16px;letter-spacing:.05em;text-transform:uppercase;color:var(--text);background:none;border:none;outline:none;flex:1;min-height:24px;word-break:break-word}
     .ex-name:focus{color:var(--accent)}
@@ -99,8 +98,6 @@
     .btn-sm{padding:6px 11px;font-size:11px;min-height:34px}
     .btn-icon{background:none;border:1px solid transparent;color:var(--muted);width:34px;height:34px;border-radius:4px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;user-select:none;transition:color .15s}
     .btn-icon:active{color:var(--red)}
-    .drag-handle{cursor:grab;touch-action:none}
-    .drag-handle:active{cursor:grabbing;color:var(--accent)}
     .btn-add-set{background:transparent;border:1px dashed var(--border);color:var(--muted);border-radius:4px;font-family:var(--mono);font-size:12px;padding:7px 12px;cursor:pointer;min-height:34px;user-select:none}
     .btn-add-set:active{border-color:var(--accent);color:var(--accent)}
     .preset-btn{padding:8px 10px;font-family:var(--mono);font-size:12px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;min-height:38px;user-select:none}
@@ -441,11 +438,10 @@ function setDay(day,scroll){
 // ── SWIPE ──
 function setupSwipe(){
   const el=document.getElementById('swipeArea');
-  let sx=0,sy=0,moved=false,blocked=false;
-  el.addEventListener('touchstart',e=>{blocked=!!(e.target.closest&&e.target.closest('.drag-handle'));if(blocked)return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;moved=false;},{passive:true});
-  el.addEventListener('touchmove',e=>{if(blocked)return;const dx=Math.abs(e.touches[0].clientX-sx),dy=Math.abs(e.touches[0].clientY-sy);if(dx>dy&&dx>10)moved=true;},{passive:true});
+  let sx=0,sy=0,moved=false;
+  el.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;moved=false;},{passive:true});
+  el.addEventListener('touchmove',e=>{const dx=Math.abs(e.touches[0].clientX-sx),dy=Math.abs(e.touches[0].clientY-sy);if(dx>dy&&dx>10)moved=true;},{passive:true});
   el.addEventListener('touchend',e=>{
-    if(blocked){blocked=false;return;}
     if(!moved)return;
     const dx=e.changedTouches[0].clientX-sx,dy=Math.abs(e.changedTouches[0].clientY-sy);
     if(Math.abs(dx)<50||dy>80)return;
@@ -794,7 +790,6 @@ function addExercise(name){
         ${prevHTML}
       </div>
       <div style="display:flex;gap:5px;flex-shrink:0">
-        <button class="btn-icon drag-handle" title="Drag to reorder exercises" aria-label="Drag to reorder exercises">↕</button>
         <button class="btn-icon" title="Plate calculator" onclick="openPlateCalc(this)">🏋️</button>
         <button class="btn-icon" title="Remove exercise" onclick="this.closest('.exercise-card').remove();saveCurrent();updateEmpty()">✕</button>
       </div>
@@ -815,7 +810,6 @@ function addExercise(name){
       <div class="vol-badge" id="vol${id}"></div>
     </div>`;
   document.getElementById('exercises').appendChild(card);
-  setupExerciseDrag(card);
   card.querySelector('.ex-name').addEventListener('input',saveCurrent);
   updateEmpty();return id;
 }
@@ -900,79 +894,6 @@ function updateVolBadge(id){
 }
 
 function updateEmpty(){document.getElementById('emptyState').style.display=document.querySelectorAll('.exercise-card').length?'none':'block';}
-
-// ── EXERCISE REORDER ──
-let dragEx=null,dragHandle=null,dragStartIndex=-1,dragMoved=false,dragPointerId=null;
-
-function setupExerciseDrag(card){
-  const handle=card.querySelector('.drag-handle');
-  if(handle)handle.addEventListener('pointerdown',startExerciseDrag);
-}
-
-function startExerciseDrag(e){
-  if(e.button!==undefined&&e.button!==0)return;
-  const list=document.getElementById('exercises');
-  const card=e.currentTarget.closest('.exercise-card');
-  if(!card||list.querySelectorAll('.exercise-card').length<2)return;
-  if(dragEx)finishExerciseDrag(false,e);
-  e.preventDefault();
-  dragEx=card;dragHandle=e.currentTarget;dragPointerId=e.pointerId;dragMoved=false;
-  dragStartIndex=Array.from(list.querySelectorAll('.exercise-card')).indexOf(card);
-  document.querySelectorAll('.exercise-card.dragging').forEach(c=>c.classList.remove('dragging'));
-  list.classList.add('reordering');card.classList.add('dragging');
-  if(dragHandle.setPointerCapture)dragHandle.setPointerCapture(e.pointerId);
-  document.addEventListener('pointermove',moveExerciseDrag);
-  document.addEventListener('pointerup',endExerciseDrag);
-  document.addEventListener('pointercancel',endExerciseDrag);
-}
-
-function moveExerciseDrag(e){
-  if(!dragEx||e.pointerId!==dragPointerId)return;
-  e.preventDefault();dragMoved=true;autoScrollExerciseDrag(e.clientY);
-  const list=document.getElementById('exercises');
-  const after=getExerciseDragAfter(list,e.clientY);
-  if(after){if(after!==dragEx.nextElementSibling)list.insertBefore(dragEx,after);}
-  else if(dragEx!==list.lastElementChild)list.appendChild(dragEx);
-}
-
-function endExerciseDrag(e){
-  if(!dragEx||e.pointerId!==dragPointerId)return;
-  e.preventDefault();
-  const list=document.getElementById('exercises');
-  const newIndex=Array.from(list.querySelectorAll('.exercise-card')).indexOf(dragEx);
-  const changed=dragMoved&&newIndex!==dragStartIndex;
-  finishExerciseDrag(changed,e);
-}
-
-function finishExerciseDrag(changed,e){
-  const pointerId=e?e.pointerId:dragPointerId;
-  if(dragHandle){
-    try{if(pointerId!==null&&dragHandle.hasPointerCapture&&dragHandle.hasPointerCapture(pointerId))dragHandle.releasePointerCapture(pointerId);}catch(err){}
-  }
-  document.removeEventListener('pointermove',moveExerciseDrag);
-  document.removeEventListener('pointerup',endExerciseDrag);
-  document.removeEventListener('pointercancel',endExerciseDrag);
-  document.querySelectorAll('.exercise-card.dragging').forEach(c=>c.classList.remove('dragging'));
-  document.getElementById('exercises').classList.remove('reordering');
-  dragEx=null;dragHandle=null;dragStartIndex=-1;dragMoved=false;dragPointerId=null;
-  if(changed)saveCurrent();
-}
-
-function getExerciseDragAfter(container,y){
-  const cards=Array.from(container.querySelectorAll('.exercise-card:not(.dragging)'));
-  return cards.reduce((closest,card)=>{
-    const box=card.getBoundingClientRect();
-    const offset=y-box.top-box.height/2;
-    if(offset<0&&offset>closest.offset)return{offset,card};
-    return closest;
-  },{offset:Number.NEGATIVE_INFINITY,card:null}).card;
-}
-
-function autoScrollExerciseDrag(y){
-  const edge=70,speed=14;
-  if(y<edge)window.scrollBy(0,-speed);
-  else if(y>window.innerHeight-edge)window.scrollBy(0,speed);
-}
 
 // ── PLATE CALCULATOR ──
 function openPlateCalc(btn){

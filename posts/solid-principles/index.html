@@ -1,173 +1,176 @@
-<!doctype html><html data-theme=dark lang=en><head><meta charset=utf-8><meta content="width=device-width,initial-scale=1" name=viewport><meta content="index, follow" name=robots><title>Solid Principles in Python</title><meta content="Solid Principles in Python" name=title><meta content="Solid Principles in Python" property=og:title><meta content=https://dhruv.fyi/posts/solid-principles/ property=og:url><link href=https://dhruv.fyi/posts/solid-principles/ rel=canonical><meta content=website property=og:type><meta content=summary_large_image name=twitter:card><meta content=https://dhruv.fyi/posts/solid-principles/ name=twitter:url><meta content="Solid Principles in Python" name=twitter:title><link title="Atom feed" href=https://dhruv.fyi/atom.xml rel=alternate type=application/atom+xml><script src=https://dhruv.fyi/js/script.js></script><link href=https://dhruv.fyi/giallo-light.css id=giallo-light rel=stylesheet><link href=https://dhruv.fyi/giallo-dark.css id=giallo-dark rel=stylesheet><link href=https://dhruv.fyi/css/style.css rel=stylesheet><script src="https://www.googletagmanager.com/gtag/js?id=G-25FRCXX5P4" async></script><script>window.dataLayer = window.dataLayer || [];
+<!doctype html><html lang=en><head><meta charset=UTF-8><meta content="IE=edge" http-equiv=X-UA-Compatible><meta content="text/html; charset=UTF-8" http-equiv=content-type><meta content="width=device-width,initial-scale=1,user-scalable=no" name=viewport><meta content="index, follow" name=robots><title>Solid Principles in Python</title><meta content="Solid Principles in Python" name=title><meta content=website property=og:type><meta content=https://dhruv.fyi/posts/solid-principles/ property=og:url><meta property=og:site_name><meta content="Solid Principles in Python" property=og:title><meta content=summary_large_image property=twitter:card><meta content=https://dhruv.fyi/posts/solid-principles/ property=twitter:url><meta content="Solid Principles in Python" property=twitter:title><link href=https://dhruv.fyi/posts/solid-principles/ rel=canonical><link href=https://dhruv.fyi/atom.xml rel=alternate title=RSS type=application/atom+xml><link href=https://dhruv.fyi/css/style.css rel=stylesheet><script src=https://dhruv.fyi/js/script.js></script><script src="https://www.googletagmanager.com/gtag/js?id=G-25FRCXX5P4" async></script><script>window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-25FRCXX5P4');</script><body><div class=wrapper><header><div class=site-header><nav aria-label="Primary navigation"><a href=https://dhruv.fyi>/home</a><a href=https://dhruv.fyi/posts>/posts</a><a href=https://dhruv.fyi/projects>/projects</a><a href=https://dhruv.fyi/resume>/resume</a></nav><nav aria-label="Social links" class=social-links><a rel="noreferrer noopener" aria-label=LinkedIn href=https://www.linkedin.com/in/dhruv-sha256/ target=_blank> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#linkedin></use></svg> </a><a rel="noreferrer noopener" aria-label=GitHub href=https://github.com/dhruvsha256 target=_blank> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#github></use></svg> </a><a rel="noreferrer noopener" aria-label=Twitter href=https://twitter.com/dhruvsha256 target=_blank> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#twitter></use></svg> </a><a aria-label=Email href=mailto:dhruv.sha256@gmail.com> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#mail></use></svg> </a><a aria-label="Atom feed" href=https://dhruv.fyi/atom.xml> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#rss></use></svg> </a></nav><button aria-label="Toggle dark theme" title="Toggle theme" class=theme-toggle type=button><svg class="icons theme-toggle__icon theme-toggle__icon--dark" aria-hidden=true><use href=https://dhruv.fyi/icons.svg#darkMode></use></svg> <svg class="icons theme-toggle__icon theme-toggle__icon--light" aria-hidden=true><use href=https://dhruv.fyi/icons.svg#lightMode></use></svg></button></div></header><main><article><header class=post-header><time datetime=2023-05-02>2023-05-02</time><h1>Solid Principles in Python</h1></header><p>S - Single Responsibility Principle <br> O - Open/Closed Principle <br> L - Liskov Substitution Principle <br> I - Interface Segmented Principle <br> D - Dependency Inversion Principle <br><h3 id=single-responsiblity>Single Responsiblity:</h3><p>any module should be changed by only one actor dont put multiple functionalities in single module<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type"> class</span><span class="z-entity z-name"> PasswordHasher</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">     def</span><span class="z-entity z-name"> hashAndSavePassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-variable z-language">         self</span><span>.</span><span>hashPassword</span><span>(</span><span>password</span><span>)</span></span>
-<span class=giallo-l><span class="z-variable z-language">         self</span><span>.</span><span>savePassword</span><span>(</span><span>password</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">     def</span><span class="z-entity z-name"> hashPassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-support>         print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>haashing </span><span class=z-constant>{</span><span>password</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">     def</span><span class="z-entity z-name"> savePassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-support>         print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>saving </span><span class=z-constant>{</span><span>password</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span></code></pre><p>for example in above code snippet the class <code>PasswordHasher</code> is doing two independent operations, and the actor that can change its implementation can be security team which can change hashing implementation or data team which may change how passwords are stored, this doesnt follow single responsiblity principle Both functionalities should be seperated<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type"> class</span><span class="z-entity z-name"> PasswordHasher</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">     def</span><span class="z-entity z-name"> hashPassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-support>         print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>hashing </span><span class=z-constant>{</span><span>password</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type"> class</span><span class="z-entity z-name"> PasswordStorage</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">     def</span><span class="z-entity z-name"> savePassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> passwordHash</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-support>         print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>saving </span><span class=z-constant>{</span><span>passwordHash</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span></code></pre><h3 id=open-close>Open Close:</h3><p>open for extension but closed for modification<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> HashingType</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>      pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> PasswordHasher</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class=z-support> __init__</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>,</span><span class="z-variable z-parameter z-function"> hashingType</span><span>:</span><span> HashingType</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-variable z-language">          self</span><span>.</span><span>password</span><span class=z-keyword> =</span><span> password</span></span>
-<span class=giallo-l><span class="z-variable z-language">          self</span><span>.</span><span>hashingType</span><span class=z-keyword> =</span><span> hashingType</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> hashPassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>          if</span><span class="z-variable z-language"> self</span><span>.</span><span>hashingType</span><span class=z-keyword> ==</span><span class="z-punctuation z-definition z-string"> "</span><span class=z-string>base64</span><span class="z-punctuation z-definition z-string">"</span><span>:</span></span>
-<span class=giallo-l><span class="z-punctuation z-definition z-comment">              #</span><span class=z-comment> hash password with bas64</span></span>
-<span class=giallo-l><span class=z-keyword>              pass</span></span>
-<span class=giallo-l><span class=z-keyword>          elif</span><span class="z-variable z-language"> self</span><span>.</span><span>hashingType</span><span class=z-keyword> ==</span><span class="z-punctuation z-definition z-string"> "</span><span class=z-string>sha256</span><span class="z-punctuation z-definition z-string">"</span><span>:</span></span>
-<span class=giallo-l><span class="z-punctuation z-definition z-comment">              #</span><span class=z-comment> hash password with sha256</span></span>
-<span class=giallo-l><span class=z-keyword>              pass</span></span>
-<span class=giallo-l><span class=z-keyword>          elif</span><span class="z-variable z-language"> self</span><span>.</span><span>hashingType</span><span class=z-keyword> ==</span><span class="z-punctuation z-definition z-string"> "</span><span class=z-string>md5</span><span class="z-punctuation z-definition z-string">"</span><span>:</span></span>
-<span class=giallo-l><span class="z-punctuation z-definition z-comment">              #</span><span class=z-comment> hash password with md5</span></span>
-<span class=giallo-l><span class=z-keyword>              pass</span></span></code></pre><p>in above code snippet, if we need to add one more hashing type, we need to modify the <code>PasswordHasher</code> class which voilates the Open Close principle. We should make the <code>HashingType</code> class more extensible<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> IHashingType</span><span>(</span><span class=z-support>metaclass</span><span class=z-keyword>=</span><span class=z-entity>ABCMeta</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-entity z-name">      @</span><span class="z-entity z-name">abstractmethod</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> hashPassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>          pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> Base64Hashing</span><span>(</span><span class=z-entity>IHashingType</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> hashPassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-punctuation z-definition z-comment">          #</span><span class=z-comment> hash password with bas64</span></span>
-<span class=giallo-l><span class=z-keyword>          pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> Md5Hashing</span><span>(</span><span class=z-entity>IHashingType</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> hashPassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-punctuation z-definition z-comment">          #</span><span class=z-comment> hash password with md5</span></span>
-<span class=giallo-l><span class=z-keyword>          pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> SHA256Hashing</span><span>(</span><span class=z-entity>IHashingType</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> hashPassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-punctuation z-definition z-comment">          #</span><span class=z-comment> hash password with sha256</span></span>
-<span class=giallo-l><span class=z-keyword>          pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> PasswordHasher</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class=z-support> __init__</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> password</span><span>:</span><span class=z-support> str</span><span>,</span><span class="z-variable z-parameter z-function"> hashingType</span><span>:</span><span> IHashingType</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-variable z-language">          self</span><span>.</span><span>password</span><span class=z-keyword> =</span><span> password</span></span>
-<span class=giallo-l><span class="z-variable z-language">          self</span><span>.</span><span>hashingType</span><span class=z-keyword> =</span><span> hashingType</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> hashPassword</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-variable z-language">          self</span><span>.</span><span>hashingType</span><span>.</span><span>hashPassword</span><span>(</span><span class="z-variable z-language">self</span><span>.</span><span>password</span><span>)</span></span></code></pre><p>This way we just need to add another class for different hashing type<h3 id=liskov-substution>Liskov Substution:</h3><p>if their is f(x) for some object x of class A then their should be f(y) for some object y of class B if B inherits A if class CitrusFruit inherit class Fruit then eat(fruit) should support both, orange of CitrusFruit and banana of Fruit function should take argument of both base class and derived class and should not break<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type">    class</span><span class="z-entity z-name"> Fruit</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">        def</span><span class=z-support> __init__</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> name</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-variable z-language">            self</span><span>.</span><span>name</span><span class=z-keyword> =</span><span> name</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">    class</span><span class="z-entity z-name"> CitrusFruit</span><span>(</span><span class=z-entity>Fruit</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>        pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">    def</span><span class="z-entity z-name"> eat</span><span>(</span><span class="z-variable z-parameter z-function">fruit</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>        if</span><span class=z-support> isinstance</span><span>(</span><span>fruit</span><span>,</span><span> CitrusFruit</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-support>            print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>Eating citrus fruit: </span><span class=z-constant>{</span><span>fruit</span><span>.</span><span>name</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span>
-<span class=giallo-l><span class=z-keyword>        elif</span><span class=z-support> isinstance</span><span>(</span><span>fruit</span><span>,</span><span> Fruit</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-support>            print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>Eating fruit: </span><span class=z-constant>{</span><span>fruit</span><span>.</span><span>name</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span>    banana</span><span class=z-keyword> =</span><span> Fruit</span><span>(</span><span class="z-punctuation z-definition z-string">"</span><span class=z-string>banana</span><span class="z-punctuation z-definition z-string">"</span><span>)</span></span>
-<span class=giallo-l><span>    orange</span><span class=z-keyword> =</span><span> CitrusFruit</span><span>(</span><span class="z-punctuation z-definition z-string">"</span><span class=z-string>orange</span><span class="z-punctuation z-definition z-string">"</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span>    eat</span><span>(</span><span>banana</span><span>)</span></span>
-<span class=giallo-l><span>    eat</span><span>(</span><span>orange</span><span>)</span></span></code></pre><p>here the behaviour of <code>eat()</code> changes with the type of object it is passed which doest follow liskov substitution principle<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> Fruit</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class=z-support> __init__</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> name</span><span>:</span><span class=z-support> str</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-variable z-language">          self</span><span>.</span><span>name</span><span class=z-keyword> =</span><span> name</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> eat</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-support>          print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>Eating fruit: </span><span class=z-constant>{</span><span class="z-variable z-language">self</span><span>.</span><span>name</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> CitrusFruit</span><span>(</span><span class=z-entity>Fruit</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> eat</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-support>          print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>Eating citrus fruit: </span><span class=z-constant>{</span><span class="z-variable z-language">self</span><span>.</span><span>name</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  def</span><span class="z-entity z-name"> eat</span><span>(</span><span class="z-variable z-parameter z-function">fruit</span><span>:</span><span> Fruit</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span>      fruit</span><span>.</span><span>eat</span><span>(</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span>  banana</span><span class=z-keyword> =</span><span> Fruit</span><span>(</span><span class="z-punctuation z-definition z-string">"</span><span class=z-string>banana</span><span class="z-punctuation z-definition z-string">"</span><span>)</span></span>
-<span class=giallo-l><span>  orange</span><span class=z-keyword> =</span><span> CitrusFruit</span><span>(</span><span class="z-punctuation z-definition z-string">"</span><span class=z-string>orange</span><span class="z-punctuation z-definition z-string">"</span><span>)</span></span>
-<span class=giallo-l><span>  eat</span><span>(</span><span>banana</span><span>)</span></span>
-<span class=giallo-l><span>  eat</span><span>(</span><span>orange</span><span>)</span></span></code></pre><p>Now <code>eat()</code> behaves same for <code>Fruit</code> or its subclass <code>CitrusFruit</code><h3 id=interface-segregation>Interface Segregation:</h3><p>design multiple smaller interfaces<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class=z-keyword>  from</span><span> abc</span><span class=z-keyword> import</span><span> ABCMeta</span><span>,</span><span> abstractmethod</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> IShape</span><span>(</span><span class=z-support>metaclass</span><span class=z-keyword>=</span><span class=z-entity>ABCMeta</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-entity z-name">      @</span><span class="z-entity z-name">abstractmethod</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> draw</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>          raise</span><span class=z-support> NotImplementedError</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> Circle</span><span>(</span><span class=z-entity>IShape</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> draw</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>          pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> Square</span><span>(</span><span class=z-entity>IShape</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> draw</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>          pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> Rectangle</span><span>(</span><span class=z-entity>IShape</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> draw</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>          pass</span></span></code></pre><h3 id=dependency-inversion>Dependency Inversion:</h3><p>high level module should not depend on low level module both should depend on abstraction abstraction should not depend on implementation implementation shouldnt depend on abstraction ex: store class has a fn makePayment which makes payment instead of initializing a class StripePayment in it make a interface HandlePayment, StripePayment and Paypalpayment both extends it not pass any object of HandlePayment interface in makePayment fn<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type">    class</span><span class="z-entity z-name"> StripePayment</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">        def</span><span class="z-entity z-name"> makePayment</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>            pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">    class</span><span class="z-entity z-name"> Store</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">        def</span><span class="z-entity z-name"> makeStripePayment</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span>            stripePayment</span><span class=z-keyword> =</span><span> StripePayment</span><span>(</span><span>)</span></span>
-<span class=giallo-l><span>            stripePayment</span><span>.</span><span>makePayment</span><span>(</span><span>)</span></span></code></pre><p>the fn <code>makeStripePayment()</code> initializes the object of <code>StripePayment</code> in its implementation suppose we need to test it using Mock payment api, then we it would be hard for us as we need to change the implementation of fn just to test. so instead of initializing payment object and depending on its concreat implementation we should depend on an interface instead (which will be implemented by StripePayment class) and take that as an argument<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> IPayment</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> makePayment</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-keyword>          pass</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> StripePayment</span><span>(</span><span class=z-entity>IPayment</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> makePayment</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span class=z-support>          print</span><span>(</span><span class="z-punctuation z-definition z-string">"</span><span class=z-string>making payment using stripe</span><span class="z-punctuation z-definition z-string">"</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span class="z-storage z-type">  class</span><span class="z-entity z-name"> Store</span><span>:</span></span>
-<span class=giallo-l><span class="z-storage z-type">      def</span><span class="z-entity z-name"> makePayment</span><span>(</span><span class="z-variable z-parameter z-function">self</span><span>,</span><span class="z-variable z-parameter z-function"> paymentObj</span><span>:</span><span> IPayment</span><span>)</span><span>:</span></span>
-<span class=giallo-l><span>          paymentObj</span><span>.</span><span>makePayment</span><span>(</span><span>)</span></span>
-<span class=giallo-l></span>
-<span class=giallo-l></span>
-<span class=giallo-l><span>  store</span><span class=z-keyword> =</span><span> Store</span><span>(</span><span>)</span></span>
-<span class=giallo-l><span>  stripePayment</span><span class=z-keyword> =</span><span> StripePayment</span><span>(</span><span>)</span></span>
-<span class=giallo-l><span>  store</span><span>.</span><span>makePayment</span><span>(</span><span>stripePayment</span><span>)</span></span></code></pre><p class=tags><a href=https://dhruv.fyi/tags/python/>#python</a> <a href=https://dhruv.fyi/tags/clean-coding/>#clean coding</a> <a href=https://dhruv.fyi/tags/solid-principle/>#solid principle</a><div class=comments id=comments></div><script>window.giscusConfig = {
-    darkTheme: "noborder_dark",
-    lightTheme: "noborder_light"
-  };
+  gtag('config', 'G-25FRCXX5P4');</script><body><div class=wrapper><header><nav class=navBar><a href=https://dhruv.fyi>/home</a><a href=https://dhruv.fyi/posts>/posts</a><a href=https://dhruv.fyi/projects>/projects</a><a href=https://dhruv.fyi/resume>/resume</a><div class=themeSwitch><button class="themeButton dark" onclick="setTheme('dark')" title="Dark mode"><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#darkMode></use></svg></button><button class="themeButton light" onclick="setTheme('light')" title="Light mode"><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#lightMode></use></svg></button></div></nav></header><main><div><a href=..>..</a>/<span class=metaData>solid-principles</span></div><time datetime=2023-05-02>Published on: <span class=metaData>2023-05-02</span></time><h1>Solid Principles in Python</h1><p>S - Single Responsibility Principle <br> O - Open/Closed Principle <br> L - Liskov Substitution Principle <br> I - Interface Segmented Principle <br> D - Dependency Inversion Principle <br><h3 id=single-responsiblity>Single Responsiblity:</h3><p>any module should be changed by only one actor dont put multiple functionalities in single module<pre><code data-lang=py> class PasswordHasher:
+     def hashAndSavePassword(self, password: str):
+         self.hashPassword(password)
+         self.savePassword(password)
 
-  const giscus = document.createElement("script");
-  giscus.src = "https://giscus.app/client.js";
-  giscus.async = true;
-  giscus.crossOrigin = "anonymous";
-  giscus.setAttribute("data-repo", "dhruvsha256/dhruvsha256.github.io");
-  giscus.setAttribute("data-repo-id", "R_kgDOIYOkrQ");
-  giscus.setAttribute("data-category", "General");
-  giscus.setAttribute("data-category-id", "DIC_kwDOIYOkrc4CacVm");
-  giscus.setAttribute("data-mapping", "pathname");
-  giscus.setAttribute("data-strict", "0");
-  giscus.setAttribute("data-reactions-enabled", "1");
-  giscus.setAttribute("data-emit-metadata", "0");
-  giscus.setAttribute("data-input-position", "bottom");
-  giscus.setAttribute("data-lang", "en");
-  giscus.setAttribute("data-theme", window.getSystemCommentTheme());
-  document.getElementById("comments").appendChild(giscus);</script><noscript>Please enable JavaScript to view comments.</noscript></article></main><footer></footer></div>
+     def hashPassword(self, password: str):
+         print(f"haashing {password}")
+
+     def savePassword(self, password: str):
+         print(f"saving {password}")
+</code></pre><p>for example in above code snippet the class <code>PasswordHasher</code> is doing two independent operations, and the actor that can change its implementation can be security team which can change hashing implementation or data team which may change how passwords are stored, this doesnt follow single responsiblity principle Both functionalities should be seperated<pre><code data-lang=py> class PasswordHasher:
+     def hashPassword(self, password: str):
+         print(f"hashing {password}")
+
+
+ class PasswordStorage:
+     def savePassword(self, passwordHash: str):
+         print(f"saving {passwordHash}")
+</code></pre><h3 id=open-close>Open Close:</h3><p>open for extension but closed for modification<pre><code data-lang=py>  class HashingType:
+      pass
+
+
+  class PasswordHasher:
+      def __init__(self, password: str, hashingType: HashingType):
+          self.password = password
+          self.hashingType = hashingType
+
+      def hashPassword(self):
+          if self.hashingType == "base64":
+              # hash password with bas64
+              pass
+          elif self.hashingType == "sha256":
+              # hash password with sha256
+              pass
+          elif self.hashingType == "md5":
+              # hash password with md5
+              pass
+</code></pre><p>in above code snippet, if we need to add one more hashing type, we need to modify the <code>PasswordHasher</code> class which voilates the Open Close principle. We should make the <code>HashingType</code> class more extensible<pre><code data-lang=py>  class IHashingType(metaclass=ABCMeta):
+      @abstractmethod
+      def hashPassword(self, password: str):
+          pass
+
+
+  class Base64Hashing(IHashingType):
+      def hashPassword(self, password: str):
+          # hash password with bas64
+          pass
+
+
+  class Md5Hashing(IHashingType):
+      def hashPassword(self, password: str):
+          # hash password with md5
+          pass
+
+
+  class SHA256Hashing(IHashingType):
+      def hashPassword(self, password: str):
+          # hash password with sha256
+          pass
+
+
+  class PasswordHasher:
+      def __init__(self, password: str, hashingType: IHashingType):
+          self.password = password
+          self.hashingType = hashingType
+
+      def hashPassword(self):
+          self.hashingType.hashPassword(self.password)
+</code></pre><p>This way we just need to add another class for different hashing type<h3 id=liskov-substution>Liskov Substution:</h3><p>if their is f(x) for some object x of class A then their should be f(y) for some object y of class B if B inherits A if class CitrusFruit inherit class Fruit then eat(fruit) should support both, orange of CitrusFruit and banana of Fruit function should take argument of both base class and derived class and should not break<pre><code data-lang=py>    class Fruit:
+        def __init__(self, name: str):
+            self.name = name
+
+
+    class CitrusFruit(Fruit):
+        pass
+
+
+    def eat(fruit):
+        if isinstance(fruit, CitrusFruit):
+            print(f"Eating citrus fruit: {fruit.name}")
+        elif isinstance(fruit, Fruit):
+            print(f"Eating fruit: {fruit.name}")
+
+
+    banana = Fruit("banana")
+    orange = CitrusFruit("orange")
+
+    eat(banana)
+    eat(orange)
+</code></pre><p>here the behaviour of <code>eat()</code> changes with the type of object it is passed which doest follow liskov substitution principle<pre><code data-lang=py>  class Fruit:
+      def __init__(self, name: str):
+          self.name = name
+
+      def eat(self):
+          print(f"Eating fruit: {self.name}")
+
+
+  class CitrusFruit(Fruit):
+      def eat(self):
+          print(f"Eating citrus fruit: {self.name}")
+
+
+  def eat(fruit: Fruit):
+      fruit.eat()
+
+  banana = Fruit("banana")
+  orange = CitrusFruit("orange")
+  eat(banana)
+  eat(orange)
+</code></pre><p>Now <code>eat()</code> behaves same for <code>Fruit</code> or its subclass <code>CitrusFruit</code><h3 id=interface-segregation>Interface Segregation:</h3><p>design multiple smaller interfaces<pre><code data-lang=py>  from abc import ABCMeta, abstractmethod
+
+
+  class IShape(metaclass=ABCMeta):
+      @abstractmethod
+      def draw(self):
+          raise NotImplementedError
+
+
+  class Circle(IShape):
+      def draw(self):
+          pass
+
+
+  class Square(IShape):
+      def draw(self):
+          pass
+
+
+  class Rectangle(IShape):
+      def draw(self):
+          pass
+</code></pre><h3 id=dependency-inversion>Dependency Inversion:</h3><p>high level module should not depend on low level module both should depend on abstraction abstraction should not depend on implementation implementation shouldnt depend on abstraction ex: store class has a fn makePayment which makes payment instead of initializing a class StripePayment in it make a interface HandlePayment, StripePayment and Paypalpayment both extends it not pass any object of HandlePayment interface in makePayment fn<pre><code data-lang=py>    class StripePayment:
+        def makePayment(self):
+            pass
+
+
+    class Store:
+        def makeStripePayment(self):
+            stripePayment = StripePayment()
+            stripePayment.makePayment()
+</code></pre><p>the fn <code>makeStripePayment()</code> initializes the object of <code>StripePayment</code> in its implementation suppose we need to test it using Mock payment api, then we it would be hard for us as we need to change the implementation of fn just to test. so instead of initializing payment object and depending on its concreat implementation we should depend on an interface instead (which will be implemented by StripePayment class) and take that as an argument<pre><code data-lang=py>  class IPayment:
+      def makePayment(self):
+          pass
+
+
+  class StripePayment(IPayment):
+      def makePayment(self):
+          print("making payment using stripe")
+
+
+  class Store:
+      def makePayment(self, paymentObj: IPayment):
+          paymentObj.makePayment()
+
+
+  store = Store()
+  stripePayment = StripePayment()
+  store.makePayment(stripePayment)
+</code></pre><p class=tagsData><a href=/tags/python>/python/</a> <a href=/tags/clean-coding>/clean coding/</a> <a href=/tags/solid-principle>/solid principle/</a></p><script>var script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.setAttribute("data-repo", "dhruvsha256/dhruvsha256.github.io");
+    script.setAttribute("data-repo-id", "R_kgDOIYOkrQ");
+    script.setAttribute("data-category", "General");
+    script.setAttribute("data-category-id", "DIC_kwDOIYOkrc4CacVm");
+    script.setAttribute("data-mapping", "pathname");
+    script.setAttribute("data-strict", "0");
+    script.setAttribute("data-reactions-enabled", "1");
+    script.setAttribute("data-emit-metadata", "0");
+    script.setAttribute("data-input-position", "bottom");
+    script.setAttribute("data-lang", "en");
+    script.setAttribute("crossorigin", "anonymous");
+    script.setAttribute("data-theme", "noborder_dark");
+    document.body.appendChild(script);</script><noscript>Please enable JavaScript to view the comments powered by giscus.</noscript></main><footer><br><hr><div class=footContainer><div class=footLeft><p>Licensed under <a rel="noopener noreferrer" href=https://creativecommons.org/licenses/by-nc-nd/4.0/ target=_blank>Licensed under CC BY-NC-ND 4.0 </a></div><div class=footRight><a rel="noopener noreferrer" title="Find Dhruv on Linkedin." class=icons__background href=https://www.linkedin.com/in/dhruv-sha256/ target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#linkedin></use></svg></a><a rel="noopener noreferrer" title="Find Dhruv on Github." class=icons__background href=https://github.com/dhruvsha256 target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#github></use></svg></a><a rel="noopener noreferrer" title="Find Dhruv on X (formally twitter)." class=icons__background href=https://x.com/dhruvsha256 target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#twitter></use></svg></a><a rel="noopener noreferrer" title="Find Dhruv on Github." class=icons__background href=mailto@dhruv.sha256@gmail.com target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#email></use></svg></a><a rel="noopener noreferrer" title="Subscribe via RSS for updates." class=icons__background href=https://dhruv.fyi/atom.xml target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#rss></use></svg></a></div></div></footer></div>

@@ -1,40 +1,57 @@
 (function(window) {
     "use strict";
-
-    const selector = ".mermaid";
-    function mermaidTheme() {
-        return window.getCurrentTheme && window.getCurrentTheme() === "dark" ? "dark" : "default";
-    }
-
-    function saveOriginalCode() {
-        document.querySelectorAll(selector).forEach((element) => {
-            if (!element.dataset.originalCode) {
-                element.dataset.originalCode = element.textContent;
+    const elementCode = ".mermaid";
+    const loadMermaid = function(theme) {
+        window.mermaid.initialize({ theme });
+        window.mermaid.init({ theme }, document.querySelectorAll(elementCode));
+    };
+    const saveOriginalData = function() {
+        return new Promise((resolve, reject) => {
+            try {
+                var els = document.querySelectorAll(elementCode),
+                    count = els.length;
+                els.forEach((element) => {
+                    element.setAttribute("data-original-code", element.innerHTML);
+                    count--;
+                    if (count == 0) {
+                        resolve();
+                    }
+                });
+            } catch (error) {
+                reject(error);
             }
-        });
-    }
-
-    function resetDiagrams() {
-        document.querySelectorAll(selector).forEach((element) => {
-            if (element.dataset.originalCode) {
-                element.removeAttribute("data-processed");
-                element.textContent = element.dataset.originalCode;
-            }
-        });
-    }
-
-    function renderDiagrams() {
-        if (!window.mermaid) return;
-        window.mermaid.initialize({ startOnLoad: false, theme: mermaidTheme() });
-        window.mermaid.init(undefined, document.querySelectorAll(selector));
-    }
-
-    window.initMermaid = function() {
-        saveOriginalCode();
-        renderDiagrams();
-        document.body.addEventListener("theme-changed", () => {
-            resetDiagrams();
-            renderDiagrams();
         });
     };
+    const resetProcessed = function() {
+        return new Promise((resolve, reject) => {
+            try {
+                var els = document.querySelectorAll(elementCode),
+                    count = els.length;
+                els.forEach((element) => {
+                    if (element.getAttribute("data-original-code") != null) {
+                        element.removeAttribute("data-processed");
+                        element.innerHTML = element.getAttribute("data-original-code");
+                    }
+                    count--;
+                    if (count == 0) {
+                        resolve();
+                    }
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+
+    const init = () => {
+        saveOriginalData().catch(console.error);
+        loadMermaid(localStorage.getItem("theme") == "dark" ? "dark" : "default");
+        document.body.addEventListener("dark-theme-set", () => {
+            resetProcessed().then(loadMermaid("dark")).catch(console.error);
+        });
+        document.body.addEventListener("light-theme-set", () => {
+            resetProcessed().then(loadMermaid("default")).catch(console.error);
+        });
+    };
+    window.initMermaid = init;
 })(window);
