@@ -1,53 +1,96 @@
-const setTheme = (theme) => {
-    document.documentElement.className = theme;
-    localStorage.setItem("theme", theme);
-    if (theme == "dark") {
-        document.body?.dispatchEvent(new CustomEvent("dark-theme-set"));
-        changeGiscusTheme("noborder_dark");
-    } else {
-        document.body?.dispatchEvent(new CustomEvent("light-theme-set"));
-        changeGiscusTheme("noborder_light");
+(function() {
+    "use strict";
+
+    const root = document.documentElement;
+    const storageKey = "theme";
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function configuredTheme() {
+        const theme = root.dataset.theme;
+        return theme === "dark" || theme === "light" ? theme : "system";
     }
-};
 
-const hasCodeRun = localStorage.getItem("hasCodeRun");
-
-if (!hasCodeRun) {
-    const defaultTheme = "dark";
-    setTheme(defaultTheme);
-    localStorage.setItem("hasCodeRun", "true");
-}
-
-const getTheme = () => {
-    const theme = localStorage.getItem("theme");
-    if (theme) {
-        setTheme(theme);
+    function storedTheme() {
+        const theme = localStorage.getItem(storageKey);
+        return theme === "dark" || theme === "light" ? theme : null;
     }
-};
 
-function changeGiscusTheme(theme) {
-    function sendMessage(message) {
+    function effectiveTheme() {
+        const theme = storedTheme() || configuredTheme();
+        if (theme === "dark" || theme === "light") return theme;
+        return prefersDark.matches ? "dark" : "light";
+    }
+
+    function applyTheme(theme) {
+        root.dataset.theme = theme;
+        root.style.colorScheme = theme;
+        localStorage.setItem(storageKey, theme);
+        updateToggle(theme);
+        updateCodeTheme(theme);
+        window.updateGiscusTheme();
+    }
+
+    function updateToggle(theme) {
+        const button = document.querySelector(".theme-toggle");
+        if (!button) return;
+
+        const nextTheme = theme === "dark" ? "light" : "dark";
+        button.setAttribute("aria-label", `Switch to ${nextTheme} theme`);
+        button.setAttribute("title", `Switch to ${nextTheme} theme`);
+    }
+
+    function updateCodeTheme(theme) {
+        const light = document.getElementById("giallo-light");
+        const dark = document.getElementById("giallo-dark");
+        if (!light || !dark) return;
+
+        light.disabled = theme === "dark";
+        dark.disabled = theme !== "dark";
+    }
+
+    window.getCurrentTheme = effectiveTheme;
+
+    window.getSystemCommentTheme = function() {
+        const config = window.giscusConfig || {};
+        return effectiveTheme() === "dark"
+            ? config.darkTheme || "noborder_dark"
+            : config.lightTheme || "noborder_light";
+    };
+
+    window.updateGiscusTheme = function() {
         const iframe = document.querySelector("iframe.giscus-frame");
         if (!iframe) return;
-        iframe.contentWindow.postMessage({ giscus: message }, "https://giscus.app");
-    }
-    sendMessage({
-        setConfig: {
-            theme: theme,
-        },
+
+        iframe.contentWindow.postMessage(
+            { giscus: { setConfig: { theme: window.getSystemCommentTheme() } } },
+            "https://giscus.app"
+        );
+    };
+
+    root.dataset.theme = effectiveTheme();
+    root.style.colorScheme = root.dataset.theme;
+    updateCodeTheme(root.dataset.theme);
+
+    document.addEventListener("DOMContentLoaded", () => {
+        updateToggle(effectiveTheme());
+        updateCodeTheme(effectiveTheme());
+
+        const button = document.querySelector(".theme-toggle");
+        if (button) {
+            button.addEventListener("click", () => {
+                applyTheme(effectiveTheme() === "dark" ? "light" : "dark");
+                document.body.dispatchEvent(new CustomEvent("theme-changed"));
+            });
+        }
     });
-}
 
-function handleGiscusMessage(event) {
-    if (event.origin !== "https://giscus.app") return;
-    if (!(typeof event.data === "object" && event.data.giscus)) return;
-    let globalColorMode =
-        localStorage.getItem("theme") == "dark"
-            ? "noborder_dark"
-            : "noborder_light";
-    changeGiscusTheme(globalColorMode);
-}
-
-window.addEventListener("message", handleGiscusMessage);
-
-getTheme();
+    prefersDark.addEventListener("change", () => {
+        if (storedTheme()) return;
+        root.dataset.theme = effectiveTheme();
+        root.style.colorScheme = root.dataset.theme;
+        updateToggle(effectiveTheme());
+        updateCodeTheme(effectiveTheme());
+        window.updateGiscusTheme();
+        document.body.dispatchEvent(new CustomEvent("theme-changed"));
+    });
+})();
