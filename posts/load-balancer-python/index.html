@@ -1,7 +1,7 @@
-<!doctype html><html lang=en><head><meta charset=UTF-8><meta content="IE=edge" http-equiv=X-UA-Compatible><meta content="text/html; charset=UTF-8" http-equiv=content-type><meta content="width=device-width,initial-scale=1,user-scalable=no" name=viewport><meta content="index, follow" name=robots><title>Network Load balancer from scratch in Python</title><meta content="Network Load balancer from scratch in Python" name=title><meta content=website property=og:type><meta content=https://dhruv.fyi/posts/load-balancer-python/ property=og:url><meta property=og:site_name><meta content="Network Load balancer from scratch in Python" property=og:title><meta content=summary_large_image property=twitter:card><meta content=https://dhruv.fyi/posts/load-balancer-python/ property=twitter:url><meta content="Network Load balancer from scratch in Python" property=twitter:title><link href=https://dhruv.fyi/posts/load-balancer-python/ rel=canonical><link href=https://dhruv.fyi/atom.xml rel=alternate title=RSS type=application/atom+xml><link href=https://dhruv.fyi/css/style.css rel=stylesheet><script src=https://dhruv.fyi/js/script.js></script><script src="https://www.googletagmanager.com/gtag/js?id=G-25FRCXX5P4" async></script><script>window.dataLayer = window.dataLayer || [];
+<!doctype html><html data-theme=dark lang=en><head><meta charset=utf-8><meta content="width=device-width,initial-scale=1" name=viewport><meta content="index, follow" name=robots><title>Network Load balancer from scratch in Python</title><meta content="Network Load balancer from scratch in Python" name=title><meta content="Network Load balancer from scratch in Python" property=og:title><meta content=https://dhruv.fyi/posts/load-balancer-python/ property=og:url><link href=https://dhruv.fyi/posts/load-balancer-python/ rel=canonical><meta content=website property=og:type><meta content=summary_large_image name=twitter:card><meta content=https://dhruv.fyi/posts/load-balancer-python/ name=twitter:url><meta content="Network Load balancer from scratch in Python" name=twitter:title><link title="Atom feed" href=https://dhruv.fyi/atom.xml rel=alternate type=application/atom+xml><script src=https://dhruv.fyi/js/script.js></script><link href=https://dhruv.fyi/giallo-light.css id=giallo-light rel=stylesheet><link href=https://dhruv.fyi/giallo-dark.css id=giallo-dark rel=stylesheet><link href=https://dhruv.fyi/css/style.css rel=stylesheet><script src="https://www.googletagmanager.com/gtag/js?id=G-25FRCXX5P4" async></script><script>window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-25FRCXX5P4');</script><body><div class=wrapper><header><nav class=navBar><a href=https://dhruv.fyi>/home</a><a href=https://dhruv.fyi/posts>/posts</a><a href=https://dhruv.fyi/projects>/projects</a><a href=https://dhruv.fyi/resume>/resume</a><div class=themeSwitch><button class="themeButton dark" onclick="setTheme('dark')" title="Dark mode"><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#darkMode></use></svg></button><button class="themeButton light" onclick="setTheme('light')" title="Light mode"><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#lightMode></use></svg></button></div></nav></header><main><div><a href=..>..</a>/<span class=metaData>load-balancer-python</span></div><time datetime=2023-11-07>Published on: <span class=metaData>2023-11-07</span></time><h1>Network Load balancer from scratch in Python</h1><p>Have you ever wondered how web applications handle increasing traffic? As a software engineer, you might have heard of load balancers,<br> which play a crucial role in managing the distribution of requests to multiple servers.<p>This weekend, I decided to dive deep into socket programming and create a simple yet functional a load balancer from scratch in Python. In this blog post, I’ll walk you through the process.<h3 id=what-is-a-load-balancer-anyway>What is a Load Balancer anyway ?</h3><p>What is a load balancer anyway you may ask. Imagine you’ve built your own onlyfans clone, and it’s gaining traction.<p>To handle the increased traffic, you can’t infinitely scale your single server vertically. Instead, you buy multiple servers and host your site across them.<p>However, a new problem arises: how do you effectively utilize the resources of all these servers? The answer is a load balancer. It distributes incoming requests to different servers based on a selection criteria, like a simple round-robin algorithm.<h3 id=layer-4-vs-layer-7-load-balancers>Layer 4 vs. Layer 7 Load Balancers</h3><ul><li><p>A layer 7 load balancer works on you guessed it right, layer 7 of OSI model which is the application layer, so for every incoming request, it do multiple things like eliminating TLS, based on the data received redirect it to a specific server.</p> <p>The whole flow goes like this: client -> load balancer (decodes request) -> server Loadbalancer essentially creates a new request to server. All the data in request body is accessible to it. So we can say it can do things a little smartly.</p></ul><pre class=mermaid>
+  gtag('config', 'G-25FRCXX5P4');</script><body><div class=wrapper><header><div class=site-header><nav aria-label="Primary navigation"><a href=https://dhruv.fyi>/home</a><a href=https://dhruv.fyi/posts>/posts</a><a href=https://dhruv.fyi/projects>/projects</a><a href=https://dhruv.fyi/resume>/resume</a></nav><nav aria-label="Social links" class=social-links><a rel="noreferrer noopener" aria-label=LinkedIn href=https://www.linkedin.com/in/dhruv-sha256/ target=_blank> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#linkedin></use></svg> </a><a rel="noreferrer noopener" aria-label=GitHub href=https://github.com/dhruvsha256 target=_blank> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#github></use></svg> </a><a rel="noreferrer noopener" aria-label=Twitter href=https://twitter.com/dhruvsha256 target=_blank> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#twitter></use></svg> </a><a aria-label=Email href=mailto:dhruv.sha256@gmail.com> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#mail></use></svg> </a><a aria-label="Atom feed" href=https://dhruv.fyi/atom.xml> <svg aria-hidden=true class=icons><use href=https://dhruv.fyi/icons.svg#rss></use></svg> </a></nav><button aria-label="Toggle dark theme" title="Toggle theme" class=theme-toggle type=button><svg class="icons theme-toggle__icon theme-toggle__icon--dark" aria-hidden=true><use href=https://dhruv.fyi/icons.svg#darkMode></use></svg> <svg class="icons theme-toggle__icon theme-toggle__icon--light" aria-hidden=true><use href=https://dhruv.fyi/icons.svg#lightMode></use></svg></button></div></header><main><article><header class=post-header><time datetime=2023-11-07>2023-11-07</time><h1>Network Load balancer from scratch in Python</h1></header><p>Have you ever wondered how web applications handle increasing traffic? As a software engineer, you might have heard of load balancers,<br> which play a crucial role in managing the distribution of requests to multiple servers.<p>This weekend, I decided to dive deep into socket programming and create a simple yet functional a load balancer from scratch in Python. In this blog post, I’ll walk you through the process.<h3 id=what-is-a-load-balancer-anyway>What is a Load Balancer anyway ?</h3><p>What is a load balancer anyway you may ask. Imagine you’ve built your own onlyfans clone, and it’s gaining traction.<p>To handle the increased traffic, you can’t infinitely scale your single server vertically. Instead, you buy multiple servers and host your site across them.<p>However, a new problem arises: how do you effectively utilize the resources of all these servers? The answer is a load balancer. It distributes incoming requests to different servers based on a selection criteria, like a simple round-robin algorithm.<h3 id=layer-4-vs-layer-7-load-balancers>Layer 4 vs. Layer 7 Load Balancers</h3><ul><li><p>A layer 7 load balancer works on you guessed it right, layer 7 of OSI model which is the application layer, so for every incoming request, it do multiple things like eliminating TLS, based on the data received redirect it to a specific server.</p> <p>The whole flow goes like this: client -> load balancer (decodes request) -> server Loadbalancer essentially creates a new request to server. All the data in request body is accessible to it. So we can say it can do things a little smartly.</p></ul><pre class=mermaid>
 sequenceDiagram
     participant Client
     participant LoadBalancer
@@ -10,68 +10,70 @@ sequenceDiagram
     LoadBalancer->>Server: Request R2
     Server->>LoadBalancer: Response R1
     LoadBalancer->>Client: Response R2
-</pre><ul><li>A layer 4 load balancer on the other hand works on (you guess), which is Transport Layer of OSI model. It instead of decoding the request, directly sends the packet to server. It basically act as a relay between client and server, which is faster but … dumb.</ul><h3 id=the-code>The code</h3><p>Let’s dive into the code to build our Layer 4 load balancer. The first step is to listen to an address and receive data from clients. We will be using Python’s socket library for this.<pre><code data-lang=py>    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        sock.bind((HOST, PORT))
-        sock.listen()
-        print(f"Listening on port: {PORT}")
-        while True:
-            client_conn, client_addr = sock.accept()
-            with client_conn:
-                print(f"Connected by {client_addr}")
-                data = client_conn.recv(1024)
-                print(data.decode())
-    finally:
-        sock.close()
-</code></pre><p>Now that we are receiving connections from clients, we need to somehow relay requests and responses between them.<pre><code data-lang=py>    def forward_request(source, destination):
-        print(f"Sending data from {source.getsockname()} to {destination.getsockname()}")
-        try:
-            while True:
-                data = source.recv(1024)
-                if len(data) == 0:
-                    break
-                destination.send(data)
-        finally:
-            source.close()
-            destination.close()
-</code></pre><p>We will be needing two separate threads for this (one for receiving client request and sending it to server, and one receiving server response and sending it to client)<pre><code data-lang=py>    c2b_thread = threading.Thread(target=forward_request, args=(client_conn, backend_conn))
-    b2c_thread = threading.Thread(target=forward_request, args=(backend_conn, client_conn))
-    c2b_thread.start()
-    b2c_thread.start()
-    c2b_thread.join()
-    b2c_thread.join()
-</code></pre><p>Now comes the tricky part: what if one server dies? It would be foolish to relay requests to a dead server.<br> We need a heartbeat mechanism to periodically check if the server is up and running. If it isn’t, we should exclude it from our pool of servers. We must perform this operation without blocking our primary server, so we’ll create a separate thread for it.<pre><code data-lang=py>    def get_server_heart_beat(server):
-        try:
-            resp = requests.get(f"http://{server.host}:{server.port}/health")
-            return resp.text == "up"
-        except:
-            return False
+</pre><ul><li>A layer 4 load balancer on the other hand works on (you guess), which is Transport Layer of OSI model. It instead of decoding the request, directly sends the packet to server. It basically act as a relay between client and server, which is faster but … dumb.</ul><h3 id=the-code>The code</h3><p>Let’s dive into the code to build our Layer 4 load balancer. The first step is to listen to an address and receive data from clients. We will be using Python’s socket library for this.<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span>    sock</span><span class=z-keyword> =</span><span> socket</span><span>.</span><span>socket</span><span>(</span><span>socket</span><span>.</span><span class=z-constant>AF_INET</span><span>,</span><span> socket</span><span>.</span><span class=z-constant>SOCK_STREAM</span><span>)</span></span>
+<span class=giallo-l><span class=z-keyword>    try</span><span>:</span></span>
+<span class=giallo-l><span>        sock</span><span>.</span><span>bind</span><span>(</span><span>(</span><span class=z-constant>HOST</span><span>,</span><span class=z-constant> PORT</span><span>)</span><span>)</span></span>
+<span class=giallo-l><span>        sock</span><span>.</span><span>listen</span><span>(</span><span>)</span></span>
+<span class=giallo-l><span class=z-support>        print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>Listening on port: </span><span class=z-constant>{</span><span class=z-constant>PORT</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span>
+<span class=giallo-l><span class=z-keyword>        while</span><span class=z-constant> True</span><span>:</span></span>
+<span class=giallo-l><span>            client_conn</span><span>,</span><span> client_addr</span><span class=z-keyword> =</span><span> sock</span><span>.</span><span>accept</span><span>(</span><span>)</span></span>
+<span class=giallo-l><span class=z-keyword>            with</span><span> client_conn</span><span>:</span></span>
+<span class=giallo-l><span class=z-support>                print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>Connected by </span><span class=z-constant>{</span><span>client_addr</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span>
+<span class=giallo-l><span>                data</span><span class=z-keyword> =</span><span> client_conn</span><span>.</span><span>recv</span><span>(</span><span class=z-constant>1024</span><span>)</span></span>
+<span class=giallo-l><span class=z-support>                print</span><span>(</span><span>data</span><span>.</span><span>decode</span><span>(</span><span>)</span><span>)</span></span>
+<span class=giallo-l><span class=z-keyword>    finally</span><span>:</span></span>
+<span class=giallo-l><span>        sock</span><span>.</span><span>close</span><span>(</span><span>)</span></span></code></pre><p>Now that we are receiving connections from clients, we need to somehow relay requests and responses between them.<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type">    def</span><span class="z-entity z-name"> forward_request</span><span>(</span><span class="z-variable z-parameter z-function">source</span><span>,</span><span class="z-variable z-parameter z-function"> destination</span><span>)</span><span>:</span></span>
+<span class=giallo-l><span class=z-support>        print</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>Sending data from </span><span class=z-constant>{</span><span>source</span><span>.</span><span>getsockname</span><span>(</span><span>)</span><span class=z-constant>}</span><span class=z-string> to </span><span class=z-constant>{</span><span>destination</span><span>.</span><span>getsockname</span><span>(</span><span>)</span><span class=z-constant>}</span><span class=z-string>"</span><span>)</span></span>
+<span class=giallo-l><span class=z-keyword>        try</span><span>:</span></span>
+<span class=giallo-l><span class=z-keyword>            while</span><span class=z-constant> True</span><span>:</span></span>
+<span class=giallo-l><span>                data</span><span class=z-keyword> =</span><span> source</span><span>.</span><span>recv</span><span>(</span><span class=z-constant>1024</span><span>)</span></span>
+<span class=giallo-l><span class=z-keyword>                if</span><span class=z-support> len</span><span>(</span><span>data</span><span>)</span><span class=z-keyword> ==</span><span class=z-constant> 0</span><span>:</span></span>
+<span class=giallo-l><span class=z-keyword>                    break</span></span>
+<span class=giallo-l><span>                destination</span><span>.</span><span>send</span><span>(</span><span>data</span><span>)</span></span>
+<span class=giallo-l><span class=z-keyword>        finally</span><span>:</span></span>
+<span class=giallo-l><span>            source</span><span>.</span><span>close</span><span>(</span><span>)</span></span>
+<span class=giallo-l><span>            destination</span><span>.</span><span>close</span><span>(</span><span>)</span></span></code></pre><p>We will be needing two separate threads for this (one for receiving client request and sending it to server, and one receiving server response and sending it to client)<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span>    c2b_thread</span><span class=z-keyword> =</span><span> threading</span><span>.</span><span>Thread</span><span>(</span><span class=z-variable>target</span><span class=z-keyword>=</span><span>forward_request</span><span>,</span><span class=z-variable> args</span><span class=z-keyword>=</span><span>(</span><span>client_conn</span><span>,</span><span> backend_conn</span><span>)</span><span>)</span></span>
+<span class=giallo-l><span>    b2c_thread</span><span class=z-keyword> =</span><span> threading</span><span>.</span><span>Thread</span><span>(</span><span class=z-variable>target</span><span class=z-keyword>=</span><span>forward_request</span><span>,</span><span class=z-variable> args</span><span class=z-keyword>=</span><span>(</span><span>backend_conn</span><span>,</span><span> client_conn</span><span>)</span><span>)</span></span>
+<span class=giallo-l><span>    c2b_thread</span><span>.</span><span>start</span><span>(</span><span>)</span></span>
+<span class=giallo-l><span>    b2c_thread</span><span>.</span><span>start</span><span>(</span><span>)</span></span>
+<span class=giallo-l><span>    c2b_thread</span><span>.</span><span>join</span><span>(</span><span>)</span></span>
+<span class=giallo-l><span>    b2c_thread</span><span>.</span><span>join</span><span>(</span><span>)</span></span></code></pre><p>Now comes the tricky part: what if one server dies? It would be foolish to relay requests to a dead server.<br> We need a heartbeat mechanism to periodically check if the server is up and running. If it isn’t, we should exclude it from our pool of servers. We must perform this operation without blocking our primary server, so we’ll create a separate thread for it.<pre class="giallo z-code"><code data-lang=python><span class=giallo-l><span class="z-storage z-type">    def</span><span class="z-entity z-name"> get_server_heart_beat</span><span>(</span><span class="z-variable z-parameter z-function">server</span><span>)</span><span>:</span></span>
+<span class=giallo-l><span class=z-keyword>        try</span><span>:</span></span>
+<span class=giallo-l><span>            resp</span><span class=z-keyword> =</span><span> requests</span><span>.</span><span>get</span><span>(</span><span class="z-storage z-type">f</span><span class=z-string>"</span><span class=z-string>http://</span><span class=z-constant>{</span><span>server</span><span>.</span><span>host</span><span class=z-constant>}</span><span class=z-string>:</span><span class=z-constant>{</span><span>server</span><span>.</span><span>port</span><span class=z-constant>}</span><span class=z-string>/health</span><span class=z-string>"</span><span>)</span></span>
+<span class=giallo-l><span class=z-keyword>            return</span><span> resp</span><span>.</span><span>text</span><span class=z-keyword> ==</span><span class="z-punctuation z-definition z-string"> "</span><span class=z-string>up</span><span class="z-punctuation z-definition z-string">"</span></span>
+<span class=giallo-l><span class=z-keyword>        except</span><span>:</span></span>
+<span class=giallo-l><span class=z-keyword>            return</span><span class=z-constant> False</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span class="z-storage z-type">    def</span><span class="z-entity z-name"> update_heartbeat</span><span>(</span><span class="z-variable z-parameter z-function">server</span><span>,</span><span class="z-variable z-parameter z-function"> delay</span><span>)</span><span>:</span></span>
+<span class=giallo-l><span class=z-keyword>        while</span><span class=z-constant> True</span><span>:</span></span>
+<span class=giallo-l><span>            server_heart_beat</span><span class=z-keyword> =</span><span> get_server_heart_beat</span><span>(</span><span>server</span><span>)</span></span>
+<span class=giallo-l><span>            server</span><span>.</span><span>update_health_status</span><span>(</span><span>server_heart_beat</span><span>)</span></span>
+<span class=giallo-l><span>            sleep</span><span>(</span><span>delay</span><span>)</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span class="z-storage z-type">    def</span><span class="z-entity z-name"> check_health</span><span>(</span><span class="z-variable z-parameter z-function">servers</span><span>)</span><span>:</span></span>
+<span class=giallo-l><span>        threads</span><span class=z-keyword> =</span><span> [</span><span>]</span></span>
+<span class=giallo-l><span class=z-keyword>        for</span><span> s</span><span class=z-keyword> in</span><span> servers</span><span>:</span></span>
+<span class=giallo-l><span>            t</span><span class=z-keyword> =</span><span> threading</span><span>.</span><span>Thread</span><span>(</span><span class=z-variable>target</span><span class=z-keyword>=</span><span>update_heartbeat</span><span>,</span><span class=z-variable> args</span><span class=z-keyword>=</span><span>(</span><span>s</span><span>,</span><span class=z-constant> 2</span><span>)</span><span>)</span></span>
+<span class=giallo-l><span>            threads</span><span>.</span><span>append</span><span>(</span><span>t</span><span>)</span></span>
+<span class=giallo-l><span>            t</span><span>.</span><span>start</span><span>(</span><span>)</span></span>
+<span class=giallo-l><span class=z-keyword>        return</span><span> threads</span></span></code></pre><p>We are almost done just need to test our load balancer. <img alt=xyx src=/media/load-balancer-test.gif><p>Full code can be found on my <a rel="noopener external" href=https://github.com/dhruvSHA256/load-balancer target=_blank>github</a></p><script src=https://cdn.jsdelivr.net/npm/mermaid@10.3.0/dist/mermaid.min.js></script><script src=/js/mermaid.js></script><script>window.initMermaid();</script><p class=tags><a href=https://dhruv.fyi/tags/python/>#python</a> <a href=https://dhruv.fyi/tags/networking/>#networking</a> <a href=https://dhruv.fyi/tags/codingchallenges/>#codingchallenges</a><div class=comments id=comments></div><script>window.giscusConfig = {
+    darkTheme: "noborder_dark",
+    lightTheme: "noborder_light"
+  };
 
-    def update_heartbeat(server, delay):
-        while True:
-            server_heart_beat = get_server_heart_beat(server)
-            server.update_health_status(server_heart_beat)
-            sleep(delay)
-
-    def check_health(servers):
-        threads = []
-        for s in servers:
-            t = threading.Thread(target=update_heartbeat, args=(s, 2))
-            threads.append(t)
-            t.start()
-        return threads
-</code></pre><p>We are almost done just need to test our load balancer. <img alt=xyx src=/media/load-balancer-test.gif><p>Full code can be found on my <a rel="noopener external" href=https://github.com/dhruvSHA256/load-balancer target=_blank>github</a></p><script src=https://cdn.jsdelivr.net/npm/mermaid@10.3.0/dist/mermaid.min.js></script><script src=/js/mermaid.js></script><script>window.initMermaid();</script><p class=tagsData><a href=/tags/python>/python/</a> <a href=/tags/networking>/networking/</a> <a href=/tags/codingchallenges>/codingchallenges/</a></p><script>var script = document.createElement("script");
-    script.src = "https://giscus.app/client.js";
-    script.setAttribute("data-repo", "dhruvsha256/dhruvsha256.github.io");
-    script.setAttribute("data-repo-id", "R_kgDOIYOkrQ");
-    script.setAttribute("data-category", "General");
-    script.setAttribute("data-category-id", "DIC_kwDOIYOkrc4CacVm");
-    script.setAttribute("data-mapping", "pathname");
-    script.setAttribute("data-strict", "0");
-    script.setAttribute("data-reactions-enabled", "1");
-    script.setAttribute("data-emit-metadata", "0");
-    script.setAttribute("data-input-position", "bottom");
-    script.setAttribute("data-lang", "en");
-    script.setAttribute("crossorigin", "anonymous");
-    script.setAttribute("data-theme", "noborder_dark");
-    document.body.appendChild(script);</script><noscript>Please enable JavaScript to view the comments powered by giscus.</noscript></main><footer><br><hr><div class=footContainer><div class=footLeft><p>Licensed under <a rel="noopener noreferrer" href=https://creativecommons.org/licenses/by-nc-nd/4.0/ target=_blank>Licensed under CC BY-NC-ND 4.0 </a></div><div class=footRight><a rel="noopener noreferrer" title="Find Dhruv on Linkedin." class=icons__background href=https://www.linkedin.com/in/dhruv-sha256/ target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#linkedin></use></svg></a><a rel="noopener noreferrer" title="Find Dhruv on Github." class=icons__background href=https://github.com/dhruvsha256 target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#github></use></svg></a><a rel="noopener noreferrer" title="Find Dhruv on X (formally twitter)." class=icons__background href=https://x.com/dhruvsha256 target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#twitter></use></svg></a><a rel="noopener noreferrer" title="Find Dhruv on Github." class=icons__background href=mailto@dhruv.sha256@gmail.com target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#email></use></svg></a><a rel="noopener noreferrer" title="Subscribe via RSS for updates." class=icons__background href=https://dhruv.fyi/atom.xml target=_blank><svg class="icons icons__background"><use href=https://dhruv.fyi/icons.svg#rss></use></svg></a></div></div></footer></div>
+  const giscus = document.createElement("script");
+  giscus.src = "https://giscus.app/client.js";
+  giscus.async = true;
+  giscus.crossOrigin = "anonymous";
+  giscus.setAttribute("data-repo", "dhruvsha256/dhruvsha256.github.io");
+  giscus.setAttribute("data-repo-id", "R_kgDOIYOkrQ");
+  giscus.setAttribute("data-category", "General");
+  giscus.setAttribute("data-category-id", "DIC_kwDOIYOkrc4CacVm");
+  giscus.setAttribute("data-mapping", "pathname");
+  giscus.setAttribute("data-strict", "0");
+  giscus.setAttribute("data-reactions-enabled", "1");
+  giscus.setAttribute("data-emit-metadata", "0");
+  giscus.setAttribute("data-input-position", "bottom");
+  giscus.setAttribute("data-lang", "en");
+  giscus.setAttribute("data-theme", window.getSystemCommentTheme());
+  document.getElementById("comments").appendChild(giscus);</script><noscript>Please enable JavaScript to view comments.</noscript></article></main><footer></footer></div>
