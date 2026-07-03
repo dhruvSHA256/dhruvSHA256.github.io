@@ -15,3 +15,7 @@ Host the folder on GitHub Pages, open it once in Android Chrome while online, th
 ## Data
 
 The app stores entries, custom activities, and weekly boss battle state in browser `localStorage` under `brainrotResistanceScore.v1`. Use the Settings tab to export or import a JSON backup.
+
+## Google Sheets Sync
+
+Create a Google Apps Script web app that accepts `POST` requests and appends rows to a sheet. In the app's System tab, save the Web App URL and sync secret. These credentials are stored only in your browser `localStorage`, not in the repository.

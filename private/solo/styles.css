@@ -540,7 +540,8 @@ main {
   font-weight: 900;
 }
 
-.custom-form {
+.custom-form,
+.sync-form {
   display: grid;
   gap: 12px;
 }
@@ -597,6 +598,10 @@ textarea {
 .settings-actions {
   display: grid;
   gap: 9px;
+}
+
+.sync-hint {
+  margin-top: 10px;
 }
 
 .rules-card ul {

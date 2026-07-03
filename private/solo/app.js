@@ -1,4 +1,6 @@
 const STORAGE_KEY = "brainrotResistanceScore.v1";
+const SYNC_CONFIG_KEY = "brainrotResistanceScore.syncConfig.v1";
+const SYNCED_IDS_KEY = "brainrotResistanceScore.syncedEntryIds.v1";
 const SUCCESS_THRESHOLD = 25;
 const DAILY_TARGET = 25;
 
@@ -146,6 +148,38 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+function loadSyncConfig() {
+  try {
+    const config = JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY));
+    return {
+      url: config?.url || "",
+      secret: config?.secret || "",
+    };
+  } catch {
+    return { url: "", secret: "" };
+  }
+}
+
+function saveSyncConfig(config) {
+  localStorage.setItem(
+    SYNC_CONFIG_KEY,
+    JSON.stringify({ url: config.url.trim(), secret: config.secret.trim() })
+  );
+}
+
+function getSyncedIds() {
+  try {
+    const ids = JSON.parse(localStorage.getItem(SYNCED_IDS_KEY));
+    return new Set(Array.isArray(ids) ? ids : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSyncedIds(ids) {
+  localStorage.setItem(SYNCED_IDS_KEY, JSON.stringify(Array.from(ids)));
+}
+
 function ensureCurrentWeek() {
   const week = getIsoWeekKey(new Date());
   if (!state.bosses || state.bosses.week !== week) {
@@ -256,18 +290,20 @@ function getScoresByDate() {
 }
 
 function addEntry(name, category, points) {
-  state.entries.push({
+  const entry = {
     id: makeId(),
     date: todayKey(),
     name,
     category,
     points,
     createdAt: new Date().toISOString(),
-  });
+  };
+  state.entries.push(entry);
   saveState();
   render();
   flash(points);
   showToast(`${points > 0 ? "+" : ""}${points} ${name}`);
+  syncEntries({ silent: true, entries: [entry] });
 }
 
 function deleteEntry(id) {
@@ -283,6 +319,7 @@ function render() {
   renderActivityLogger();
   renderHistory();
   renderBosses();
+  renderSyncSettings();
 }
 
 function renderDashboard() {
@@ -459,6 +496,20 @@ function renderBosses() {
   }).join("");
 }
 
+function renderSyncSettings() {
+  const config = loadSyncConfig();
+  const syncedIds = getSyncedIds();
+  const pending = state.entries.filter((entry) => !syncedIds.has(entry.id)).length;
+  const urlInput = $("#syncUrl");
+  const secretInput = $("#syncSecret");
+  if (!urlInput || document.activeElement === urlInput || document.activeElement === secretInput) return;
+  urlInput.value = config.url;
+  secretInput.value = config.secret;
+  $("#syncStatus").textContent = config.url && config.secret
+    ? `${pending} unsynced entr${pending === 1 ? "y" : "ies"}.`
+    : "Not configured.";
+}
+
 function getBossState(boss) {
   if (!state.bosses.state[boss.id]) {
     state.bosses.state[boss.id] = { tasks: boss.tasks.map(() => false), claimed: false };
@@ -577,9 +628,37 @@ function bindEvents() {
   $("#clearAllBtn").addEventListener("click", () => {
     if (!confirm("Clear all Brainrot Resistance Score data from this browser?")) return;
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SYNCED_IDS_KEY);
     state = loadState();
     render();
   });
+
+  $("#syncSettingsForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const url = $("#syncUrl").value.trim();
+    const secret = $("#syncSecret").value.trim();
+    if (!url || !secret) {
+      alert("Enter both the Apps Script URL and sync secret.");
+      return;
+    }
+    saveSyncConfig({ url, secret });
+    renderSyncSettings();
+    showToast("Sync credentials saved");
+  });
+
+  $("#syncNowBtn").addEventListener("click", () => {
+    syncEntries({ silent: false });
+  });
+
+  $("#clearSyncBtn").addEventListener("click", () => {
+    if (!confirm("Clear stored Google Sheets sync URL, secret, and synced-entry markers?")) return;
+    localStorage.removeItem(SYNC_CONFIG_KEY);
+    localStorage.removeItem(SYNCED_IDS_KEY);
+    renderSyncSettings();
+    showToast("Sync settings cleared");
+  });
+
+  window.addEventListener("online", () => syncEntries({ silent: true }));
 }
 
 function claimBoss(bossId) {
@@ -614,6 +693,49 @@ function importBackup(event) {
     }
   };
   reader.readAsText(file);
+}
+
+async function syncEntries({ silent = false, entries = null } = {}) {
+  const config = loadSyncConfig();
+  if (!config.url || !config.secret) {
+    if (!silent) alert("Save your Apps Script URL and sync secret first.");
+    return;
+  }
+
+  if (!navigator.onLine) {
+    if (!silent) showToast("Offline. Sync pending.");
+    return;
+  }
+
+  const syncedIds = getSyncedIds();
+  const candidates = entries || state.entries;
+  const unsyncedEntries = candidates.filter((entry) => !syncedIds.has(entry.id));
+  if (!unsyncedEntries.length) {
+    if (!silent) showToast("Nothing to sync");
+    renderSyncSettings();
+    return;
+  }
+
+  try {
+    await fetch(config.url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
+      body: JSON.stringify({
+        secret: config.secret,
+        entries: unsyncedEntries,
+      }),
+    });
+
+    unsyncedEntries.forEach((entry) => syncedIds.add(entry.id));
+    saveSyncedIds(syncedIds);
+    renderSyncSettings();
+    if (!silent) showToast(`Synced ${unsyncedEntries.length} entr${unsyncedEntries.length === 1 ? "y" : "ies"}`);
+  } catch {
+    if (!silent) showToast("Sync failed");
+  }
 }
 
 bindEvents();

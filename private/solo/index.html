@@ -180,6 +180,33 @@
 
       <section id="settings" class="tab-panel">
         <section class="card">
+          <div class="section-heading">
+            <div>
+              <h2>Google Sheets Sync</h2>
+              <p class="subtle" id="syncStatus">Not configured.</p>
+            </div>
+          </div>
+          <form id="syncSettingsForm" class="sync-form">
+            <label>
+              Apps Script Web App URL
+              <input id="syncUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" />
+            </label>
+            <label>
+              Sync Secret
+              <input id="syncSecret" type="password" placeholder="Stored only in this browser" autocomplete="off" />
+            </label>
+            <div class="settings-actions">
+              <button class="primary-button" type="submit">Save Sync</button>
+              <button class="ghost-button" type="button" id="syncNowBtn">Sync Now</button>
+              <button class="ghost-button danger" type="button" id="clearSyncBtn">Clear Sync</button>
+            </div>
+          </form>
+          <p class="subtle sync-hint">
+            Local storage remains primary. Sheets sync only uploads entries that have not been synced yet.
+          </p>
+        </section>
+
+        <section class="card">
           <h2>System Data</h2>
           <div class="settings-actions">
             <button class="primary-button" id="exportBtn">Export JSON</button>
