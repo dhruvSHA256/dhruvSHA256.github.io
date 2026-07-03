@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#050816" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="BRS" />
+    <title>Brainrot Resistance Score</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="system-grid" aria-hidden="true"></div>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Daily quest protocol</p>
+        <h1>Brainrot Resistance Score</h1>
+      </div>
+      <div class="date-pill" id="todayLabel"></div>
+    </header>
+
+    <nav class="tabs" aria-label="Primary sections">
+      <button class="tab is-active" data-tab="dashboard">Status</button>
+      <button class="tab" data-tab="log">Quests</button>
+      <button class="tab" data-tab="history">Archive</button>
+      <button class="tab" data-tab="bosses">Raids</button>
+      <button class="tab" data-tab="settings">System</button>
+    </nav>
+
+    <main>
+      <section id="dashboard" class="tab-panel is-active">
+        <div class="score-hero card">
+          <div>
+            <p class="label">Current resistance</p>
+            <div class="net-score" id="netScore">0</div>
+            <p class="rank" id="dailyRank">Brainrot Goblin</p>
+          </div>
+          <div class="progress-block">
+            <div class="progress-label">
+              <span>Daily clear condition</span>
+              <span id="dailyProgressText">0 / 25</span>
+            </div>
+            <div class="progress-bar">
+              <div id="dailyProgress" class="progress-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <article class="card stat-card positive-flash-target">
+            <span class="label">XP gained</span>
+            <strong id="todayPoints">0</strong>
+          </article>
+          <article class="card stat-card negative-flash-target">
+            <span class="label">Corruption</span>
+            <strong id="todayPenalties">0</strong>
+          </article>
+          <article class="card stat-card">
+            <span class="label">Clear streak</span>
+            <strong id="currentStreak">0</strong>
+          </article>
+          <article class="card stat-card">
+            <span class="label">Best streak</span>
+            <strong id="longestStreak">0</strong>
+          </article>
+        </div>
+
+        <section class="card">
+          <div class="section-heading">
+            <div>
+              <p class="label">Hunter progression</p>
+              <h2 id="levelName">Brainrot Goblin</h2>
+            </div>
+            <strong id="lifetimeXp">0 XP</strong>
+          </div>
+          <div class="progress-label">
+            <span id="levelProgressLabel">Level progress</span>
+            <span id="levelProgressText">0 / 100</span>
+          </div>
+          <div class="progress-bar level">
+            <div id="levelProgress" class="progress-fill"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-heading">
+            <h2>Quest Log</h2>
+            <button class="ghost-button danger" id="resetTodayBtn">Reset Day</button>
+          </div>
+          <div id="todayEntries" class="entry-list empty-host"></div>
+        </section>
+
+        <section class="card rules-card">
+          <h2>System Rules</h2>
+          <ul>
+            <li>Consumption only earns points if it produces output.</li>
+            <li>Reading without notes = 0.</li>
+            <li>Videos without notes = 0.</li>
+            <li>Passive scrolling always costs points.</li>
+            <li>Phone in bed is always negative.</li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="log" class="tab-panel">
+        <section class="card">
+          <div class="section-heading">
+            <h2>Quest Board</h2>
+            <span class="subtle">Accept productive quests or record corruption events.</span>
+          </div>
+          <div id="activityGroups" class="activity-groups"></div>
+        </section>
+
+        <section class="card">
+          <h2>Create Custom Quest</h2>
+          <form id="customActivityForm" class="custom-form">
+            <label>
+              Quest Name
+              <input id="customName" type="text" placeholder="e.g. Deep reading notes" required />
+            </label>
+            <label>
+              Category
+              <input id="customCategory" type="text" placeholder="e.g. Knowledge" required />
+            </label>
+            <label>
+              XP
+              <input id="customPoints" type="number" min="-100" max="100" step="1" value="5" required />
+            </label>
+            <button type="submit" class="primary-button">Register Quest</button>
+          </form>
+        </section>
+      </section>
+
+      <section id="history" class="tab-panel">
+        <div class="stat-grid history-stats">
+          <article class="card stat-card">
+            <span class="label">7-day average</span>
+            <strong id="average7">0</strong>
+          </article>
+          <article class="card stat-card">
+            <span class="label">30-day average</span>
+            <strong id="average30">0</strong>
+          </article>
+          <article class="card stat-card">
+            <span class="label">Best clear</span>
+            <strong id="bestDay">0</strong>
+          </article>
+          <article class="card stat-card">
+            <span class="label">All-time points / penalties</span>
+            <strong id="totalsAllTime">0 / 0</strong>
+          </article>
+        </div>
+
+        <section class="card">
+          <h2>Last 7 Days</h2>
+          <div id="last7Days" class="history-list empty-host"></div>
+        </section>
+
+        <section class="card">
+          <h2>Last 30 Days</h2>
+          <div id="last30Days" class="history-list empty-host"></div>
+        </section>
+      </section>
+
+      <section id="bosses" class="tab-panel">
+        <section class="card">
+          <div class="section-heading">
+            <div>
+              <h2>Weekly Raid Gates</h2>
+              <p class="subtle" id="weekLabel"></p>
+            </div>
+            <span class="reward-badge">+50 each</span>
+          </div>
+          <div id="bossList" class="boss-list"></div>
+        </section>
+      </section>
+
+      <section id="settings" class="tab-panel">
+        <section class="card">
+          <h2>System Data</h2>
+          <div class="settings-actions">
+            <button class="primary-button" id="exportBtn">Export JSON</button>
+            <label class="file-button">
+              Import JSON
+              <input id="importInput" type="file" accept="application/json" />
+            </label>
+            <button class="ghost-button danger" id="clearAllBtn">Clear All Data</button>
+          </div>
+          <textarea id="exportOutput" readonly placeholder="Exported JSON will appear here."></textarea>
+        </section>
+
+        <section class="card">
+          <h2>Storage Protocol</h2>
+          <p class="subtle">
+            Entries, custom activities, and weekly boss checklist state are stored only in this browser.
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
