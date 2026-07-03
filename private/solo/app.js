@@ -499,14 +499,16 @@ function renderBosses() {
 function renderSyncSettings() {
   const config = loadSyncConfig();
   const syncedIds = getSyncedIds();
+  const total = state.entries.length;
   const pending = state.entries.filter((entry) => !syncedIds.has(entry.id)).length;
+  const synced = Math.max(0, total - pending);
   const urlInput = $("#syncUrl");
   const secretInput = $("#syncSecret");
-  if (!urlInput || document.activeElement === urlInput || document.activeElement === secretInput) return;
-  urlInput.value = config.url;
-  secretInput.value = config.secret;
+  if (!urlInput) return;
+  if (document.activeElement !== urlInput) urlInput.value = config.url;
+  if (document.activeElement !== secretInput) secretInput.value = config.secret;
   $("#syncStatus").textContent = config.url && config.secret
-    ? `${pending} unsynced entr${pending === 1 ? "y" : "ies"}.`
+    ? `${pending} unsynced, ${synced} marked synced, ${total} total.`
     : "Not configured.";
 }
 
@@ -650,6 +652,17 @@ function bindEvents() {
     syncEntries({ silent: false });
   });
 
+  $("#retryAllSyncBtn").addEventListener("click", () => {
+    if (!state.entries.length) {
+      showToast("No logged entries yet");
+      return;
+    }
+    if (!confirm("Reupload every logged entry to Google Sheets? This may create duplicate rows.")) return;
+    localStorage.removeItem(SYNCED_IDS_KEY);
+    renderSyncSettings();
+    syncEntries({ silent: false, forceAll: true });
+  });
+
   $("#clearSyncBtn").addEventListener("click", () => {
     if (!confirm("Clear stored Google Sheets sync URL, secret, and synced-entry markers?")) return;
     localStorage.removeItem(SYNC_CONFIG_KEY);
@@ -695,7 +708,7 @@ function importBackup(event) {
   reader.readAsText(file);
 }
 
-async function syncEntries({ silent = false, entries = null } = {}) {
+async function syncEntries({ silent = false, entries = null, forceAll = false } = {}) {
   const config = loadSyncConfig();
   if (!config.url || !config.secret) {
     if (!silent) alert("Save your Apps Script URL and sync secret first.");
@@ -709,9 +722,9 @@ async function syncEntries({ silent = false, entries = null } = {}) {
 
   const syncedIds = getSyncedIds();
   const candidates = entries || state.entries;
-  const unsyncedEntries = candidates.filter((entry) => !syncedIds.has(entry.id));
+  const unsyncedEntries = forceAll ? candidates : candidates.filter((entry) => !syncedIds.has(entry.id));
   if (!unsyncedEntries.length) {
-    if (!silent) showToast("Nothing to sync");
+    if (!silent) showToast(state.entries.length ? "Nothing new to sync" : "No logged entries yet");
     renderSyncSettings();
     return;
   }
